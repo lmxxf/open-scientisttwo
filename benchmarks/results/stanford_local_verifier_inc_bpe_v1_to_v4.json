@@ -1,0 +1,230 @@
+[
+  {
+    "pdf": "/tmp/st-bpe-v1/manuscript.pdf",
+    "seconds": 55.87,
+    "numerical_score": 3.8,
+    "fine_weighted_score": 5.09,
+    "positive_count": 1,
+    "neutral_count": 4,
+    "negative_count": 2,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": -1,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The local equivalence and certificate arguments hold under stated assumptions, and empirical claims are carefully qualified. Complete tokenizer correctness is inherited, while component attribution and performance scope remain limited.",
+      "Experimental_Soundness": "The intended region subtraction controls fail because of a configuration-key mismatch. Compilation is not cleanly isolated, and randomized paired comparisons, uncertainty estimates, realistic scaling, and resource measurements are absent.",
+      "Writing_Clarity": "The technical exposition is understandable, but main-text artifact paths, execution labels, and audit-oriented trajectory reporting prevent a clean standalone academic presentation.",
+      "Prior_Work_Context": "The bibliography contains only one paper and omits the second directly relevant retrieved work. Formal differentiation against the closest online-tokenization alternatives is inadequate.",
+      "Question_Importance": "Exact incremental tokenization and reliable streaming behavior are important problems for language-model infrastructure.",
+      "Originality": "Compiling a tree predicate into sets and using forbidden adjacencies as sufficient boundaries form a useful specialization, but the manuscript does not demonstrate a nontrivial new algorithmic synthesis.",
+      "Value_to_Community": "The precise local characterization and candid negative evidence could support a useful technical note, but the small workload and unresolved scaling and attribution constrain broader value."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.0,
+      "Experimental_Soundness": 3.0,
+      "Writing_Clarity": 5.5,
+      "Prior_Work_Context": 2.5,
+      "Question_Importance": 8.0,
+      "Originality": 4.0,
+      "Value_to_Community": 4.5
+    },
+    "sections": {
+      "summary": "The manuscript studies a Python optimization of exact incremental BPE: compiling a successor-tree acceptance predicate into membership sets, arranging suffix candidates, and identifying vocabulary-certified region boundaries. The predicate-equivalence argument and boundary certificate are sound under the stated assumptions. Experiments demonstrate exact agreement on a small workload and descriptive append-time improvements, but do not establish scalable performance or isolate all components.",
+      "strengths": "The manuscript carefully distinguishes predicate equivalence from complete tokenizer correctness. It explicitly states expected hash-table complexity, vocabulary-dependent preprocessing, linear history storage, and potentially quadratic cumulative reconstruction output. Every evaluated prefix is compared with an independent ranked-merge reference. The authors candidly disclose broken region ablations, missing uncertainty estimates, and the absence of a paired test baseline rather than claiming unsupported benefits.",
+      "weaknesses": "The evaluation uses only 72 merges and three short streams totaling 2,304 bytes per full evaluation. Region-removal ablations use an unrecognized configuration key, invalidating the intended factorial comparison. Candidate ordering and record construction lack separate removal controls, and the compilation control retains acknowledged implementation differences. There are no confidence intervals, randomized paired timing comparisons, production-scale vocabularies, adversarial stress tests, construction-time measurements, or allocated-memory measurements. Hardware and interpreter details are absent. Related work cites only one paper and omits the second directly relevant work supplied in retrieved_literature.json. The presentation remains substantially an artifact audit rather than a standalone research article.",
+      "detailed_comments": "1. Mathematical validity: The acceptance-set identity follows directly from the unique successor-tree path: a proper descendant reaches p(t) through exactly one child, so the rank condition selects precisely the stated subtrees. The boundary certificate is also valid because any token crossing the boundary must contain the forbidden adjacency. These are useful local propositions, but neither establishes the complete last-token characterization. That characterization is inherited without a sufficiently self-contained theorem specifying all vocabulary and tie-breaking assumptions and explaining why the first valid suffix candidate is correct. Reconstruction similarly depends on the inherited history characterization. I do not find a demonstrated contradiction in the local proofs, but their scope must remain limited.\n2. Computational tradeoff: Replacing pointer traversal with materialized sets is a conventional preprocessing-versus-query tradeoff. The manuscript correctly avoids claiming the cited deterministic logarithmic bound. Its O(RM) storage bound can become prohibitive at realistic vocabulary sizes, and the reported 23,616-entry upper bound is not a memory measurement. Excluding construction and tokens() from timing leaves session-level and reconstruction benefits untested.\n3. Experimental identification: The reported 58.23% validation latency reduction describes the complete selected implementation relative to its local baseline. It cannot identify the gain attributable to compilation alone. The approximately 19.47% slowdown in the compilation-removal configuration is suggestive, but acknowledged implementation differences and missing paired uncertainty estimates prevent clean causal attribution. The region controls do not remove the region mechanism, so their near-equal timings are uninformative about its value. Honest disclosure does not repair the experimental design.\n4. Statistical support: Seven-pass medians without raw distributions or confidence intervals are insufficient to resolve small differences among optimized variants. A permitted 50% rerun variation is a reproducibility tolerance, not an uncertainty estimate. Prefix checks are correlated correctness checks, not independent statistical trials. Seed-separated streams from the same fixed corpus provide a narrow held-out evaluation; they do not establish cross-domain generalization. The final test appropriately avoids reporting an unavailable test speedup.\n5. Prior work and novelty: The supplied literature includes Online Tokenization with Optimal Delay in Linear Time, which addresses online output delay, throughput, and input-size-independent memory. Its abstract does not establish that it uses the same acceptance compilation, so anticipation cannot be asserted from this evidence. Nevertheless, omitting it leaves the region/eager-output and memory positioning incomplete. Against Incremental BPE Tokenization, the manuscript acknowledges inherited semantics and successor relationships; the remaining contribution appears to be a straightforward implementation specialization rather than a new algorithmic framework.\n6. Presentation: The technical explanations are readable, but main-text snapshot paths, configuration filenames, baseline/seed/evolved/rebuttal labels, the mse timing alias, and the trajectory table give the paper the structure of an internal audit. Replace these with mechanism-named methods, theorem statements, executable-style pseudocode, and focused comparison tables. Move artifact provenance and failed configuration histories to supplementary material. Some formula and character corruption may arise from PDF extraction and should be checked against the PDF rather than automatically attributed to authoring.",
+      "questions": "Can the authors state and justify the complete last-token theorem under explicit canonicality, rank, duplicate-token, and tie-breaking assumptions? Can they rerun a true compilation-by-region factorial experiment using recognized controls and identical implementations otherwise, with separate controls for candidate ordering and record construction? Do randomized paired measurements support the observed gains with confidence intervals? How do preprocessing time, peak allocated memory, append latency, and reconstruction cost scale with realistic vocabulary sizes, stream lengths, and adversarial inputs? What hardware, Python version, and measurement conditions produced the results? How does the contribution differ technically from both retrieved online-tokenization works?",
+      "assessment": "I recommend rejection in the current form. The local propositions and transparent reporting have merit, but the contribution is incremental and the experimental evidence is too small and insufficiently isolated for an ICLR research contribution. My assessment concerns the submitted manuscript and supplied literature; it does not constitute an independent execution or source-code verification."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  },
+  {
+    "pdf": "/tmp/st-bpe-v2/manuscript.pdf",
+    "seconds": 53.32,
+    "numerical_score": 4.4,
+    "fine_weighted_score": 5.72,
+    "positive_count": 1,
+    "neutral_count": 5,
+    "negative_count": 1,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": 0,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The central conditional equivalence appears sound and empirical claims are restrained, but batch equivalence relies on an externally supplied recurrence and mechanism-specific performance remains unverified.",
+      "Experimental_Soundness": "Fixed execution order and mismatched cached ablations fail to isolate the final method; realistic scale, deep-forest stress tests, and strong controlled baselines are absent.",
+      "Writing_Clarity": "The mathematics and limitations are understandable, but internal filenames, historical configurations, exhaustive artifact inventories, and redundant metrics substantially clutter the article.",
+      "Prior_Work_Context": "The bibliography supplies relevant context, but formal differentiation is limited and the closest additional retrieved component-weighted centroid work is omitted.",
+      "Question_Importance": "Exact incremental tokenization with explicit correctness and resource guarantees is important for streaming language-model systems.",
+      "Originality": "Rank-ordered subtree compilation is a neat specialization of established DFS interval indexing, with no demonstrated broader algorithmic synthesis or improved complete-update bound.",
+      "Value_to_Community": "The characterization and candid reproducibility analysis could be useful, but the small workload and unresolved practical contribution constrain their current value."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.5,
+      "Experimental_Soundness": 3.5,
+      "Writing_Clarity": 5.0,
+      "Prior_Work_Context": 5.0,
+      "Question_Importance": 8.0,
+      "Originality": 5.0,
+      "Value_to_Community": 5.0
+    },
+    "sections": {
+      "summary": "The paper compiles a ranked successor-forest acceptance predicate for incremental BPE into at most two DFS intervals per merge. The conditional representation theorem appears correct, including strict-rank overlap exclusion. The implementation reports substantial aggregate append-speed improvements, but its experiments do not establish a practical benefit from the central interval mechanism.",
+      "strengths": "The rank-ordered DFS argument is concise and sound under the stated predecessor-validity assumption. The paper carefully distinguishes constant-time membership from complete append complexity and linear output reconstruction. It explicitly acknowledges ineffective interval ablation, incomplete memory accounting, timing uncertainty, and initialization amortization issues rather than claiming unsupported causal gains.",
+      "weaknesses": "Evaluation uses only 72 merges, maximum token length six, successor depth four, and three short corpus-derived streams. The final configuration lacks orthogonal subtraction ablations; the cached pointer comparison retains interval construction and differs by only approximately 0.086%. Execution order is fixed, raw paired measurements are unavailable, and the seed-based test split provides limited distributional separation. Closest retrieved work is incompletely addressed. Extensive artifact inventories, snapshot paths, configuration history, and redundant metric listings make the manuscript read like an audit report.",
+      "detailed_comments": "Theorem 1 correctly follows because rank-ordered child subtrees partition the parent's proper descendants into a forbidden prefix and an admissible suffix. Updating the current rule's successor cutoff before querying its predecessor cutoff correctly excludes the equal-rank subtree when both merge operands coincide. The linear compilation scan is plausible and consistent with the stated ordering. Proposition 2 establishes preservation of an assumed recurrence, however, rather than independently proving that recurrence equivalent to batch BPE; the antecedent must be stated and sourced formally instead of relying on baseline_paper.md. The materialization lower bound is correct but elementary. The reported 2.683-fold test append speedup is an integrated implementation result against a dynamically sorted pointer baseline, not evidence for interval compilation. A preordered pointer baseline with identical transitions, bypass, and cache settings is essential. Seven fixed-stream repetitions and normal-approximation intervals do not establish dataset-level confidence or significance of the near-zero mechanism difference. Hardware and selected allocation sizes are disclosed, but historical timing provenance, total peak memory, and realistic vocabulary scaling remain unresolved. Related work covers the cited entries but omits the retrieved Component-Weighted Centroid Search for Exact Incremental BPE, which reports O(log T) updates and real-vocabulary experiments. Formalizing BPE Tokenization already discusses incremental execution and finite-state transducers; the technical novelty boundary needs sharper treatment. The present theorem is a useful ordered-tree specialization, but the manuscript does not establish a substantial algorithmic advance beyond established subtree indexing.",
+      "questions": "Can the authors state the exact assumptions and a formal citation for the predecessor-validity recurrence, including vocabulary uniqueness and tie handling? How does the representation differ technically from the closest incremental and finite-state formulations, including the retrieved component-weighted centroid method? Does interval validation help against an otherwise identical cache-disabled, preordered pointer implementation when interval construction is actually removed? What happens across realistic vocabularies and controlled increasing successor depths? Can randomized process-level paired measurements, confidence intervals for speedup, peak memory, and fully charged end-to-end initialization and reconstruction costs be provided?",
+      "assessment": "Reject in the present form. The conditional theorem and transparent limitations support a potentially useful technical note, but empirical mechanism isolation, novelty differentiation, realistic scale, and standalone presentation are insufficient for an ICLR research paper. This assessment is based on the supplied manuscript and retrieved literature; no new experiments were executed."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  },
+  {
+    "pdf": "/tmp/st-bpe-v3/manuscript.pdf",
+    "seconds": 355.54,
+    "numerical_score": 3.8,
+    "fine_weighted_score": 5.43,
+    "positive_count": 1,
+    "neutral_count": 4,
+    "negative_count": 2,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": -1,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The central interval equivalence is sound and claims are mostly qualified, but full greedy correctness is inherited conditionally and empirical mechanism attribution remains unresolved.",
+      "Experimental_Soundness": "Primary paired timing is careful, but the central stress protocol is non-randomized, its predicate microbenchmark misses the intended traversal, and final-method subtraction effects lack direct paired verification.",
+      "Writing_Clarity": "The mathematics and algorithm are understandable, but extensive internal paths, trial logs, configuration details, and redundant metrics prevent a clean standalone presentation.",
+      "Prior_Work_Context": "Several relevant works are discussed, but the supplied directly competing Component-Weighted Centroid Search paper is entirely omitted and formal differentiation is incomplete.",
+      "Question_Importance": "Exact incremental tokenization with predictable worst-case costs is important for streaming language-model systems.",
+      "Originality": "Rank-threshold compilation into preorder intervals is a neat specialization of established tree geometry; a substantially new algorithmic synthesis is not established.",
+      "Value_to_Community": "The characterization could make a useful technical note, but tiny workloads, incomplete comparisons, and unresolved practical attribution constrain broader value."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.0,
+      "Experimental_Soundness": 3.5,
+      "Writing_Clarity": 5.0,
+      "Prior_Work_Context": 3.5,
+      "Question_Importance": 8.0,
+      "Originality": 5.0,
+      "Value_to_Community": 5.0
+    },
+    "sections": {
+      "summary": "The paper compiles a ranked successor-forest acceptance predicate into a parent singleton and a contiguous DFS interval, giving worst-case constant-time membership with O(R) region storage. The representation proof is sound under the stated predicate. An integrated tokenizer reports a 3.088\u00d7 local-baseline speedup, but the experiments do not establish that interval compilation causes this gain.",
+      "strengths": "Theorem 1 correctly exploits the contiguity of rank-ordered child subtrees, including empty suffixes and strict rank thresholds. The pointer-to-interval equivalence argument is clear. The paper distinguishes predicate complexity from whole-tokenizer complexity and acknowledges conditional greedy correctness. Primary measurements include randomized paired timing, Student-t confidence intervals, and independent greedy checks at 2,304 prefixes. Removing redundant DFS history is a useful subtraction result.",
+      "weaknesses": "Evaluation is extremely small: 72 learned merges, maximum token length six, and three streams totaling 2,304 bytes from the vocabulary-training corpus. The optimized pointer variant is faster on the primary workload. Synthetic comparisons use fixed execution order, jointly vary several factors, lack confidence intervals and independent greedy verification, and include a predicate microbenchmark that fails to exercise the intended deep traversal. Component removals are measured against an earlier parent without direct paired uncertainty. Hardware/interpreter metadata and total or peak memory are missing. The retrieved Component-Weighted Centroid Search for Exact Incremental BPE is omitted. Main-text snapshot paths, configuration dumps, historical trials, and duplicated metric listings make the manuscript read substantially like an audit report.",
+      "detailed_comments": "1. Mathematical validity: Theorem 1 follows correctly because admissible children form a suffix in rank order and preorder makes their subtrees adjacent. Proposition 2 then preserves candidate decisions by induction. Neither proves the inherited canonical-vocabulary recurrence against global greedy BPE; Proposition 3 explicitly assumes the needed removal property. A standalone presentation should state the inherited correctness theorem precisely, identify its source, and establish that the manuscript's canonicality and tie-breaking assumptions satisfy its hypotheses.\n2. Complexity: O(1) membership is justified under standard word-RAM indexing assumptions. Append remains O(K), region compilation includes O(R log(1+Delta)) searches, and total storage includes dense transitions, candidate incidences, and growing history. These distinctions are appropriately acknowledged. The contribution is a useful specialization of standard preorder interval geometry, rather than a demonstrated new whole-tokenizer complexity result.\n3. Attribution: The 3.088\u00d7 comparison combines transition layout, candidate layout, inline execution, and fast paths. The same-system pointer median is 3.4710 versus 3.5792 for intervals, so the primary experiment supplies no positive latency evidence for the central representation change. This does not refute its worst-case guarantee, but substantially limits empirical attribution.\n4. Experimental controls: Randomized primary comparisons and fixed-workload paired confidence intervals are positive features. They measure timing variability, not generalization across documents or machines. The synthetic fixed-order protocol and ineffective deep-path microbenchmark leave the claimed depth-related practical benefit insufficiently isolated. A full factorial study is unnecessary, but directly paired removals from the final configuration and a controlled depth-only experiment are needed.\n5. Prior work: The supplied literature explicitly includes Component-Weighted Centroid Search for Exact Incremental BPE, which claims O(log L) whole-byte updates, adversarial probe-count separation, a Rust implementation, and six real vocabularies. Its omission materially weakens positioning. Formalizing BPE Tokenization also explicitly discusses incremental and finite-state approaches; its relationship to the proposed transducer deserves technical discussion. Abstracts alone do not establish that the interval construction was previously published, so I do not infer duplication.\n6. Reporting and presentation: Concrete dense-array payload and shallow tuple sizes are helpful, but logical entry counts do not establish memory savings. Hardware, interpreter, full retained-memory accounting, and production-scale construction costs remain necessary. Remove internal trial identifiers, source-hash assertions, workspace-review commentary, and redundant raw metric tables from the main article. Some extracted tables have missing columns or truncated text; the submitted PDF should be checked before attributing those defects to typesetting.",
+      "questions": "Can the authors state and justify the exact inherited recurrence theorem, including canonicality and equal-rank overlap assumptions? How does the construction relate technically to Component-Weighted Centroid Search, and can it improve that algorithm's relevant predicate without changing its other guarantees? Does an identical-layout, randomized paired predicate comparison show an advantage when actual traversed depth is controlled? Do the retained components still help when individually removed from the final configuration? What are throughput, construction time, and peak memory on realistic vocabularies and independently sourced long documents, with hardware and interpreter specified?",
+      "assessment": "Reject in its current form. I find the interval representation correct and potentially useful, but its novelty is modestly established, the closest retrieved follow-up is missing, and the experimental mechanism evidence is inadequate for a strong ICLR contribution. Transparent acknowledgment of limitations improves credibility but does not replace the missing controls or a standalone research presentation."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  },
+  {
+    "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/inc_bpe_v4/manuscript.pdf",
+    "seconds": 48.72,
+    "numerical_score": 5.2,
+    "fine_weighted_score": 6.26,
+    "positive_count": 1,
+    "neutral_count": 6,
+    "negative_count": 0,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": 0,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": 0,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The core compilation and certificate arguments appear valid conditionally, and limitations are acknowledged; empirical attribution and generality remain insufficient for +1.",
+      "Experimental_Soundness": "Randomized paired primary comparisons and exhaustive primary-prefix checks support a careful local prototype, but tiny workloads, incomplete subtraction controls, fixed-order scaling, and local baselines prevent +1.",
+      "Writing_Clarity": "The exposition is technically organized, with proofs and pseudocode, but experiment-history narration and trajectory-manifest clutter prevent a clean standalone-paper rating.",
+      "Prior_Work_Context": "The bibliography and several technical distinctions are adequate, but the closest retrieved centroid-search improvement is omitted and the interval-compilation novelty boundary remains unresolved.",
+      "Question_Importance": "Exact incremental tokenization with predictable computational costs is important for streaming language-model systems.",
+      "Originality": "Rank-ordered preorder intervals and an offline cutoff sweep form a neat specialization of established tree-query techniques; a genuinely new algorithmic synthesis beyond that is not established.",
+      "Value_to_Community": "The characterization and transparent measurements are potentially useful, but evidence currently supports a small technical note rather than broadly validated practical impact."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.5,
+      "Experimental_Soundness": 5.0,
+      "Writing_Clarity": 6.5,
+      "Prior_Work_Context": 5.5,
+      "Question_Importance": 8.0,
+      "Originality": 5.5,
+      "Value_to_Community": 6.0
+    },
+    "sections": {
+      "summary": "The paper compiles an inherited exact incremental BPE acceptance predicate into two preorder intervals, constructs their cutoffs with a linear rank sweep, and adds conservative static acceptance certificates. The interval and certificate arguments appear correct under the stated canonical-vocabulary and prefix-last-token assumptions. Experiments demonstrate a useful small Python prototype, but neither production-scale performance nor fully isolated component benefits.",
+      "strengths": "The two-interval characterization is simple and precise. The cutoff sweep correctly updates before querying, including self-overlapping rules. Certificate soundness accounts for tokens extending beyond the recognizer state's left boundary. Complexity accounting separates linear forest compilation from recognizer construction, certification, candidate enumeration, and history storage. The paper explicitly distinguishes the 4.072-fold integrated speedup from the 1.119-fold acceptance-mode comparison and reports randomized primary timings, timing confidence intervals, initialization costs, and traced memory.",
+      "weaknesses": "The primary evaluation contains only 72 merges and 2,304 bytes per split; held-out sequences share the vocabulary-training source corpus. Synthetic scaling reaches only 512 merges, varies depth and vocabulary size together, uses fixed variant order, and lacks equally exhaustive prefix verification. Certificate removal has no paired difference interval, while candidate ordering and tuple unpacking have no individual subtraction controls. External tokenizer implementations are not benchmarked. The retrieved component-weighted centroid-search work is omitted despite addressing the same incremental BPE objective. Main-text experiment-history narration and the trajectory appendix weaken the standalone research presentation.",
+      "detailed_comments": "Theorem 1 follows from contiguous preorder child subtrees and rank-ordered siblings. Theorem 2's invariant also checks out: updating C[s(t)] to U[t] advances the appropriate parent's forbidden-prefix boundary, and reading afterward implements strict rank exclusion. Proposition 3 is a valid conservative suffix-compatibility argument. Proposition 4 is conditional on an inherited semantic characterization rather than an independent derivation of exact incremental BPE; the paper should define canonicality operationally and identify precisely the prior result that supplies both last-token selection and reconstruction compatibility. The O(1) result concerns each acceptance query, whereas the implemented tokenizer remains O(nB), a distinction the manuscript generally maintains honestly. Empirically, the integrated comparison establishes a substantial local implementation improvement, but the acceptance-mode control also changes dispatch, so it does not isolate interval arithmetic alone. The certificate result is inconclusive as an independently quantified speed benefit: overlapping marginal intervals do not themselves test the difference, and a paired removal experiment is needed. Its construction cost rises from 0.8152 to 5.9705 ms, making workload-dependent amortization central. Hardware and memory reporting are unusually explicit, although traced Python allocations are not resident memory and affinity/clock stability are not independently demonstrated. The supplied literature includes Component-Weighted Centroid Search for Exact Incremental BPE, reporting O(log B) updates and six real vocabularies; this requires a direct technical discussion alongside the cited O(log\u00b2 B) predecessor. Existing related-work comparisons are useful but do not establish that the interval compilation itself is absent from the closest algorithms. The manuscript has clear theorem/proof structure and pseudocode, but exploratory variant results, internal experiment labels, and the appendix's unexplained 'mse' column should be replaced by a concise research-focused presentation. Some table and link problems may arise from PDF extraction and should be checked against the submitted PDF.",
+      "questions": "What exact canonical-vocabulary conditions make the inherited last-token characterization and reconstruction valid, and where are they established? How does interval compilation relate technically to the retrieved component-weighted centroid search, and can it complement that search? Do randomized paired certificate-removal measurements show a reliable benefit, and what are certificate counts and runtime hit rates? Do gains persist on production vocabularies, independent corpora, and longer streams when construction and reconstruction are included? Can depth, vocabulary size, candidate frequency, and dispatch changes be varied independently?",
+      "assessment": "Weak reject. The conditional mathematical result is sound and the reporting is candid, but the contribution currently fits a useful technical specialization more closely than a sufficiently validated ICLR algorithmic advance. Production-scale evaluation, stronger mechanism isolation, and differentiation from the closest retrieved work are the principal missing evidence."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  }
+]

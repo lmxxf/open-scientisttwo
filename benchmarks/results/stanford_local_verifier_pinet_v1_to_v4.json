@@ -1,0 +1,230 @@
+[
+  {
+    "pdf": "/tmp/st-pinet-v1/manuscript.pdf",
+    "seconds": 52.05,
+    "numerical_score": 3.1,
+    "fine_weighted_score": 4.74,
+    "positive_count": 1,
+    "neutral_count": 3,
+    "negative_count": 3,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": -1,
+      "Question_Importance": 1,
+      "Originality": -1,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The convexity and equality-reduction arguments hold under stated assumptions, and claims are appropriately restricted, but empirical isolation and numerical certification remain incomplete.",
+      "Experimental_Soundness": "The subtraction suite includes an explicitly confounded switch, while randomized paired timing, uncertainty estimates, strong solver baselines, and meaningful scale stress tests are missing.",
+      "Writing_Clarity": "The method and limitations are understandable, but candidate-search logs, opaque experiment labels, and an interface-specific score table clutter the main article.",
+      "Prior_Work_Context": "Only Pinet is cited; relevant active-set Newton and null-space Newton works supplied in the retrieved literature are omitted.",
+      "Question_Importance": "Efficient optimization under hard equality and bound constraints is important for constrained prediction and optimization layers.",
+      "Originality": "The method combines established equality elimination and active-face Newton machinery; pruning unused stages on this small workload does not establish a nontrivial new algorithm.",
+      "Value_to_Community": "The honest characterization and local pruning result could support a useful technical note, but the small workload and limited comparisons constrain broader value."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.0,
+      "Experimental_Soundness": 3.5,
+      "Writing_Clarity": 5.5,
+      "Prior_Work_Context": 2.0,
+      "Question_Importance": 7.0,
+      "Originality": 2.5,
+      "Value_to_Community": 4.5
+    },
+    "sections": {
+      "summary": "The manuscript studies a small CPU solver for equality- and box-constrained objectives, combining SVD-based equality elimination with conventional active-face Newton updates. It reports near-machine-precision feasibility and clipped objective gaps, with approximately 3.85\u00d7 lower validation runtime than a fixed-budget lifted splitting baseline. The strong-convexity calculation is sound, and the manuscript carefully limits its conclusions. However, the experiments are too small and insufficiently controlled to establish robust comparative performance, and the contribution remains a conventional implementation specialization.",
+      "strengths": "The Hessian bound correctly establishes strong convexity on the specified box. The reference construction supplies a valid optimality certificate when feasibility and bound-normal signs hold. The manuscript explicitly distinguishes forward optimization from learned projection layers, acknowledges the lack of a convergence guarantee, and avoids claiming arbitrary nonconvex optimization performance. Removing preliminary splitting and row equilibration is a useful local simplification. A separately seeded post-selection test is reported.",
+      "weaknesses": "Each full evaluation contains only six synthetic instances, with dimensions at most 64. Comparisons lack randomized execution order, paired timing distributions, confidence intervals, and optimized solver baselines. One purported subtraction ablation also disables active-face optimization, preventing isolated attribution. Hardware, numerical-library configuration, and measured peak memory are absent. The bibliography contains only one paper and omits relevant works already present in retrieved_literature.json. The main text contains extensive candidate-search bookkeeping and interface-specific labels, weakening its presentation as a standalone research article.",
+      "detailed_comments": "Mathematical assessment: For symmetric Q with minimum eigenvalue 0.3, alpha at most 0.8, and coordinates in [-0.25, 0.25], the stated lower bound 0.3 - 0.8 sin(0.25) > 0.102 is correct. Strong convexity gives uniqueness provided the feasible set is nonempty; the planted feasible construction supplies that condition for the benchmark. Equality elimination is valid for a consistent system under the stated numerical-rank interpretation. The active-face block equations and bound-multiplier sign convention are consistent with constrained Newton updates. These observations do not prove convergence of the implemented algorithm: intermediate iterates can be infeasible, full Newton steps are unglobalized, simultaneously added bounds can produce inconsistent working sets, and least squares does not make such systems exactly satisfiable. Returning the last finite iterate after 12 iterations is not a certificate. The manuscript appropriately acknowledges these limitations, but external aggregate objective and feasibility metrics do not replace per-instance stationarity certificates.\n\nExperimental assessment: The reported validation ratio is consistent with 1.582411/0.411122, but three timing repetitions per context cannot establish its uncertainty or robustness. Independent seeds provide a useful held-out check, but six instances per split do not characterize sensitivity to equality rank, active-set size, conditioning, degeneracy, or dimension. No matched final-test baseline is reported. The lifted baseline is redundant and fixed to 40 steps, so its comparison does not establish competitiveness against optimized active-set, interior-point, or reduced-space solvers at matched accuracy. Clipped objective gaps must be interpreted jointly with feasibility; signed gaps and full KKT residuals would make the numerical-accuracy claim more assessable. The row-scaling subtraction shows no meaningful accuracy loss, while the box/primal-dual subtraction is explicitly confounded with removal of active-face optimization. Thus the ablation suite does not satisfy clean orthogonal mechanism isolation. The matrix-byte estimate and asymptotic storage bound are useful, but neither substitutes for measured peak memory and a specified CPU, BLAS/LAPACK backend, thread count, software environment, and timing protocol.\n\nNovelty and presentation: The retrieved Active-set Newton-MR paper already studies Newton methods within active faces and provides globalization and complexity guarantees. The retrieved null-space inexact Newton paper demonstrates reduced Newton systems and factorization reuse in another application. Neither abstract establishes exact equivalence to this implementation, but both require explicit technical comparison. The manuscript's statement that the supplied reference collection contains only Pinet overlooks the search_results entries. Equality elimination, active-set Newton equations, and early stopping are established components; the current evidence supports a workload-specific engineering simplification rather than a fresh algorithmic synthesis. The search-record paragraph and table entries such as seed0_full, ablation0, and rebuttal0 should be replaced by descriptive scientific comparisons, with search bookkeeping moved out of the main paper.",
+      "questions": "1. Can the authors report per-instance signed objective gaps, full KKT residuals, iteration counts, active-set sizes, numerical ranks, and termination reasons? 2. Does the speed advantage persist against optimized solvers at matched feasibility and stationarity tolerances, using randomized paired timing and confidence intervals? 3. Can the implementation expose independent switches for active-face updates and box/primal-dual processing, enabling genuinely isolated subtraction ablations? 4. How does performance change with larger dimensions, near-dependent equalities, narrow feasible regions, degenerate bounds, and substantially worse conditioning? 5. What precise distinction from existing active-set Newton and null-space Newton methods constitutes the research contribution?",
+      "assessment": "Reject in its current form. The manuscript is candid and mathematically coherent as a local implementation study, but its limited novelty, inadequate prior-work coverage, confounded ablation, and weak comparative experimental evidence fall below the standard for an ICLR research contribution. The reported numbers are manuscript evidence; I did not independently reproduce them."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  },
+  {
+    "pdf": "/tmp/st-pinet-v2/manuscript.pdf",
+    "seconds": 65.31,
+    "numerical_score": 4.4,
+    "fine_weighted_score": 5.47,
+    "positive_count": 1,
+    "neutral_count": 5,
+    "negative_count": 1,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": 0,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The conditional mathematical claims hold and empirical limitations are acknowledged, but mechanism activation, returned optimality certificates, and general performance claims remain insufficiently verified.",
+      "Experimental_Soundness": "The archived ablations are non-randomized, timing uncertainty is not paired or statistically matched, dual selection has no demonstrated effect, and strong solver baselines and meaningful stress tests are absent.",
+      "Writing_Clarity": "Technical exposition is understandable, but internal filenames, configuration commentary, and exhaustive development-history tables substantially clutter the main article.",
+      "Prior_Work_Context": "Seven relevant works are discussed, but comparisons are mostly scope-level and omit the retrieved active-set Newton-MR and equality-constrained online Newton papers.",
+      "Question_Importance": "Accurate and efficient hard-constrained optimization is important for optimization layers, control, and feasible prediction.",
+      "Originality": "The combination is a coherent specialization, but the results and solver components largely instantiate established nullspace, active-set Newton, caching, and projection techniques.",
+      "Value_to_Community": "The transparent analysis and diagnostic observations could support a useful technical note, but the tiny workload and unvalidated distinguishing mechanism constrain broader value."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.0,
+      "Experimental_Soundness": 3.5,
+      "Writing_Clarity": 5.0,
+      "Prior_Work_Context": 4.5,
+      "Question_Importance": 8.0,
+      "Originality": 4.5,
+      "Value_to_Community": 5.0
+    },
+    "sections": {
+      "summary": "The paper presents a specialized dense solver for strongly convex optimization with affine equalities and box constraints, combining reusable SVD geometry, cached active-face tangent spaces, reduced Newton steps, and conditional multiplier-nullspace feasibility search. The stated mathematical results are largely correct under their explicit assumptions. Reported accuracy and latency are promising, but the evidence is limited to tiny archived workloads and does not establish the necessity of the dual-selection mechanism or superiority over established solvers.",
+      "strengths": "The restricted strong-convexity bound, affine/face invariance argument, reduced-Hessian positivity, multiplier sign-feasibility equivalence, and conditional Newton convergence argument are mathematically sound under the stated assumptions. The manuscript distinguishes local convergence from global solver guarantees and reference-objective agreement from an optimality certificate. It includes a stronger factorization-cached splitting baseline, reports negative signed objective gaps, acknowledges ineffective dual-selection ablation, and identifies a genuine limitation of equality-only multiplier diagnostics.",
+      "weaknesses": "Each full split contains only six instances, with dimensions at most 64 and one instance per dimension/objective combination. Comparisons and ablations are archived, non-randomized runs with unequal timing repeat counts. The pooled confidence intervals do not estimate uncertainty in the reported speedup. Dual selection remains enabled despite no demonstrated benefit or evidence that its branch executed. There are no established solver comparisons, adversarial degeneracy tests, conditioning sweeps, measured peak-memory results, or adequate hardware reporting. The presentation contains extensive experiment-history tables, internal filenames, and configuration-dispatch commentary. Related work omits the two additional retrieved search results and does not adequately distinguish the method from classical active-set numerical optimization.",
+      "detailed_comments": "Theory: The Hessian bound mu = 0.3 - 0.8 sin(0.25) is valid on the specified box. Proposition 4 correctly parameterizes all consistent free-coordinate multipliers and converts bound-normal compatibility into linear inequalities. The quadratic-convergence constant alpha/(2 mu) follows from the Hessian Lipschitz bound in orthonormal tangent coordinates. These are conditional structural results, rather than a convergence theorem for the complete release-and-search algorithm. Finite feasibility initialization, heuristic releases, skipped near-zero dual rows, finite Dykstra sweeps, and termination without status or certificates remain substantive executable limitations. The stationarity counterexample has a minor arithmetic error: with gradient (-2,0) and lambda_hat=1, the residual is (-1,1), not (1,1); its conclusion about the lower-bound sign violation remains valid.\n\nExperiments: The reported 1.401-fold validation timing ratio is descriptive evidence on six tiny problems. It lacks randomized paired uncertainty estimates, and comparisons at different achieved accuracies should be supplemented by time-to-tolerance curves. The affine-cache, face-cache, and curvature removals show plausible runtime effects, including a useful quadratic/nonquadratic control for curvature. However, they are not clean randomized interventions against the final configuration. Removing dual selection changes neither accuracy nor runtime materially, so the central degenerate-face mechanism lacks empirical validation. The test split is reported separately, but model-selection chronology and test independence are not established by these records. Evaluator stationarity values near 0.02\u20130.05 cannot certify returned solutions; independently minimized primal-dual residuals are needed. The 32,768-byte matrix calculation is correct but is not a peak-memory measurement.\n\nNovelty and positioning: The retrieved OSQP abstract explicitly describes factorization caching and warm starts, OptNet describes efficient primal-dual solves and differentiation, and DC3 describes equality completion followed by inequality correction. The manuscript acknowledges broad scope differences but supplies little formal algorithmic differentiation. The retrieved Active-set Newton-MR paper is directly relevant to within-face Newton directions, Armijo search, and face escape; OPEN-M is relevant to equality-constrained Newton updates, although its online setting differs. Neither is discussed. The supplied literature contains abstracts for all seven cited works, making the manuscript's repeated metadata-only justification incomplete relative to the review materials. The demonstrated contribution is currently a useful specialization of established techniques.\n\nPresentation: The paper is technically traceable, but the main text reads partly as an implementation audit. Move snapshot paths, configuration parsing details, all 21 historical metric records, and development trajectory into supplementary material. Present one self-contained algorithm, focused result tables, conventional citations, and a sharper statement of the scientific contribution. Some equations and tables are truncated in the supplied extraction; their typeset completeness should be checked rather than assumed.",
+      "questions": "1. On controlled rank-deficient faces, how often does dual selection execute, find a feasible multiplier, prevent an incorrect release, and improve convergence over its removal? 2. Do randomized paired comparisons against the final configuration preserve each ablation's runtime effect, with confidence intervals over independent problem instances? 3. How does performance compare with OSQP on alpha=0 and suitable established constrained solvers on alpha=0.8 at matched feasibility and optimality tolerances? 4. What happens as dimension, conditioning, equality rank deficiency, active-set degeneracy, and row scaling increase? 5. Can the solver return explicit termination status and independently checked primal-dual certificates, and can the authors report CPU, BLAS/thread settings, software versions, and peak memory? 6. What substantive algorithmic distinction remains after comparison with established active-set Newton methods and the additional retrieved works?",
+      "assessment": "Reject in the current form. The analysis is mostly correct and the limitations are unusually explicit, but the submission currently supports a small numerical-methods prototype rather than a sufficiently isolated and validated ICLR contribution. Stronger controlled experiments and sharper novelty positioning are necessary."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  },
+  {
+    "pdf": "/tmp/st-pinet-v3/manuscript.pdf",
+    "seconds": 63.82,
+    "numerical_score": 4.4,
+    "fine_weighted_score": 5.45,
+    "positive_count": 1,
+    "neutral_count": 5,
+    "negative_count": 1,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": 0,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The central conditional theorems are credible and limitations are explicit, but empirical isolation, directional implementation, and reproducibility remain incomplete.",
+      "Experimental_Soundness": "The factorial prose misattributes component effects; the directional implementation fails half its audited directions, and randomized, fully reconstructible subtraction evidence is absent.",
+      "Writing_Clarity": "Technical development is understandable, but main-text filenames, historical logs, provenance narration, and damaged table headers prevent a clean standalone presentation.",
+      "Prior_Work_Context": "Seven relevant publications receive meaningful discussion, but formal novelty boundaries against classical optimization and sensitivity methods remain unresolved and supplied abstracts are incompletely used.",
+      "Question_Importance": "Reliable hard-constrained optimization layers and correct derivatives at active-set transitions address an important community problem.",
+      "Originality": "The method is a coherent specialization of established nullspace Newton, active-set, and implicit-sensitivity principles rather than a demonstrated new algorithmic synthesis.",
+      "Value_to_Community": "The characterization and candid failure analysis are potentially useful, but the small prototype, defective directional interface, and incomplete empirical archives constrain broader value."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 5.5,
+      "Experimental_Soundness": 3.5,
+      "Writing_Clarity": 5.0,
+      "Prior_Work_Context": 5.5,
+      "Question_Importance": 8.0,
+      "Originality": 4.5,
+      "Value_to_Community": 5.0
+    },
+    "sections": {
+      "summary": "The paper specializes constrained Newton optimization to affine equalities and box bounds, combining nullspace elimination, active-face updates, stable-face implicit differentiation, and critical-cone directional sensitivity. The main mathematical statements are sound under their stated assumptions, but the numerical directional interface demonstrably fails on dependent constraints. Experiments support a small synthetic prototype rather than a broadly validated differentiable optimization layer.",
+      "strengths": "The explicit strong-convexity bound, feasibility argument, conditional local quadratic convergence, and stable-face adjoint are coherent. The critical-cone formulation correctly separates directional sensitivity from fixed-face differentiation. The manuscript candidly reports implementation defects, larger-scale slowdowns, uncertainty limitations, and the distinction between local comparator implementations and published systems. A separate held-out split and a cache-free factorial study provide useful preliminary evidence.",
+      "weaknesses": "The directional interface fails in 96 of 192 audited directions, and the solver can return an uncertified iterate after budget exhaustion. The factorial interpretation swaps the effects of nullspace coordinates and exact curvature. Principal evaluation comprises only six synthetic conditions; supplementary attribution, memory, and audit findings lack reconstructible raw archives. Baselines are local implementations, timing intervals do not target the reported estimator, and retained caching lacks convincing paired subtraction evidence. Main-text source paths, historical trial logs, artifact names, and provenance commentary make the submission read like an audit report. Novelty beyond established reduced-space Newton and sensitivity analysis is limited.",
+      "detailed_comments": "Mathematics: Theorem 1 follows from the restricted sine curvature and the stated spectral bounds. Proposition 2 establishes feasible descent directions, not monotonic objective decrease under the implemented undamped update. Theorem 3 is a standard reduced-space Newton result conditional on correct face identification and full steps; neither identification nor global convergence is proved. Theorem 4 follows by implicit differentiation on a locally constant face. Theorem 5 is consistent with strongly convex parametric optimization over a fixed polyhedron; its proof is compressed but the characterization is credible. These results do not certify Algorithm 2, whose multiplier-based classification is explicitly shown to fail. The same nonunique-multiplier issue also warrants analysis of forward release decisions.\n\nAttribution: Reading the factorial table literally, nullspace coordinates alone reduce latency from 0.9083 to 0.5563 ms, or 38.7%, while exact curvature alone reduces it to 0.6611 ms, or 27.2%. The prose reverses those labels. Conditional curvature improvement is 25.2%, and conditional nullspace improvement is 37.1%; these labels are also reversed. The combined 54.2% reduction and 0.1070 ms interaction contrast are arithmetically consistent. Historical one-flag ablations use a different configuration, and the retained caching benefit is small and lacks dedicated paired inference.\n\nExperiments and statistics: Configuration selection precedes the reported held-out split, but six constructed conditions provide little distributional coverage. Rotating execution order is not a documented randomized timing protocol. Validation paired intervals support the local ADMM comparison but not the smaller DR difference; neither supplies held-out paired uncertainty. Pooled timing intervals mix condition variability and timing variability and do not estimate uncertainty of the mean of condition medians. Fixed-seed stress results through dimension 128 are informative but unrepeated, and runtime reverses substantially at larger dimensions. Row scaling and an active-face construction flag are not conditioning or degeneracy certificates. The backward timing control is not complete unrolled differentiation, and optimizing one q vector is not neural-network training.\n\nResources and presentation: Dense complexity and traced allocation are discussed, including cache growth, but total process/native workspace memory and a clear hardware, BLAS, thread-count, and software environment specification are missing. Several extracted tables have truncated headers. The historical trial log, snapshot paths, role_026.json references, and discussion of nonexistent deep-forest experiments should be removed from the main article or consolidated into supplementary reproducibility material.\n\nPrior work: Comparisons with OptNet, differentiable convex optimization layers, DC3, splitting, and \u03a0net establish an appropriate broad context, but formal differentiation from classical active-set Newton and polyhedral sensitivity theory remains insufficient. The retrieved literature supplies an abstract for Hard Constraint Projection in a Physics Informed Neural Network, contrary to the manuscript's statement that only its title and identifier are available. The retrieved hPINN abstract also supports a more precise discussion of penalty and augmented-Lagrangian enforcement.",
+      "questions": "Can the authors correct the factorial factor labels and supply raw paired measurements for all cells and retained components? Can directional sensitivity be implemented directly from the true critical cone without unreliable multiplier classification and verified on the reported dependent-constraint workload? What prevents incorrect forward release decisions under nonunique multipliers, and what failure status is returned when convergence or feasibility is uncertified? Can comparisons include tolerance-matched production solvers and larger application or batched learning workloads, with randomized timing order, held-out paired intervals, and complete hardware reporting? What formal result or algorithmic ingredient goes beyond established reduced-space active-set Newton and parametric sensitivity theory?",
+      "assessment": "I lean reject. The paper contains a sound specialized mathematical treatment and useful preliminary measurements, but does not establish a sufficiently novel, reliable, and experimentally isolated optimization-layer contribution. Honest disclosure of failures improves credibility without resolving the broken directional interface, attribution mismatch, limited baseline coverage, or report-like presentation."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  },
+  {
+    "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/pinet_hcnn_v4/manuscript.pdf",
+    "seconds": 59.44,
+    "numerical_score": 4.4,
+    "fine_weighted_score": 5.78,
+    "positive_count": 1,
+    "neutral_count": 5,
+    "negative_count": 1,
+    "triple_scores": {
+      "Claims_Support": 0,
+      "Experimental_Soundness": -1,
+      "Writing_Clarity": 0,
+      "Prior_Work_Context": 0,
+      "Question_Importance": 1,
+      "Originality": 0,
+      "Value_to_Community": 0
+    },
+    "triple_reasons": {
+      "Claims_Support": "The central conditional mathematical statements hold, and limitations are unusually explicit. However, predictive-mechanism attribution and practical adjoint benefits remain unverified, while empirical scope is very small.",
+      "Experimental_Soundness": "Held-out instances and useful cache-free comparisons are present, but central subtraction interventions are bundled, randomized execution is unreported, uncertainty is not calibrated for paired comparisons, and strong established baselines are absent.",
+      "Writing_Clarity": "The mathematical exposition and algorithms are understandable. Development-history material, a trajectory manifest, and auxiliary audit-style disclosures prevent the clean standalone presentation required for +1.",
+      "Prior_Work_Context": "Seven established works receive substantive discussion, but the supplied dQP and first-order active-set differentiation papers are omitted, leaving the closest novelty boundary insufficiently resolved.",
+      "Question_Importance": "Accurate, efficient hard-constrained optimization layers with useful derivatives address an important problem in decision-focused learning and constrained prediction.",
+      "Originality": "The integration is a solid specialization of established active-set, nullspace Newton, and implicit differentiation methods. A nontrivial advance beyond shared-system differentiation and standard factor reuse is not demonstrated.",
+      "Value_to_Community": "The transparent conditional analysis and local findings could support a useful technical note, but broader value is constrained by synthetic scale, incomplete isolation, and unmeasured backward performance."
+    },
+    "fine_scores_10": {
+      "Claims_Support": 6.0,
+      "Experimental_Soundness": 4.0,
+      "Writing_Clarity": 6.0,
+      "Prior_Work_Context": 5.0,
+      "Question_Importance": 8.0,
+      "Originality": 5.0,
+      "Value_to_Community": 5.5
+    },
+    "sections": {
+      "summary": "The manuscript presents a specialized solver for strongly convex quadratic-plus-sinusoidal objectives under affine equalities and box constraints. It combines nullspace elimination, predicted active faces, reduced Newton steps, geometry caching, and retained curvature factors for implicit differentiation. The stated curvature, tangent-preservation, conditional local-convergence, and stable-face sensitivity arguments are sound under their assumptions. Empirical evidence supports a small synthetic prototype, but does not establish a distinct predictive mechanism or practical backward-pass advantage.",
+      "strengths": "The restricted-domain convexity argument correctly establishes uniqueness despite the sinusoidal term. The local Newton and stable-face sensitivity results clearly separate their assumptions from global algorithmic guarantees. Cache-free controls provide useful evidence for equality elimination and exact curvature. The paper candidly discloses comparator limitations, bundled interventions, incomplete derivative comparisons, analytical rather than measured memory, and the limited held-out workload.",
+      "weaknesses": "The principal evidence comprises six synthetic held-out instances, with dimensions no larger than 128 in separate stress tests. Comparators are local fixed-iteration implementations rather than strong established solver packages. Randomized execution order and calibrated paired confidence intervals are not reported. Prediction, caching, and incremental geometry are not independently ablated; removing equality reduction also disables prediction. The retained-factor adjoint is not directly benchmarked. Closely relevant retrieved work on active-set differentiation and shared linear systems is omitted. Development trajectories and auxiliary implementation defects distract from a standalone research contribution.",
+      "detailed_comments": "Mathematics: The Hessian bounds follow directly from the prescribed box, and the Newton error bound follows from an alpha-Lipschitz Hessian and the reduced spectral lower bound. The sensitivity formula is correct for an optimal solution on a locally constant face; it does not differentiate a prematurely terminated algorithm. None of these results proves global convergence or reliable face identification for the complete solver. Predictor excursions outside the box can encounter indefinite curvature, and the manuscript appropriately admits that factorization can fail. Dependent active constraints and least-squares multiplier signs remain unresolved operational weaknesses.\n\nNovelty: Nullspace Newton methods, active-set geometry, Householder updates, and implicit differentiation of stationarity are established techniques. The retrieved dQP paper, Differentiation Through Black-Box Quadratic Programming Solvers, explicitly describes active-set solution and derivative systems sharing the same matrix. OptNet already emphasizes inexpensive differentiation using forward-solve structure. The nonlinear reduced-Hessian specialization is a legitimate distinction, but the paper must explain what exceeds these established principles. The retrieved A Fully First-Order Layer for Differentiable Optimization also deserves discussion as an alternative active-set differentiation strategy, while recognizing its approximate first-order setting.\n\nExperiments: The cache-free comparisons support two conditional improvements, but the missing joint-off cell prevents interaction analysis. More seriously for the predictive contribution, prediction and incremental geometry remain bundled with caching. The reported removal-of-reduction result is also confounded by removing prediction. The strict component-isolation requirement is therefore unmet. Repeated timings on the same six instances do not constitute independent problem replications. The nominal intervals pool heterogeneous raw timings while centering on a mean of medians, so they are not confidence intervals for the reported estimator or paired speedup. Single stress timings cannot establish reliable scaling advantages.\n\nBackward evaluation: One directional finite-difference check is insufficient to characterize derivative accuracy across faces, degeneracies, and cotangents. The auxiliary benchmark reconstructs a full Jacobian and compares against incomplete splitting derivatives, so its timing ratio cannot support retained-factor efficiency. The coefficient-update experiment includes an unvalidated substitute-gradient branch and is not an end-to-end learning benchmark. These limitations are disclosed, but the experiment should be corrected or removed.\n\nReporting: Dense complexity and float64 payload estimates are useful, but measured peak memory, cache growth, exact CPU identification, and consistent historical timing provenance are missing. The manuscript is technically organized, yet the research-report subtitle, main-text development-candidate history, and appendix of unexplained trajectory MSE values weaken its presentation as a clean academic article. Those MSE values are not connected clearly to the principal optimization metrics.",
+      "questions": "1. What technical novelty remains relative to dQP's active-set shared-system differentiation and OptNet's reuse of forward linear algebra?\n2. Can prediction, incremental geometry, and caching be toggled independently, with the missing factorial cell and paired uncertainty reported?\n3. How does the method compare with established solvers at matched feasibility and stationarity tolerances, including setup and terminal factorization?\n4. What are direct retained-factor VJP timings and errors across tangent dimensions, repeated cotangents, and face transitions?\n5. How often do predictor factorization failures, iteration-limit exits, dependent-face release problems, and substitute-gradient branches occur on independently generated problems?\n6. Can the authors provide randomized timing order, larger independent instance samples, measured peak memory, cache occupancy, and complete processor provenance?",
+      "assessment": "Weak reject. The conditional theory is credible and the implementation ideas may be useful, but the contribution currently resembles a specialized numerical optimization note. Missing differentiation against close retrieved prior work, confounded prediction ablations, weak comparator coverage, and the absence of a direct backward benchmark prevent a convincing ICLR-level algorithmic and empirical contribution."
+    },
+    "calibration": {
+      "intercept": 4.2,
+      "weights": {
+        "Claims_Support": 1.5,
+        "Experimental_Soundness": 0.8,
+        "Writing_Clarity": 0.3,
+        "Prior_Work_Context": 0.6,
+        "Question_Importance": 1.0,
+        "Originality": 0.7,
+        "Value_to_Community": 0.7
+      },
+      "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+    }
+  }
+]
