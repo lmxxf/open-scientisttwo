@@ -81,7 +81,8 @@ def verify_claims(root, manifest, manuscript):
         row = f"| {claim['label']} | {expected:.9f} |"
         if text.count(row) != 1:
             raise ValueError('I1 manuscript table mismatch')
-    rows = re.findall(r'^\| ([^|]+) \| (-?[0-9.]+) \|$', text, re.M)
+    table_text = text.split('\n| Experiment |', 1)[1] if '\n| Experiment |' in text else text
+    rows = re.findall(r'^\| ([^|]+) \| (-?[0-9.]+) \|$', table_text, re.M)
     if len(rows) != len(records):
         raise ValueError('unmanifested metric rows')
     return len(records)
