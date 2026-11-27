@@ -105,3 +105,20 @@ python submit_paperreview_ai.py /tmp/st-bpe-full/manuscript.pdf --venue ICLR --e
 # 凭返回的 token 轮询拉取斯坦福官方审稿报告
 python submit_paperreview_ai.py --token YOUR_TOKEN --poll 20 --interval 30 --output /tmp/official-review.json
 ```
+
+---
+
+## 四、 DGX Spark (`ARM Cortex-X925`) 四轮自主进化实测战绩与斯坦福官方核验账本
+
+我们在 `DGX Spark` 单颗 `3.90 GHz ARM Cortex-X925` 核心上，使用 `Codex CLI (gpt-6.1-sol low)` + 80 行中文高维认知协议 [`AGENTS.md`](AGENTS.md) 连续完成了四轮（`v1 -> v2 -> v3 -> v4`）端到端六阶段自主科研演化（单轮 33~35 次角色调用，耗时仅 `~36` 分钟，零 API 额外充值成本）：
+
+| 基准任务与轮次 | 自主发现的核心定理与算法演进 | 验证集 / 留出测试集 (`final_test`) 实测指标 | 5 组减法消融 & `I1–I4` 四道审计 | 斯坦福官方 [`paperreview.ai`](https://paperreview.ai/) 公开核验链接 & 评分 |
+| :--- | :--- | :--- | :--- | :--- |
+| **`inc_bpe` v1** | 后缀树显式接受集 `frozenset` + 二元边界区间 | `10.599 -> 4.428 ms/10KB` (`2.394×`)，`final_test = 4.454 ms` | 20 项声明 `I1–I4` 全过 | [`token=mpo_Db1-Pa6KS4GwR6ZhR7LJkW8H8iGh6wz8ZuqY7I4`](https://paperreview.ai/review?token=mpo_Db1-Pa6KS4GwR6ZhR7LJkW8H8iGh6wz8ZuqY7I4)<br>官方分：**`2.4 / 10`**（`Writing_Clarity: +1`） |
+| **`inc_bpe` v2** | **Rank-Ordered DFS 双区间折叠定理**：按合并秩重排子节点后，每个规则合法前驱集坍缩为 $\le 2$ 个半开区间 $\mathcal{I}_t = [L_a, L_a+1) \cup [q_t, R_a)$，$O(R)$ 空间、$O(1)$ 判定 | `10.455 -> 3.983 ms/10KB` (`2.733×`)，`final_test = 4.018 ms` (`2.683×`) | 20 项声明 `I1–I4` 全过 | [`token=Izr0Sel882dZaDn4lpyGnNMneHV-9guj3OpNAgmTJgU`](https://paperreview.ai/review?token=Izr0Sel882dZaDn4lpyGnNMneHV-9guj3OpNAgmTJgU)<br>官方分：**`4.4 / 10`**（较 v1 暴涨 **`+2.0`**，`Question_Importance: +1`） |
+| **`inc_bpe` v3** | 无缓存纯净双区间编译 + 不可变 6 元组候选预解包 + 自动砍掉冗余 DFS 历史数组（`pruned`） | **`11.172 -> 3.6141 ms/10KB` (`3.091×`)，`final_test = 3.6429 ± 0.1783 ms` (`3.088×`)** | 21 项声明 `I1–I4` 全过 | [`token=7NOP7mp0kevrcpo4IdWvcUe_IJ3Azi91xqwBHS-l4Pw`](https://paperreview.ai/review?token=7NOP7mp0kevrcpo4IdWvcUe_IJ3Azi91xqwBHS-l4Pw)<br>官方分：**`5.2 / 10`**（`2.4 -> 4.4 -> 5.2` 三级跳，**7 维 `0` 个 `-1`**！） |
+| **`inc_bpe` v4**<br>([归档产物](benchmarks/results/inc_bpe_v4/)) | **$O(M+R)$ 单遍先更新后读取秩扫描双区间编译器 + 保守静态上下文证书 $K(C)$**：消除自重叠合并特判，强制深度 $D=4..36$ 单谓词加速从 **`2.77×` 线性飙至 `13.68×`** | **`10.555 -> 2.7824 ms/10KB`（配对加速 `4.056×`），`final_test = 2.8061 ms`（配对加速 `4.072×`，吞吐量 `3.56 MB/s`）** | **5 组减法消融 100% 严格退化**（`2.7824 -> 2.8726..3.5699 ms`），20 项声明 `I1–I4` 全过 | 本地七维审稿创 **`6.14 / 10 (Accept)`** 新高（`Clarity: 8`, `Claims: 7`, `Originality: 6`）；PDF 已归档待配额刷新提交 |
+| **`pinet_hcnn` v1** | SVD 零空间消元 + 活跃面牛顿 + Stage 4 自动砍掉冗余行平衡（`pruned`） | `0.096118 -> 0.020556`（`0.411 ms`，快 `3.85×`），`final_test = 0.020463` | 21 项声明 `I1–I4` 全过 | [`token=kkKJw5yr9XDBUM0ahJQptvdRYq0ukRY9SPIwi-d8bPU`](https://paperreview.ai/review?token=kkKJw5yr9XDBUM0ahJQptvdRYq0ukRY9SPIwi-d8bPU)<br>官方分：**`4.6 / 10`**（**`Claims_Support: +1`, `Writing_Clarity: +1`**） |
+| **`pinet_hcnn` v2** | 仿射因子复用 + 活跃面切空间基缓存 $Z=V\ker(V_I)$ + 退化面乘子修正 | `0.095956 -> 0.019500`（比 `cached_dr` 快 `1.4×`），`final_test = 0.019378` | 20 项声明 `I1–I4` 全过 | [`token=3Z9Rh6mtmKAmWVN_BoTfXBysE9iecKENEqZJWg9DvQc`](https://paperreview.ai/review?token=3Z9Rh6mtmKAmWVN_BoTfXBysE9iecKENEqZJWg9DvQc)<br>官方分：**`4.5 / 10`**（`Writing_Clarity: +1`，**7 维 `0` 个 `-1`**！） |
+| **`pinet_hcnn` v4**<br>([归档产物](benchmarks/results/pinet_hcnn_v4/)) | **预测性活跃面牛顿 + Householder 增量切空间更新 + 前向 Cholesky 因子复用的 $O(dk+k^2)$ 隐式伴随微分**：$d=128$、$10^4\times$ 行尺度下仅 `1.0497 ms`（快于 ADMM，违背量小 `2,027×`） | **`0.095680 -> 0.010100`，`final_test = 0.009932`（`0.1986 ms`，比 `cached_dr` 快 `2.27×`、比 `OSQP-ADMM` 快 `2.89×`，可行性违背 $1.15\times 10^{-14}$）** | **5 组减法消融 100% 严格正交退化**（`0.01010 -> 0.01183..0.02062`，恶化 `+17.1% ~ +104.1%`），20 项声明 `I1–I4` 全过 | 本地七维审稿 **`5.43 / 10 (Accept)`**（`Claims: 7`, `Clarity: 7`）；PDF 已归档待配额刷新提交 |
+

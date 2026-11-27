@@ -1,0 +1,7 @@
+{
+  "nullspace_reduction": true,
+  "exact_hessian": true,
+  "active_face_caching": true,
+  "row_equilibration": false,
+  "armijo_line_search": false
+}

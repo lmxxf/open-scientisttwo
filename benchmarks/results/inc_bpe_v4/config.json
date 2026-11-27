@@ -1,0 +1,8 @@
+{
+  "name": "static_context_acceptance_certificates",
+  "acceptance_mode": "intervals",
+  "certified_regions": true,
+  "certificate_domain": "conservative_context_compatible_predecessors",
+  "uncertified_path": "exact_two_interval_check",
+  "runtime_acceptance_cache": false
+}

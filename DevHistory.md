@@ -214,3 +214,22 @@ python submit_paperreview_ai.py --token <PINET_TOKEN> --poll 20 --interval 60 \
    - **独立顶会论文排版（Appendix A 隔离轨迹清单 + 禁用内部工作区文件名）**：`manuscript.py` 将 21 行 `| Experiment | mse |` 历史轨迹表自动移入参考文献后的 `Appendix A: Complete Experimental Trajectory Manifest`；`pipeline.py` 要求 `Writer` 按独立 camera-ready ICLR 论文行文，严禁在正文中出现 `snapshots/pruned`、`*_metrics.json` 等内部文件名；
    - **修复深林 $D=36$ 强制深度微基准（`forced_depth_D_predicate_micro_speedup`）**：消除偶数槽位 `None` 短路，在 $D \in \{4, 12, 24, 36\}$ 上实测出 **`2.17× -> 5.13× -> 9.20× -> 13.54×`** 的严格线性发散加速曲线，并补充 `tracemalloc` 峰值字节内存、`ARM Cortex-X925` 硬件环境元数据、$O(M+R)$ 单遍线性秩扫描定理及与 Jiang & Gong `Prefix Last-Token Condition` 的形式化对比算例；
    - **`pinet_hcnn` 快速 $O(|A|^2 n)$ QR 活跃面切空间与前向 Cholesky 因子直接复用的 $O(dk)$ 隐式微分反向传播**：确保在 $d=96..128$ 上同样以 `<1.2 ms` 超越 OSQP/ADMM，且反向传播零重复矩阵分解。
+
+---
+
+## 2026-11-28 00:32 —— 双路 v4 圆满出厂、10 组减法消融 100% 严格退化与全套产物归档
+
+1. **`inc_bpe` v4 出厂战果（归档于 [`benchmarks/results/inc_bpe_v4/`](benchmarks/results/inc_bpe_v4/)）**：
+   - 生成论文：《*Compiling Exact Streaming BPE: Rank-Ordered Two-Interval Predicates with Static Context Certificates*》；
+   - 算法突破：在 $O(M+R)$ 先更新后读取（update-before-read）单遍双区间编译之上，提出**保守静态上下文证书 $K(C)$**，无需运行时缓存即可在编译期静态认证高频后缀；
+   - 实测主指标：全量验证延迟从 `10.5549 ms/10KB` 压至 **`2.7824 ms/10KB`（配对基线加速 `4.0556×`，降低 `75.34%`）**；留出测试集（`final_test`）为 **`2.8061 ms/10KB`（配对加速 `4.0715×`，吞吐量 `3.564 MB/s`）**；强制深度单谓词微基准在 $D \in \{4, 12, 24, 36\}$ 上从 **`2.77×` 线性飙至 `13.68×`**；
+   - **5 组减法消融 100% 严格退化**：完整版 `2.7824 ms` $\to$ 去掉静态证书 `2.8726 ms` $\to$ 换显式集合 `3.0468 ms` $\to$ 换指针爬树 `3.1420 ms` $\to$ 去掉单字节快路 `3.1704 ms` $\to$ 去掉密集转移表 `3.5699 ms`；
+   - 20 项声明 `I1–I4` 100% 一次通过，本地七维审稿分创下 **`6.14 / 10 (Accept)`** 新高（`Clarity_of_Writing: 8/10`, `Claims_Supported: 7/10`, `Originality: 6/10`, `Value_to_Community: 6/10`, `Contextualization: 6/10`）。
+2. **`pinet_hcnn` v4 出厂战果（归档于 [`benchmarks/results/pinet_hcnn_v4/`](benchmarks/results/pinet_hcnn_v4/)）**：
+   - 生成论文：《*Predictive Active-Face Newton Layers with Exact Reduced Curvature and Reusable Implicit Adjoints*》；
+   - 算法突破：耦合等式零空间消元、3 步预测性活跃面识别、Householder 增量切空间正交基更新与终端 Cholesky 因子复用的 $O(dk+k^2)$ 隐式伴随微分；
+   - 实测主指标：全量验证 `mse` 从基线 `0.095680`（v3 为 `0.019067`）一举压至 **`0.010100`**；留出测试集 `final_test = 0.009932`（平均求解耗时 **`0.198641 ms`**，比 `cached_dr` 快 **`2.27×`**、比调优 `OSQP-ADMM` 快 **`2.89×`**，最大约束违背 $1.15 \times 10^{-14}$）；在 **$d=128$、行尺度跨度 $10^4\times$ 的压力测试下耗时仅 `1.0497 ms`（全面快于 ADMM，且违背量比 ADMM 小 `2,027×`）**；
+   - **5 组减法消融 100% 严格正交退化**：完整版 `0.010100` $\to$ 关非线性海森 `0.011826 (+17.1%)` $\to$ 关零空间归约 `0.014120 (+39.8%)` $\to$ 关活跃面缓存与预测 `0.014486 (+43.4%)` $\to$ 同时关归约与缓存 `0.019866 (+96.7%)` $\to$ 同时关非线性曲率与缓存 `0.020616 (+104.1%)`；
+   - 20 项声明 `I1–I4` 100% 一次通过，本地七维审稿分 **`5.43 / 10 (Accept)`**（`Claims_Supported: 7/10`, `Clarity_of_Writing: 7/10`）。
+3. **斯坦福 `paperreview.ai` 配额状态**：
+   - 今晚已连续提交并拿回 5 篇官方审稿报告（已全部归档于 [`benchmarks/results/stanford_official_reviews/`](benchmarks/results/stanford_official_reviews/)），触发 `paperreview.ai` 单 IP 每 24 小时 5 篇上限（`HTTP 429`）。待配额窗口恢复后，直接运行 `submit_paperreview_ai.py` 提交 `benchmarks/results/inc_bpe_v4/manuscript.pdf` 与 `benchmarks/results/pinet_hcnn_v4/manuscript.pdf` 即可拿回 v4 官方分。

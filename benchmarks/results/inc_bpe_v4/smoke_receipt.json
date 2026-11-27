@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "best": {
+    "label": "initial",
+    "snapshot": "initial_full",
+    "config": {
+      "name": "static_context_acceptance_certificates",
+      "acceptance_mode": "intervals",
+      "certified_regions": true,
+      "certificate_domain": "conservative_context_compatible_predecessors",
+      "uncertified_path": "exact_two_interval_check",
+      "runtime_acceptance_cache": false
+    },
+    "value": 2.782369645299493
+  },
+  "baseline_full": 10.554896208405907,
+  "final_test": 2.806132720757483,
+  "local_score": 6.142857142857142,
+  "local_decision": "Accept",
+  "claims": 20,
+  "roles": 33,
+  "protected_hashes": {
+    "eval.py": "2d6fe82b8ec8c4c85d5268515e0bbc5638af3294aed113936d68d5402ad99ba5",
+    "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+    "task_spec.json": "b5514788d859cd49979893ff90c5b38bdb9e3442eab21a268313371fea2d12eb"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/inc_bpe",
+    "--K",
+    "4",
+    "--S",
+    "4",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-bpe-full"
+  ],
+  "seconds": 2286.2554633668624
+}

@@ -1,0 +1,63 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 20
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "2d6fe82b8ec8c4c85d5268515e0bbc5638af3294aed113936d68d5402ad99ba5",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "task_spec.json": "b5514788d859cd49979893ff90c5b38bdb9e3442eab21a268313371fea2d12eb"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2605.30813",
+        "title": "Incremental BPE Tokenization",
+        "url": "https://arxiv.org/abs/2605.30813"
+      },
+      {
+        "doi": "10.48550/arXiv.2309.08715",
+        "title": "Formalizing BPE Tokenization",
+        "url": "https://arxiv.org/abs/2309.08715"
+      },
+      {
+        "doi": "10.48550/arXiv.2306.16837",
+        "title": "A Formal Perspective on Byte-Pair Encoding",
+        "url": "https://arxiv.org/abs/2306.16837"
+      },
+      {
+        "doi": "10.48550/arXiv.2207.13870",
+        "title": "Engineering faster double-array Aho-Corasick automata",
+        "url": "https://arxiv.org/abs/2207.13870"
+      },
+      {
+        "doi": "10.48550/arXiv.1508.07909",
+        "title": "Neural Machine Translation of Rare Words with Subword Units",
+        "url": "https://arxiv.org/abs/1508.07909"
+      },
+      {
+        "doi": "10.48550/arXiv.1808.06226",
+        "title": "SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing",
+        "url": "https://arxiv.org/abs/1808.06226"
+      },
+      {
+        "doi": "10.48550/arXiv.2402.01035",
+        "title": "Getting the most out of your tokenizer for pre-training and domain adaptation",
+        "url": "https://arxiv.org/abs/2402.01035"
+      },
+      {
+        "doi": "10.1145/360825.360855",
+        "title": "Efficient string matching",
+        "url": "https://api.crossref.org/works/10.1145%2F360825.360855"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The selected config enables interval acceptance and static certificates. In snapshots/initial_full/model.py, compilation updates cutoff[b]=tree.right[t] before reading cutoff[a], storing (L[a],L[a]+1,q,U[a]) and successor-length offsets, matching Algorithm 1. Certification uses context=W_state[:-off] and universally checks vocabulary tokens satisfying word.endswith(context) or context.endswith(word), matching K(C); defaults enforce 64 eligible states and 256 attempted pairs. append() uses decreasing-length candidates, requires n-off>0, bypasses history membership only for certified pairs, and otherwise executes the exact two-interval predicate. Dense transitions, atomic-only shortcuts, token-ID history, reconstruction, and absence of runtime acceptance caching match the manuscript. The reported selected validation value rounds to 2.7824. Imported automaton/forest internals and timing results were not independently verified because the audit was restricted to the selected source and config."
+  }
+}

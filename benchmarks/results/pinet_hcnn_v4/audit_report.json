@@ -1,0 +1,58 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 20
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "64791e844147ced49d17553c51a7ca3461e194cf7366cb32ed8b10ff0ed229ba",
+      "data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+      "task_spec.json": "8251a943758dcbdc823f392252f33f72992116bfa14327eabedacb7d0b76ea3d"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2508.10480",
+        "title": "Pinet: Optimizing hard-constrained neural networks with orthogonal projection layers",
+        "url": "https://arxiv.org/abs/2508.10480"
+      },
+      {
+        "doi": "10.48550/arXiv.2104.12225",
+        "title": "DC3: A learning method for optimization with hard constraints",
+        "url": "https://arxiv.org/abs/2104.12225"
+      },
+      {
+        "doi": "10.48550/arXiv.1703.00443",
+        "title": "OptNet: Differentiable Optimization as a Layer in Neural Networks",
+        "url": "https://arxiv.org/abs/1703.00443"
+      },
+      {
+        "doi": "10.48550/arXiv.1910.12430",
+        "title": "Differentiable Convex Optimization Layers",
+        "url": "https://arxiv.org/abs/1910.12430"
+      },
+      {
+        "doi": "10.48550/arXiv.1711.08013",
+        "title": "OSQP: An Operator Splitting Solver for Quadratic Programs",
+        "url": "https://arxiv.org/abs/1711.08013"
+      },
+      {
+        "doi": "10.48550/arXiv.2102.04626",
+        "title": "Physics-informed neural networks with hard constraints for inverse design",
+        "url": "https://arxiv.org/abs/2102.04626"
+      },
+      {
+        "doi": "10.48550/arXiv.2601.06244",
+        "title": "Hard Constraint Projection in a Physics Informed Neural Network",
+        "url": "https://arxiv.org/abs/2601.06244"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The selected config enables nullspace reduction, exact Hessians, and active-face caching, and disables row equilibration and Armijo search, matching the manuscript. The executed gradient Qy+q+alpha*cos(y), reduced Hessian R0-alpha*(Z.T*sin(y))@Z, QR/SVD equality elimination, corrected feasibility projections, ordered-face caching, and Householder updates match the stated formulas. Predictor counts (3 steps, 8 expansion rounds, 4 tangent corrections), default 100 main iterations, stopping thresholds, boundary truncation, and signed-multiplier release match. Terminal exact curvature is factorized and retained; adjoint computes -Z*(Z.T*H*Z)^(-1)*Z.T*v using that factor. This is a static method-code audit; reported experimental scores were not independently verified."
+  }
+}

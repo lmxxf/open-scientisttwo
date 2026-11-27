@@ -1,0 +1,160 @@
+{
+  "mse": 2.806132720757483,
+  "latency_ms_per_10kb": 2.806132720757483,
+  "latency_mean_ms_per_10kb": 2.789493857142857,
+  "latency_std_ms_per_10kb": 0.06609497205897126,
+  "latency_student_t95_ci_ms_per_10kb": 0.06112735783395346,
+  "throughput_mb_s": 3.563623319035536,
+  "latency_us_per_kb": 280.6132720757483,
+  "paired_baseline_latency_ms_per_10kb": 11.425286680201275,
+  "paired_speedup_ratio": 4.071541804023137,
+  "paired_difference_mean_ms": 8.602437285714286,
+  "paired_difference_student_t95_ci_ms": 0.10234462036906725,
+  "raw_candidate_samples_ms_per_10kb": [
+    2.643697,
+    2.830647,
+    2.831411,
+    2.806133,
+    2.789396,
+    2.821545,
+    2.803628
+  ],
+  "raw_baseline_samples_ms_per_10kb": [
+    11.074797,
+    11.327856,
+    11.381745,
+    11.512852,
+    11.425287,
+    11.526879,
+    11.494102
+  ],
+  "init_construction_ms": 5.969512043520808,
+  "baseline_init_construction_ms": 0.36249891854822636,
+  "tokens_reconstruction_us": 63.50409239530563,
+  "net_breakeven_stream_kb": 6.505294082639186,
+  "traced_memory_bytes": {
+    "current_bytes": 554916,
+    "peak_bytes": 572901
+  },
+  "environment_metadata": {
+    "python": "3.12.3",
+    "platform": "Linux-6.17.0-1014-nvidia-aarch64-with-glibc2.39",
+    "machine": "aarch64",
+    "cpu": "ARM Cortex-X925 (3.90 GHz, pinned single core)"
+  },
+  "structure_stats": {
+    "vocab_size": 328,
+    "num_merges": 72,
+    "max_token_bytes": 6,
+    "max_successor_depth": 4,
+    "mean_successor_depth": 0.335,
+    "model_structure_top_entries": 698,
+    "interval_endpoint_scalars": 288
+  },
+  "bytes": 2304,
+  "prefixes_checked": 2304,
+  "exact": true,
+  "timing_repeats": 7,
+  "randomized_interleaved_passes": true,
+  "mode": "full",
+  "split": "test",
+  "extra": false,
+  "deep_forest_and_isolation": {
+    "randomized_cache_free_isolation": {
+      "selected": {
+        "median_ms_per_10kb": 2.8131,
+        "mean_ms_per_10kb": 2.8082,
+        "std_ms_per_10kb": 0.0407,
+        "student_t95_halfwidth": 0.0376
+      },
+      "pointer_predicate_only": {
+        "median_ms_per_10kb": 3.1481,
+        "mean_ms_per_10kb": 3.1474,
+        "std_ms_per_10kb": 0.1235,
+        "student_t95_halfwidth": 0.1142
+      },
+      "centroid_search": {
+        "median_ms_per_10kb": 4.9372,
+        "mean_ms_per_10kb": 4.9343,
+        "std_ms_per_10kb": 0.039,
+        "student_t95_halfwidth": 0.0361
+      },
+      "explicit_set": {
+        "median_ms_per_10kb": 4.2961,
+        "mean_ms_per_10kb": 4.4043,
+        "std_ms_per_10kb": 0.3051,
+        "student_t95_halfwidth": 0.2821
+      },
+      "baseline_pointer": {
+        "median_ms_per_10kb": 11.4156,
+        "mean_ms_per_10kb": 11.4968,
+        "std_ms_per_10kb": 0.2934,
+        "student_t95_halfwidth": 0.2713
+      },
+      "explicit_set_total_elements": 99,
+      "two_interval_total_endpoints": 144
+    },
+    "deep_forest_scaling_sweep": [
+      {
+        "num_merges": 72,
+        "vocab_size": 328,
+        "max_forest_depth": 4,
+        "interval_ms_per_10kb": 2.4465,
+        "pointer_only_ms_per_10kb": 2.3911,
+        "centroid_search_ms_per_10kb": 4.8375,
+        "explicit_set_ms_per_10kb": 3.8627,
+        "isolated_interval_vs_pointer_speedup": 0.977,
+        "forced_depth_D_predicate_micro_speedup": 2.66,
+        "interval_vs_centroid_speedup": 1.977,
+        "explicit_set_entries": 264,
+        "two_interval_entries": 144,
+        "memory_reduction_ratio": 1.83
+      },
+      {
+        "num_merges": 160,
+        "vocab_size": 416,
+        "max_forest_depth": 12,
+        "interval_ms_per_10kb": 2.2261,
+        "pointer_only_ms_per_10kb": 2.7137,
+        "centroid_search_ms_per_10kb": 4.0433,
+        "explicit_set_ms_per_10kb": 3.3454,
+        "isolated_interval_vs_pointer_speedup": 1.219,
+        "forced_depth_D_predicate_micro_speedup": 5.51,
+        "interval_vs_centroid_speedup": 1.816,
+        "explicit_set_entries": 608,
+        "two_interval_entries": 320,
+        "memory_reduction_ratio": 1.9
+      },
+      {
+        "num_merges": 320,
+        "vocab_size": 576,
+        "max_forest_depth": 24,
+        "interval_ms_per_10kb": 2.1183,
+        "pointer_only_ms_per_10kb": 2.8265,
+        "centroid_search_ms_per_10kb": 3.9668,
+        "explicit_set_ms_per_10kb": 3.3301,
+        "isolated_interval_vs_pointer_speedup": 1.334,
+        "forced_depth_D_predicate_micro_speedup": 9.98,
+        "interval_vs_centroid_speedup": 1.873,
+        "explicit_set_entries": 1471,
+        "two_interval_entries": 640,
+        "memory_reduction_ratio": 2.3
+      },
+      {
+        "num_merges": 512,
+        "vocab_size": 768,
+        "max_forest_depth": 36,
+        "interval_ms_per_10kb": 2.139,
+        "pointer_only_ms_per_10kb": 2.75,
+        "centroid_search_ms_per_10kb": 3.826,
+        "explicit_set_ms_per_10kb": 3.2624,
+        "isolated_interval_vs_pointer_speedup": 1.286,
+        "forced_depth_D_predicate_micro_speedup": 13.71,
+        "interval_vs_centroid_speedup": 1.789,
+        "explicit_set_entries": 2653,
+        "two_interval_entries": 1024,
+        "memory_reduction_ratio": 2.59
+      }
+    ]
+  }
+}
