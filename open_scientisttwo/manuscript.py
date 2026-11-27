@@ -7,15 +7,70 @@ SECTIONS = [('introduction','Introduction'), ('related_work','Related Work'),
 
 def escape(text):
     mapping = {'\\':r'\textbackslash{}','{':r'\{','}':r'\}','&':r'\&','%':r'\%',
-               '_':r'\_','#':r'\#','$':r'\$','^':r'\textasciicircum{}','~':r'\textasciitilde{}'}
+               '_':r'\_','#':r'\#','$':r'\$','^':r'\textasciicircum{}','~':r'\textasciitilde{}',
+               '\u2013':'--','\u2014':'---','\u2018':'`','\u2019':"'",'\u201c':'``','\u201d':"''",
+               '\u00b1':r'$\pm$','\u00d7':r'$\times$'}
     return ''.join(mapping.get(c, c if ord(c)<128 else '[U+%04X]' % ord(c)) for c in text)
+
+def _render_inline(text, math=True):
+    if not math:
+        return escape(text)
+    parts = re.split(r'(\$\$[\s\S]*?\$\$|(?<!\$)\$[^$\n]+\$(?!\$))',text)
+    out = []
+    for p in parts:
+        if p.startswith('$') and p.endswith('$'):
+            out.append(p)
+        else:
+            esc = escape(p)
+            esc = re.sub(r'\*\*([^*]+)\*\*', r'\\textbf{\1}', esc)
+            out.append(esc)
+    return ''.join(out)
 
 def render(text, math=True):
     if not math:
         return escape(text)
-    parts = re.split(r'(\$\$[\s\S]*?\$\$|(?<!\$)\$[^$\n]+\$(?!\$))',text)
-    # Only math blocks are native TeX; arbitrary prose commands remain escaped.
-    return ''.join(p if p.startswith('$') and p.endswith('$') else escape(p) for p in parts)
+    lines = text.splitlines()
+    out = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        if stripped.startswith('```'):
+            out.append(r'\begin{verbatim}')
+            i += 1
+            while i < len(lines) and not lines[i].strip().startswith('```'):
+                out.append(lines[i])
+                i += 1
+            out.append(r'\end{verbatim}')
+            i += 1
+            continue
+        if stripped.startswith('### '):
+            out.append(r'\subsection*{' + _render_inline(stripped[4:].strip(), math) + '}')
+            i += 1
+            continue
+        if stripped.startswith('|') and stripped.endswith('|') and i + 1 < len(lines) and re.match(r'^\s*\|[\s:\-|]+\|\s*$', lines[i+1]):
+            headers = [c.strip() for c in stripped.strip('|').split('|')]
+            ncols = len(headers)
+            col_spec = 'l' + 'r' * max(0, ncols - 1)
+            out.append(r'\begin{center}\footnotesize\begin{longtable}{' + col_spec + r'}\toprule')
+            out.append(' & '.join(_render_inline(h, math) for h in headers) + r'\\\midrule')
+            i += 2
+            while i < len(lines):
+                rline = lines[i].strip()
+                if not (rline.startswith('|') and rline.endswith('|')):
+                    break
+                cells = [c.strip() for c in rline.strip('|').split('|')]
+                if len(cells) < ncols:
+                    cells += [''] * (ncols - len(cells))
+                elif len(cells) > ncols:
+                    cells = cells[:ncols]
+                out.append(' & '.join(_render_inline(c, math) for c in cells) + r'\\')
+                i += 1
+            out.append(r'\bottomrule\end{longtable}\end{center}')
+            continue
+        out.append(_render_inline(line, math))
+        i += 1
+    return '\n'.join(out)
 
 def write_manuscript(root, response, claims, refs, spec):
     root=Path(root)

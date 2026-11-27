@@ -27,24 +27,39 @@ def evaluate(root, mode='full', split='validation', extra=False, timeout=None):
     return result
 
 
+_LOOKUP_CACHE = {}
+_REF_CACHE = {}
+
+
 def lookup(query):
+    if query in _LOOKUP_CACHE:
+        return _LOOKUP_CACHE[query]
     url = 'https://export.arxiv.org/api/query?' + urllib.parse.urlencode({'search_query': query, 'max_results': 2})
-    return execute(['curl', '--fail', '--silent', '--show-error', '--max-time', '40', url], '/tmp', 45)
+    res = execute(['curl', '--fail', '--silent', '--show-error', '--retry', '3', '--retry-delay', '2', '--max-time', '40', url], '/tmp', 90)
+    _LOOKUP_CACHE[query] = res
+    return res
 
 
 def reference(doi):
-    if doi.lower().startswith('10.48550/arxiv.'):
+    key = doi.casefold()
+    if key in _REF_CACHE:
+        return _REF_CACHE[key]
+    if key.startswith('10.48550/arxiv.'):
         identifier = doi[len('10.48550/arXiv.'):]
         tree = ET.fromstring(lookup('id:'+identifier))
         ns = {'a':'http://www.w3.org/2005/Atom'}
         entry = tree.find('a:entry', ns)
         if entry is None or identifier not in entry.findtext('a:id', '', ns):
             raise ValueError('arXiv reference not found')
-        return dict(doi=doi, title=' '.join(entry.findtext('a:title', '', ns).split()), url='https://arxiv.org/abs/'+identifier)
+        res = dict(doi=doi, title=' '.join(entry.findtext('a:title', '', ns).split()), url='https://arxiv.org/abs/'+identifier)
+        _REF_CACHE[key] = res
+        return res
     url = 'https://api.crossref.org/works/' + urllib.parse.quote(doi, safe='')
     with urllib.request.urlopen(url, timeout=40) as response:
         message = json.load(response)['message']
-    return {'doi': message['DOI'], 'title': message['title'][0], 'url': url}
+    res = {'doi': message['DOI'], 'title': message['title'][0], 'url': url}
+    _REF_CACHE[key] = res
+    return res
 
 
 def verify_claims(root, manifest, manuscript):
@@ -85,12 +100,20 @@ class StanfordAgenticReviewer:
         self.intercept = intercept
 
     def review(self, runner, context):
-        query = runner.role('Review retrieval planner', 'Read manuscript.md. Return {"query":"arXiv search query grounded in this manuscript"}.')['query']
-        xml = lookup(query)
-        tree = ET.fromstring(xml)
+        query = runner.role('Review retrieval planner', 'Read manuscript.md. Return {"query":"simple arXiv keyword query without nested parentheses grounded in this manuscript"}.')['query']
         ns = {'a': 'http://www.w3.org/2005/Atom'}
-        papers = [dict(title=e.findtext('a:title', namespaces=ns), id=e.findtext('a:id', namespaces=ns),
-                       abstract=e.findtext('a:summary', namespaces=ns)) for e in tree.findall('a:entry', ns)]
+        papers = []
+        for q in (query, load_spec(runner.root).get('arxiv_query', 'all:optimization')):
+            try:
+                xml = lookup(q)
+                tree = ET.fromstring(xml)
+                papers = [dict(title=e.findtext('a:title', namespaces=ns), id=e.findtext('a:id', namespaces=ns),
+                               abstract=e.findtext('a:summary', namespaces=ns)) for e in tree.findall('a:entry', ns)]
+                if papers:
+                    query = q
+                    break
+            except Exception:
+                continue
         if not papers:
             raise ValueError('review retrieval returned no metadata')
         (runner.root/'review_retrieval.json').write_text(json.dumps(dict(query=query, papers=papers), indent=2))

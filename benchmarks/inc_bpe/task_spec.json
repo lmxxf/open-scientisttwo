@@ -1,14 +1,21 @@
 {
-  "title": "Exact streaming incremental byte-pair tokenization",
+  "title": "Exact streaming incremental byte-pair tokenization via rank-ordered DFS complement-interval transduction",
   "primary_metric": "mse",
   "higher_is_better": false,
   "arxiv_query": "id:2605.30813",
   "seed_dois": [
-    "10.48550/arXiv.2605.30813"
+    "10.48550/arXiv.2605.30813",
+    "10.48550/arXiv.2309.08715",
+    "10.48550/arXiv.2306.16837",
+    "10.48550/arXiv.2207.13870",
+    "10.48550/arXiv.1508.07909",
+    "10.48550/arXiv.1808.06226",
+    "10.48550/arXiv.2402.01035",
+    "10.1145/360825.360855"
   ],
-  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve IncrementalBPE(vocab,rules,config), append(byte) returning last token ID, and tokens() returning all current prefix token IDs. Exact priority-ranked BPE, not longest-match tokenization.",
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve IncrementalBPE(vocab,rules,config), append(byte) returning last token ID, and tokens() returning all current prefix token IDs. Exact priority-ranked BPE at every prefix. CRITICAL DESIGN REQUIREMENTS: (1) Do NOT implement any runtime memoization/dictionary cache (no acceptance_cache), because caching confounds component ablations and adds lookup overhead. (2) Compile each merge token's valid predecessor region in the rank-ordered SufSucTree into at most TWO half-open DFS intervals (parent singleton [left[a], left[a]+1) union admissible higher-rank sibling suffix [cutoff_t, right[a])), guaranteeing strict O(R) space (2R intervals total vs O(RM) sets) and strict O(1) per-candidate membership checks. (3) Combine with dense 256-way flat automaton transition array, pre-sorted candidate tuples, atomic single-byte fast-path bypass, and optional certified non-spanning bigram boundaries. (4) Support clean orthogonal config switches: acceptance_mode in ['intervals','sets','pointer'], flat_transitions (bool, default True), atomic_fastpath (bool, default True), certified_regions (bool, default False) so all 5 Stage-4 ablations are 100% cache-free and causally isolated.",
   "eval_timeout": 120,
   "metric_atol": 0.0,
   "metric_rtol": 0.5,
-  "metric_description": "Median CPU wall-time includes OS/CPU noise; rerun tolerance 50%, not bitwise timings."
+  "metric_description": "Randomized interleaved paired streaming latency (ms per 10KB) with Student-t 95% CI, cache-free predicate isolation (Two-Interval vs Pointer vs Centroid Binary Search vs Explicit Set), and deep-forest scaling sweep (R up to 512, forest depth D up to 36)."
 }

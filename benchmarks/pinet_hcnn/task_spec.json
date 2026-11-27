@@ -1,14 +1,20 @@
 {
-  "title": "Context-dependent hard-constrained neural projection solver",
+  "title": "Differentiable nullspace active-face Newton projection for hard-constrained neural optimization",
   "primary_metric": "mse",
   "higher_is_better": false,
   "arxiv_query": "id:2508.10480",
   "seed_dois": [
-    "10.48550/arXiv.2508.10480"
+    "10.48550/arXiv.2508.10480",
+    "10.48550/arXiv.2104.12225",
+    "10.48550/arXiv.1703.00443",
+    "10.48550/arXiv.1910.12430",
+    "10.48550/arXiv.1711.08013",
+    "10.48550/arXiv.2102.04626",
+    "10.48550/arXiv.2601.06244"
   ],
-  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve solve(problem,config) returning a finite vector y. Enforce M@y=b and lower<=y<=upper. Optimize quadratic plus alpha*sin(y); never access hidden reference values.",
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve solve(problem,config) returning a finite vector y satisfying M@y=b and lower<=y<=upper while minimizing 0.5*y.T@Q@y + q.T@y + alpha*sum(sin(y)). Never access hidden reference values. CRITICAL DESIGN REQUIREMENTS: (1) Combine algebraic nullspace reparameterization y = y_p + V w via rank-revealing orthonormal QR/SVD (enforcing ||M y - b||_inf ~ 1e-15 by construction) with reduced active-face second-order Newton steps using exact Hessian H(y) = Q - alpha*diag(sin(y)) and cached face tangent basis Z. (2) Keep the core solver streamlined without redundant unexercised branches; expose clean orthogonal boolean config toggles: nullspace_reduction (default True), exact_hessian (default True), active_face_caching (default True), row_equilibration (default False), armijo_line_search (default True) so all 5 Stage-4 ablations cleanly isolate each mechanism's contribution without dead flags. Always return a finite iterate y when an ablation toggle is disabled.",
   "eval_timeout": 120,
   "metric_atol": 0.0,
   "metric_rtol": 0.5,
-  "metric_description": "Median CPU wall-time includes OS/CPU noise; rerun tolerance 50%, not bitwise timings."
+  "metric_description": "Composite projection error mse = rs_mean + 50*cv_max + 0.05*solve_time_ms with minimized primal-dual KKT certificate, cached-DR & tuned OSQP/ADMM baselines, implicit differentiation backward pass & end-to-end neural layer training, and d<=128 degeneracy stress sweep."
 }

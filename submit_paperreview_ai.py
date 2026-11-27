@@ -29,7 +29,12 @@ def main():
         if not token or receipt.get('pending') is False:
             break
         time.sleep(a.interval)
-        receipt['query'] = client.review(token)
+        try:
+            receipt['query'] = client.review(token)
+        except Exception as exc:
+            if isinstance(exc, RuntimeError):
+                raise
+            continue
         persist()
         if not receipt['query']['pending']:
             break
