@@ -136,10 +136,10 @@ class Pipeline:
         self.restore(self.best['snapshot'])
         response = self.agent('Writer', 'Read baseline_paper.md, task_spec.json, model.py, all *_metrics.json, related_work.xml and references.json. '
             'Write a comprehensive, standalone, camera-ready ICLR academic research paper in English ("We propose...", "Our theoretical analysis establishes...", "Our experiments evaluate...") with formal mathematical theorems/propositions and proofs in $...$ or $$...$$, explicit algorithm pseudocode blocks in ```...```, explicit space/time complexity bounds, and thorough empirical analysis. '
-            'CRITICAL STANDALONE PAPER STYLE: NEVER mention internal workspace filenames, pipeline roles, or artifact paths in the paper prose (strictly forbid writing "snapshots/pruned", "*_metrics.json", "final_test_metrics.json", "related_work.xml", "references.json", "role_026.json", "baseline_paper.md", "task_spec.json", "mse alias", or "read-only manuscript preparation"). Present the selected algorithm and its hyperparameters naturally as the proposed method, and note that the complete 21-run trajectory table is automatically appended in Appendix A. '
+            'CRITICAL STANDALONE PAPER STYLE: NEVER mention internal workspace filenames, pipeline roles, or artifact paths in the paper prose (strictly forbid writing "snapshots/pruned", "*_metrics.json", "final_test_metrics.json", "related_work.xml", "references.json", "role_026.json", "baseline_paper.md", "task_spec.json", "mse alias", or "read-only manuscript preparation"). Present the selected algorithm and its hyperparameters naturally as the proposed method. Do NOT write an Appendix A subsection inside experiments, as the complete trajectory table is automatically appended after References by the compiler. '
             'In Abstract and Introduction, state the proven theoretical contribution and the isolated + integrated empirical gains clearly and confidently as a unified algorithmic advance. '
             'In Related Work, systematically compare against ALL prior works in references.json and related_work.xml with deep technical contrast and formal differentiation. '
-            'In Experiments, present clean, well-organized Markdown summary tables of the primary held-out comparison, cache-free mechanism isolation, multi-scale/deep-forest scaling, component ablations, memory footprint, and hardware/environment reproducibility details. '
+            'In Experiments, present clean, well-organized Markdown summary tables of the primary held-out comparison, mechanism isolation, multi-scale stress scaling, component ablations, memory footprint, and hardware/environment reproducibility details. '
             'Only evidence-backed contributions; ensure 100% alignment between equations/hyperparameters in Methodology and snapshots/' + str(self.best["snapshot"]) + '/model.py and config.json. Return JSON with nonempty strings: '
             'title, abstract, introduction, related_work, methodology, experiments, limitations. '
             f'Read snapshots/{self.best["snapshot"]}/config.json for selected parameters. '+note)
@@ -215,12 +215,12 @@ class Pipeline:
                        'Return {"hypothesis":"..."}; no model changes or test inspection.')
             self.restore(self.best['snapshot'])
             self.snapshot(f'rebuttal{i}', self.best['config'], extra=True)
-            self.draft('Integrate the extra validation workload (rebuttal0_metrics.json), multi-scale/deep-forest scaling tables, and cache-free factorial ablations cleanly into the manuscript.')
+            self.draft('Integrate the extra validation workload, multi-scale stress scaling tables, and factorial ablations cleanly into the manuscript.')
         # Table 5 motivates one peer round by default: a second can overfit review feedback.
         self.restore(self.best['snapshot'])
         self.snapshot('final_test', self.best['config'], split='test')
-        self.draft('Final held-out test split is now measured (never used for model selection); integrate final_test_metrics.json including its paired baseline speedup, confidence intervals, and deep-forest/multi-regime tables into the empirical analysis.')
-        meta = self.agent('Meta Reviewer', 'Read manuscript.md and snapshots/' + str(self.best["snapshot"]) + '/config.json. Verify that all 21 metric records are present, methodology matches snapshots/' + str(self.best["snapshot"]) + '/model.py and config.json, and claims are well-structured. Do NOT ask to alter selected config values or add self-deprecating disclaimers in the abstract. Return {"revise":true|false,"reason":"..."}.')
+        self.draft('Final held-out test split is now measured (never used for model selection); integrate the held-out test results including paired baseline speedup, confidence intervals, and multi-scale scaling tables into the empirical analysis.')
+        meta = self.agent('Meta Reviewer', f'Read manuscript.md and snapshots/{self.best["snapshot"]}/config.json. Verify that all {len(self.claims)} metric records are present in Appendix A, methodology matches snapshots/{self.best["snapshot"]}/model.py and config.json, and claims are well-structured. Do NOT ask to alter selected config values, duplicate Appendix A in experiments, or add self-deprecating disclaimers in the abstract. Return {{"revise":true|false,"reason":"..."}}.')
         if meta['revise']:
             self.draft(meta['reason'])
         self.guard()
