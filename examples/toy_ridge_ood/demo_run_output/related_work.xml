@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/jDQYNoiCRryvzyJobrns9/v9gpI</id>
+  <title>arXiv Query: search_query=all:"robust regression"&amp;id_list=&amp;start=0&amp;max_results=2</title>
+  <updated>2026-11-27T04:29:46Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22robust+regression%22&amp;start=0&amp;max_results=2&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>2</opensearch:itemsPerPage>
+  <opensearch:totalResults>320</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2212.12787v2</id>
+    <title>A Bayesian Robust Regression Method for Corrupted Data Reconstruction</title>
+    <updated>2023-01-08T15:51:18Z</updated>
+    <link href="https://arxiv.org/abs/2212.12787v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2212.12787v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Because of the widespread existence of noise and data corruption, recovering the true regression parameters with a certain proportion of corrupted response variables is an essential task. Methods to overcome this problem often involve robust least-squares regression, but few methods perform well when confronted with severe adaptive adversarial attacks. In many applications, prior knowledge is often available from historical data or engineering experience, and by incorporating prior information into a robust regression method, we develop an effective robust regression method that can resist adaptive adversarial attacks. First, we propose the novel TRIP (hard Thresholding approach to Robust regression with sImple Prior) algorithm, which improves the breakdown point when facing adaptive adversarial attacks. Then, to improve the robustness and reduce the estimation error caused by the inclusion of priors, we use the idea of Bayesian reweighting to construct the more robust BRHT (robust Bayesian Reweighting regression via Hard Thresholding) algorithm. We prove the theoretical convergence of the proposed algorithms under mild conditions, and extensive experiments show that under different types of dataset attacks, our algorithms outperform other benchmark ones. Finally, we apply our methods to a data-recovery problem in a real-world application involving a space solar array, demonstrating their good applicability.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2022-12-24T17:25:53Z</published>
+    <arxiv:comment>22 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Zheyi Fan</name>
+    </author>
+    <author>
+      <name>Zhaohui Li</name>
+    </author>
+    <author>
+      <name>Jingyan Wang</name>
+    </author>
+    <author>
+      <name>Dennis K. J. Lin</name>
+    </author>
+    <author>
+      <name>Xiao Xiong</name>
+    </author>
+    <author>
+      <name>Qingpei Hu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2508.02874v1</id>
+    <title>Beyond Least Squares: Robust Regression Transformer (R2T)</title>
+    <updated>2025-08-04T20:03:13Z</updated>
+    <link href="https://arxiv.org/abs/2508.02874v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2508.02874v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Robust regression techniques rely on least-squares optimization, which works well for Gaussian noise but fails in the presence of asymmetric structured noise. We propose a hybrid neural-symbolic architecture where a transformer encoder processes numerical sequences, a compression NN predicts symbolic parameters, and a fixed symbolic equation reconstructs the original sequence. Using synthetic data, the training objective is to recover the original sequence after adding asymmetric structured noise, effectively learning a symbolic fit guided by neural parameter estimation. Our model achieves a median regression MSE of 6e-6 to 3.5e-5 on synthetic wearable data, which is a 10-300 times improvement when compared with ordinary least squares fit and robust regression techniques such as Huber loss or SoftL1.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-08-04T20:03:13Z</published>
+    <arxiv:comment>10 pages, 4 figures, 1 table</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Roman Gutierrez</name>
+    </author>
+    <author>
+      <name>Tony Kai Tang</name>
+    </author>
+    <author>
+      <name>Isabel Gutierrez</name>
+    </author>
+  </entry>
+</feed>

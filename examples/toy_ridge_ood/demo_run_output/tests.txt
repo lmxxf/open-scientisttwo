@@ -1,0 +1,27 @@
+test_audits (test_core.Core) ... ok
+test_snapshot_and_guard (test_core.Core) ... ok
+test_stage (test_core.Core) ... ok
+test_timeout (test_core.Core) ... ok
+test_trial_decisions (test_core.Core) ... ok
+test_upload (test_core.Core) ... ok
+test_cli_dry_run_and_query (test_regressions.HTTPTests) ... ok
+test_cli_persists_token_before_query_failure (test_regressions.HTTPTests) ... ok
+test_confirmation_validation (test_regressions.HTTPTests) ... ok
+test_empty_s3 (test_regressions.HTTPTests) ... ok
+test_pending_and_rate_limit (test_regressions.HTTPTests) ... ok
+test_s3_failure (test_regressions.HTTPTests) ... ok
+test_xml_s3_and_confirmation (test_regressions.HTTPTests) ... ok
+test_actual_reference_extra_and_mismatch (test_regressions.IntegrityTests) ... ok
+test_candidate_resets_before_coding (test_regressions.IntegrityTests) ... ok
+test_failure_trace_precedes_guard (test_regressions.IntegrityTests) ... ok
+test_full_engineering_budget_and_feedback (test_regressions.IntegrityTests) ... ok
+test_invalid_budgets (test_regressions.IntegrityTests) ... ok
+test_latex_braces_and_backslashes (test_regressions.IntegrityTests) ... ok
+test_restore_selected_and_baseline_immutable (test_regressions.IntegrityTests) ... ok
+test_stage_exhaustion_invalid_and_feedback (test_regressions.IntegrityTests) ... ok
+test_zero_success_terminal_receipt (test_regressions.IntegrityTests) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 5.896s
+
+OK

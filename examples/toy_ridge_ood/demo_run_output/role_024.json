@@ -1,0 +1,4 @@
+{
+  "aligned": true,
+  "evidence": "I inspected AGENTS.md, manuscript.md, and only the selected snapshot's model.py and config.json. The Method matches the code: intercept augmentation; OLS initialization with rcond=None; exactly 20 IRLS updates; centered residual MAD divided by 0.6744897501960817 and floored at 1e-8; cutoff 1.345 times scale; weights 1 within the cutoff and cutoff/absolute residual otherwise; square-root-weighted least squares; and prediction using the final coefficients. The stated standardized Huber loss matches these weights. The manuscript correctly qualifies that recomputing scale does not establish minimization of a single fixed-scale objective. Configuration matches the supplied selection. This source audit does not independently verify reported MSEs or execution history."
+}

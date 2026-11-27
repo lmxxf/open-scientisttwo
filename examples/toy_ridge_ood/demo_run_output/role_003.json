@@ -1,0 +1,36 @@
+{
+  "ideas": [
+    {
+      "config": {
+        "method": "huber_irls",
+        "iterations": 20,
+        "delta": 1.345,
+        "scale": "residual_mad",
+        "scale_floor": 1e-08
+      },
+      "novelty": 0,
+      "rationale": "I propose Huber iteratively reweighted least squares with residual MAD scaling and a positive scale floor. This standard approach limits large residual influence; improvement remains unmeasured. The supplied Huber reference concerns location estimation and does not establish regression performance."
+    },
+    {
+      "config": {
+        "method": "trimmed_least_squares",
+        "iterations": 20,
+        "retain_fraction": 0.8,
+        "initialization": "huber_irls"
+      },
+      "novelty": 0,
+      "rationale": "I propose alternating between retaining the 80% smallest absolute residuals and refitting least squares. Hard residual selection is related to the thresholding theme in the supplied TRIP/BRHT abstract, without reproducing its prior or Bayesian machinery. The trimming fraction is a hypothesis requiring validation."
+    },
+    {
+      "config": {
+        "method": "student_t_irls",
+        "iterations": 20,
+        "degrees_of_freedom": 4,
+        "scale": "residual_mad",
+        "scale_floor": 1e-08
+      },
+      "novelty": 0,
+      "rationale": "I propose Student-t residual reweighting with weights proportional to (degrees_of_freedom+1)/(degrees_of_freedom+(residual/scale)^2). This offers smooth downweighting distinct from Huber clipping and hard trimming. I make no novelty or measured performance claim; the supplied two-paper feed cannot establish literature coverage."
+    }
+  ]
+}

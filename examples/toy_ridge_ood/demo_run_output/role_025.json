@@ -1,0 +1,3 @@
+{
+  "query": "(all:\"Huber regression\" OR all:\"robust linear regression\") AND (all:\"iteratively reweighted least squares\" OR all:\"median absolute deviation\" OR all:\"leverage points\" OR all:\"adaptive scale\")"
+}

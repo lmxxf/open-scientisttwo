@@ -1,0 +1,30 @@
+{
+  "environment": {
+    "python": "3.10.12",
+    "numpy": "2.2.6",
+    "codex": "codex-cli 0.172.0"
+  },
+  "test_count": 22,
+  "test_status": "passed",
+  "roles": 26,
+  "coding_roles": 3,
+  "fresh_cli": true,
+  "selected_source_sha256": "5e0dea717a0ba214675853b436d28beb7d9ba6d05f63d916a0aa4fa1fdc0c462",
+  "core_sha256": {
+    "open_scientisttwo/audits.py": "e03cacc1d3b0fd4b85ea7bee221d58a3b75b08242a99c3d1afd6b06664272d3b",
+    "open_scientisttwo/pipeline.py": "32afde9f6f58f0783b2fa869c104d5210ca91f94f7176fefd1bdb85fa30d1cf0",
+    "open_scientisttwo/runner.py": "430b47d22974d493e67974688a62175a8d9e844a0c3a31c1782b96bcd6300def",
+    "open_scientisttwo/upload.py": "4b0f46c9afc2ec6e1dd75add27c83dfc165698c406b9d61e46a6947bff5e5ab4"
+  },
+  "coding_branches": [
+    "evolved0",
+    "initial",
+    "master",
+    "seed0"
+  ],
+  "latex": {
+    "compiler": "/usr/bin/pdflatex",
+    "returncode": 0,
+    "missing_glyph_warnings": 0
+  }
+}

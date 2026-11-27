@@ -1,0 +1,175 @@
+{
+  "date": "2026-11-27T06:18:43.287410+00:00",
+  "python": "3.10.12",
+  "machine": "x86_64",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "threads": {
+    "OPENBLAS_NUM_THREADS": 1,
+    "OMP_NUM_THREADS": 1
+  },
+  "results": [
+    {
+      "benchmark": "inc_bpe",
+      "command": [
+        "/tmp/ost-venv/bin/python",
+        "-B",
+        "eval.py",
+        "--mode",
+        "subset",
+        "--split",
+        "validation"
+      ],
+      "metrics": {
+        "mse": 11.035083237705598,
+        "latency_ms_per_10kb": 11.035083237705598,
+        "throughput_mb_s": 0.9062006859931208,
+        "latency_us_per_kb": 1103.5083237705599,
+        "bytes": 480,
+        "prefixes_checked": 480,
+        "exact": true,
+        "timing_repeats": 7,
+        "mode": "subset",
+        "split": "validation",
+        "extra": false
+      }
+    },
+    {
+      "benchmark": "inc_bpe",
+      "command": [
+        "/tmp/ost-venv/bin/python",
+        "-B",
+        "eval.py",
+        "--mode",
+        "full",
+        "--split",
+        "validation"
+      ],
+      "metrics": {
+        "mse": 10.310243081019305,
+        "latency_ms_per_10kb": 10.310243081019305,
+        "throughput_mb_s": 0.9699092370003914,
+        "latency_us_per_kb": 1031.0243081019305,
+        "bytes": 2304,
+        "prefixes_checked": 2304,
+        "exact": true,
+        "timing_repeats": 7,
+        "mode": "full",
+        "split": "validation",
+        "extra": false
+      }
+    },
+    {
+      "benchmark": "inc_bpe",
+      "command": [
+        "/tmp/ost-venv/bin/python",
+        "-B",
+        "eval.py",
+        "--mode",
+        "subset",
+        "--split",
+        "test",
+        "--extra"
+      ],
+      "metrics": {
+        "mse": 10.738958129271245,
+        "latency_ms_per_10kb": 10.738958129271245,
+        "throughput_mb_s": 0.9311890296641476,
+        "latency_us_per_kb": 1073.8958129271243,
+        "bytes": 480,
+        "prefixes_checked": 480,
+        "exact": true,
+        "timing_repeats": 7,
+        "mode": "subset",
+        "split": "test",
+        "extra": true
+      }
+    },
+    {
+      "benchmark": "pinet_hcnn",
+      "command": [
+        "/tmp/ost-venv/bin/python",
+        "-B",
+        "eval.py",
+        "--mode",
+        "subset",
+        "--split",
+        "validation"
+      ],
+      "metrics": {
+        "mse": 0.07503313593521908,
+        "rs_mean": 0.0008405164677577244,
+        "eq_cv_max": 6.217248937900877e-15,
+        "cv_max": 0.00020166114335795626,
+        "solve_time_ms": 1.282191245991271,
+        "severe_infeasibility_penalty": 0.0,
+        "instances": 4,
+        "mode": "subset",
+        "split": "validation",
+        "extra": false,
+        "reference": "KKT certified global optimum on box; sinusoidal cases convex on this restricted box",
+        "timing_repeats": 3
+      }
+    },
+    {
+      "benchmark": "pinet_hcnn",
+      "command": [
+        "/tmp/ost-venv/bin/python",
+        "-B",
+        "eval.py",
+        "--mode",
+        "full",
+        "--split",
+        "validation"
+      ],
+      "metrics": {
+        "mse": 0.15231426480275154,
+        "rs_mean": 0.003263816709955677,
+        "eq_cv_max": 1.509903313490213e-14,
+        "cv_max": 0.0002746744625241049,
+        "solve_time_ms": 2.706334499331812,
+        "severe_infeasibility_penalty": 0.0,
+        "instances": 6,
+        "mode": "full",
+        "split": "validation",
+        "extra": false,
+        "reference": "KKT certified global optimum on box; sinusoidal cases convex on this restricted box",
+        "timing_repeats": 3
+      }
+    },
+    {
+      "benchmark": "pinet_hcnn",
+      "command": [
+        "/tmp/ost-venv/bin/python",
+        "-B",
+        "eval.py",
+        "--mode",
+        "subset",
+        "--split",
+        "test",
+        "--extra"
+      ],
+      "metrics": {
+        "mse": 0.2110343185403314,
+        "rs_mean": 0.0006849622025763141,
+        "eq_cv_max": 3.774758283725532e-15,
+        "cv_max": 0.002902390376922248,
+        "solve_time_ms": 1.3045967498328537,
+        "severe_infeasibility_penalty": 0.0,
+        "instances": 4,
+        "mode": "subset",
+        "split": "test",
+        "extra": true,
+        "reference": "KKT certified global optimum on box; sinusoidal cases convex on this restricted box",
+        "timing_repeats": 3
+      }
+    }
+  ],
+  "source_hashes": {
+    "benchmarks/inc_bpe/data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+    "benchmarks/inc_bpe/eval.py": "588c54f9de77ca4232940da72bff528f97db9d612b97de1db14a6aac3d2ed3d3",
+    "benchmarks/inc_bpe/model.py": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542",
+    "benchmarks/pinet_hcnn/data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+    "benchmarks/pinet_hcnn/eval.py": "0efb58891e08173b92dd14ce75e60a5ec318d5edd6cac0aab6423e23621abc69",
+    "benchmarks/pinet_hcnn/model.py": "3bc5fb48839c214ae68e5b3d72343f90a6a43834d88c87566804cad788779b67"
+  }
+}

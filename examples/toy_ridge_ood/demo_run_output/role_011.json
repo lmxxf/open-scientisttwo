@@ -1,0 +1,12 @@
+{
+  "config": {
+    "iterations": 30,
+    "delta": 1.5
+  },
+  "modified_files": [
+    "model.py"
+  ],
+  "method": "Huber IRLS initialized from OLS, with residual MAD scale. iterations=0 returns OLS.",
+  "limitation": "Inherited scale settings were unavailable in the supplied baseline; residual MAD was used.",
+  "validation": "No tests run or data inspected."
+}

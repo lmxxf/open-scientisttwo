@@ -1,0 +1,14 @@
+{
+  "title": "Context-dependent hard-constrained neural projection solver",
+  "primary_metric": "mse",
+  "higher_is_better": false,
+  "arxiv_query": "id:2508.10480",
+  "seed_dois": [
+    "10.48550/arXiv.2508.10480"
+  ],
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve solve(problem,config) returning a finite vector y. Enforce M@y=b and lower<=y<=upper. Optimize quadratic plus alpha*sin(y); never access hidden reference values.",
+  "eval_timeout": 120,
+  "metric_atol": 0.0,
+  "metric_rtol": 0.5,
+  "metric_description": "Median CPU wall-time includes OS/CPU noise; rerun tolerance 50%, not bitwise timings."
+}

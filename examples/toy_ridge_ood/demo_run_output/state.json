@@ -1,0 +1,201 @@
+[
+  {
+    "stage": 1,
+    "limitations": {
+      "limitations": [
+        {
+          "limitation": "Squared-error fitting is sensitive to training-response contamination.",
+          "evidence": "baseline_paper.md specifies 12% training response contamination; model.py fits all responses with unweighted np.linalg.lstsq and no robust loss or outlier handling.",
+          "status": "Mechanism supported by implementation; prediction degradation has not been measured in this role."
+        },
+        {
+          "limitation": "The predictor is restricted to an affine function of the supplied features.",
+          "evidence": "model.py adds an intercept and fits linear coefficients without nonlinear features or interactions.",
+          "status": "Verified structural restriction; the specified synthetic linear task does not establish that this restriction causes error."
+        },
+        {
+          "limitation": "The baseline provides no explicit adaptation to the stated validation/test covariate scale shift.",
+          "evidence": "baseline_paper.md specifies a clean covariate scale shift; model.py applies the training coefficients directly to test features.",
+          "status": "Verified absence of adaptation; scale shift alone does not establish failure under a correctly specified linear conditional model."
+        },
+        {
+          "limitation": "The implementation has no explicit regularization or conditioning diagnostics.",
+          "evidence": "model.py uses np.linalg.lstsq with rcond=None and does not expose penalties or report rank and singular values.",
+          "status": "Verified implementation property; instability or rank deficiency in the actual inputs has not been established."
+        },
+        {
+          "limitation": "The interface returns only point predictions and ignores configuration.",
+          "evidence": "fit_predict returns b @ fitted_coefficients; config is unused, and no uncertainty estimates or fitting diagnostics are returned.",
+          "status": "Verified interface limitation; whether additional outputs are required is unspecified."
+        },
+        {
+          "limitation": "The documented scope supports a demonstration rather than a novelty or broad generalization claim.",
+          "evidence": "baseline_paper.md describes synthetic linear regression with four features and explicitly identifies the exercise as known robust regression rather than a novel algorithm.",
+          "status": "Documented scope; these files provide no empirical results establishing generalization beyond that setting."
+        }
+      ]
+    }
+  },
+  {
+    "stage": 1,
+    "seed_queue": [
+      {
+        "config": {
+          "method": "huber_irls",
+          "iterations": 20,
+          "delta": 1.345,
+          "scale": "residual_mad",
+          "scale_floor": 1e-08
+        },
+        "novelty": 0,
+        "rationale": "I propose Huber iteratively reweighted least squares with residual MAD scaling and a positive scale floor. This standard approach limits large residual influence; improvement remains unmeasured. The supplied Huber reference concerns location estimation and does not establish regression performance."
+      },
+      {
+        "config": {
+          "method": "trimmed_least_squares",
+          "iterations": 20,
+          "retain_fraction": 0.8,
+          "initialization": "huber_irls"
+        },
+        "novelty": 0,
+        "rationale": "I propose alternating between retaining the 80% smallest absolute residuals and refitting least squares. Hard residual selection is related to the thresholding theme in the supplied TRIP/BRHT abstract, without reproducing its prior or Bayesian machinery. The trimming fraction is a hypothesis requiring validation."
+      },
+      {
+        "config": {
+          "method": "student_t_irls",
+          "iterations": 20,
+          "degrees_of_freedom": 4,
+          "scale": "residual_mad",
+          "scale_floor": 1e-08
+        },
+        "novelty": 0,
+        "rationale": "I propose Student-t residual reweighting with weights proportional to (degrees_of_freedom+1)/(degrees_of_freedom+(residual/scale)^2). This offers smooth downweighting distinct from Huber clipping and hard trimming. I make no novelty or measured performance claim; the supplied two-paper feed cannot establish literature coverage."
+      }
+    ]
+  },
+  {
+    "stage": 2,
+    "label": "initial",
+    "mode": "subset",
+    "decision": "Good",
+    "mse": 0.048565701283490234,
+    "feedback": "I accept the supplied subset result: MSE 0.048565701283490234 is lower than baseline 6.408876466897288. This satisfies the numeric improvement gate; full-validation performance and scientific novelty remain unestablished."
+  },
+  {
+    "stage": 2,
+    "label": "initial",
+    "mode": "full",
+    "decision": "Good",
+    "mse": 0.04132739672516235,
+    "feedback": "I verified recorded full-validation MSE decreased from 1.99069057153675 to 0.04132739672516235, with improvement on all five matched seeds. Source and configuration match the candidate snapshot; evaluator and loader hashes match baseline snapshots. Accept for this validation stage; these records do not establish held-out performance or scientific novelty."
+  },
+  {
+    "stage": 2,
+    "label": "seed0",
+    "mode": "subset",
+    "decision": "Good",
+    "mse": 0.04281212939891291,
+    "feedback": "I accept the supplied subset result: MSE 0.04281212939891291 is lower than baseline 6.408876466897288. This satisfies the numeric improvement gate; full-validation performance and scientific novelty remain unestablished."
+  },
+  {
+    "stage": 2,
+    "label": "seed0",
+    "mode": "full",
+    "decision": "Good",
+    "mse": 0.04135963917671087,
+    "feedback": "I verified the recorded full-validation MSE is 0.04135963917671087 versus baseline 1.99069057153675, with improvement on all five matching seeds. Current model, evaluator, and loader hashes match the candidate snapshot. The lower-MSE gate passes. This assessment uses recorded metrics, not an independent rerun; it establishes neither held-out performance nor scientific novelty."
+  },
+  {
+    "stage": 2,
+    "label": "evolved0",
+    "mode": "subset",
+    "decision": "Good",
+    "mse": 0.04961906615617495,
+    "feedback": "The reported subset MSE of 0.04961906615617495 with iterations=30 and delta=1.5 is lower than the baseline MSE of 6.408876466897288. This passes the stated improvement gate; full-validation performance remains unverified."
+  },
+  {
+    "stage": 2,
+    "label": "evolved0",
+    "mode": "full",
+    "decision": "Good",
+    "mse": 0.04145129104587781,
+    "feedback": "I verified the recorded full-validation MSE is 0.04145129104587781 versus baseline 1.99069057153675, a 97.92% reduction, with improvement on all five matching seeds. The snapshot configuration matches iterations=30 and delta=1.5. Accept on validation performance; this does not establish scientific novelty or held-out generalization."
+  },
+  {
+    "stage": 3,
+    "round": 0,
+    "successes": 3,
+    "unconsumed_seeds": [
+      {
+        "config": {
+          "method": "student_t_irls",
+          "iterations": 20,
+          "degrees_of_freedom": 4,
+          "scale": "residual_mad",
+          "scale_floor": 1e-08
+        },
+        "novelty": 0,
+        "rationale": "I propose Student-t residual reweighting with weights proportional to (degrees_of_freedom+1)/(degrees_of_freedom+(residual/scale)^2). This offers smooth downweighting distinct from Huber clipping and hard trimming. I make no novelty or measured performance claim; the supplied two-paper feed cannot establish literature coverage."
+      }
+    ]
+  },
+  {
+    "stage": 4,
+    "best": {
+      "label": "initial",
+      "snapshot": "initial_full",
+      "config": {
+        "method": "huber_irls",
+        "iterations": 20,
+        "delta": 1.345,
+        "scale": "residual_mad",
+        "scale_floor": 1e-08
+      },
+      "mse": 0.04132739672516235
+    },
+    "ablations": [
+      {
+        "config": {
+          "method": "huber_irls",
+          "iterations": 0,
+          "delta": 1.345,
+          "scale": "residual_mad",
+          "scale_floor": 1e-08
+        },
+        "mse": 1.99069057153675
+      },
+      {
+        "config": {
+          "method": "huber_irls",
+          "iterations": 1,
+          "delta": 1.345,
+          "scale": "residual_mad",
+          "scale_floor": 1e-08
+        },
+        "mse": 0.07206682832034102
+      },
+      {
+        "config": {
+          "method": "huber_irls",
+          "iterations": 20,
+          "delta": 1.345,
+          "scale": "residual_mad",
+          "scale_floor": 1e-300
+        },
+        "mse": 0.04132739672516235
+      }
+    ]
+  },
+  {
+    "stage": 5,
+    "review": {
+      "score": 5,
+      "experiment": "Freeze the selected source, configuration, evaluator, and loader hashes, then independently reproduce baseline and selected IRLS results in fresh processes. Report paired per-seed MSE differences and uncertainty on additional validation seeds, explicitly identify each ablated component, and measure sensitivity to contamination rate and leverage outliers. After freezing all choices, evaluate held-out tests once. The manuscript clearly disclaims novelty and acknowledges limitations, but currently provides recorded validation means without independent reproduction, uncertainty estimates, or interpretable ablation definitions."
+    }
+  },
+  {
+    "stage": 6,
+    "audits": "passed",
+    "local_review": "Reject"
+  }
+]

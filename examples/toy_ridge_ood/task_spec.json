@@ -1,0 +1,11 @@
+{
+  "title": "Robust regression under response contamination",
+  "primary_metric": "mse",
+  "higher_is_better": false,
+  "arxiv_query": "all:\"robust regression\"",
+  "seed_dois": [
+    "10.1214/aoms/1177703732"
+  ],
+  "coding_guidance": "Edit only model.py; preserve fit_predict(x,y,test,config). Return predictions; weights must use training residuals only. Never change eval.py/data.py.",
+  "eval_timeout": 120
+}

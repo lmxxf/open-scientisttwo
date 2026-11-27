@@ -1,0 +1,34 @@
+{
+  "limitations": [
+    {
+      "limitation": "Squared-error fitting is sensitive to training-response contamination.",
+      "evidence": "baseline_paper.md specifies 12% training response contamination; model.py fits all responses with unweighted np.linalg.lstsq and no robust loss or outlier handling.",
+      "status": "Mechanism supported by implementation; prediction degradation has not been measured in this role."
+    },
+    {
+      "limitation": "The predictor is restricted to an affine function of the supplied features.",
+      "evidence": "model.py adds an intercept and fits linear coefficients without nonlinear features or interactions.",
+      "status": "Verified structural restriction; the specified synthetic linear task does not establish that this restriction causes error."
+    },
+    {
+      "limitation": "The baseline provides no explicit adaptation to the stated validation/test covariate scale shift.",
+      "evidence": "baseline_paper.md specifies a clean covariate scale shift; model.py applies the training coefficients directly to test features.",
+      "status": "Verified absence of adaptation; scale shift alone does not establish failure under a correctly specified linear conditional model."
+    },
+    {
+      "limitation": "The implementation has no explicit regularization or conditioning diagnostics.",
+      "evidence": "model.py uses np.linalg.lstsq with rcond=None and does not expose penalties or report rank and singular values.",
+      "status": "Verified implementation property; instability or rank deficiency in the actual inputs has not been established."
+    },
+    {
+      "limitation": "The interface returns only point predictions and ignores configuration.",
+      "evidence": "fit_predict returns b @ fitted_coefficients; config is unused, and no uncertainty estimates or fitting diagnostics are returned.",
+      "status": "Verified interface limitation; whether additional outputs are required is unspecified."
+    },
+    {
+      "limitation": "The documented scope supports a demonstration rather than a novelty or broad generalization claim.",
+      "evidence": "baseline_paper.md describes synthetic linear regression with four features and explicitly identifies the exercise as known robust regression rather than a novel algorithm.",
+      "status": "Documented scope; these files provide no empirical results establishing generalization beyond that setting."
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "hypothesis": "I hypothesize that the frozen selected Huber IRLS method will retain lower mean validation MSE than the frozen baseline across five previously unused validation seeds, 5–9. Evaluate both methods on identical generated data for each seed with unchanged configurations, evaluator, and loader; report all paired per-seed MSEs and the mean paired difference (IRLS minus baseline), predicting a negative mean difference. Treat this as supplementary validation evidence without reselection, model changes, or held-out-test inspection; no new measurements are claimed here."
+}

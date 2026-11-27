@@ -1,0 +1,4 @@
+{
+  "revise": true,
+  "reason": "I find the Method and limitations appropriately bounded, but the experiment table does not identify validation splits, seed sets, or extra-seed status for each row. Define the seed0/evolved0 candidates and ablation0–2 interventions, link each result to its source/configuration snapshot and metric artifact, and explain why initial_full was selected. These omissions prevent readers from interpreting the comparisons and subtraction controls reproducibly."
+}

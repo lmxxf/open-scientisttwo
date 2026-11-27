@@ -1,0 +1,7 @@
+{
+  "method": "huber_irls",
+  "iterations": 20,
+  "delta": 1.345,
+  "scale": "residual_mad",
+  "scale_floor": 1e-08
+}

@@ -1,0 +1,32 @@
+{
+  "success": true,
+  "best": {
+    "label": "initial",
+    "snapshot": "initial_full",
+    "config": {
+      "method": "huber_irls",
+      "iterations": 20,
+      "delta": 1.345,
+      "scale": "residual_mad",
+      "scale_floor": 1e-08
+    },
+    "mse": 0.04132739672516235
+  },
+  "baseline_full": 1.99069057153675,
+  "final_test": 0.038916122671650406,
+  "local_score": 4.428571428571429,
+  "local_decision": "Reject",
+  "claims": 14,
+  "roles": 26,
+  "protected_hashes": {
+    "eval.py": "90dd5a6971ac70351d762aab8818b44b4fd2b08cf6e14e61c15b56b66e067195",
+    "data.py": "8c2f544fe750098a54050829ad102f08cd4ec5aee55c46b6a0dc2a3373bebd03"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--fast-demo",
+    "--output",
+    "/tmp/ost-final-verified"
+  ],
+  "seconds": 478.56309016900195
+}

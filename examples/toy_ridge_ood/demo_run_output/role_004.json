@@ -1,0 +1,15 @@
+{
+  "config": {
+    "method": "huber_irls",
+    "iterations": 20,
+    "delta": 1.345,
+    "scale": "residual_mad",
+    "scale_floor": 1e-08
+  },
+  "status": "implemented",
+  "files_modified": [
+    "model.py"
+  ],
+  "details": "Preserved fit_predict API; iterations=0 returns OLS. Added Huber IRLS with residual MAD scaling and positive scale floor.",
+  "verification": "git diff --check passed. No tests run or data inspected; performance remains unmeasured."
+}

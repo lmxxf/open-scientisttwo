@@ -1,0 +1,4 @@
+{
+  "score": 5,
+  "experiment": "Freeze the selected source, configuration, evaluator, and loader hashes, then independently reproduce baseline and selected IRLS results in fresh processes. Report paired per-seed MSE differences and uncertainty on additional validation seeds, explicitly identify each ablated component, and measure sensitivity to contamination rate and leverage outliers. After freezing all choices, evaluate held-out tests once. The manuscript clearly disclaims novelty and acknowledges limitations, but currently provides recorded validation means without independent reproduction, uncertainty estimates, or interpretable ablation definitions."
+}

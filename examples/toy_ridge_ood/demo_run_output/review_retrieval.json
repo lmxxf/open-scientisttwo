@@ -1,0 +1,10 @@
+{
+  "query": "(all:\"Huber regression\" OR all:\"robust linear regression\") AND (all:\"iteratively reweighted least squares\" OR all:\"median absolute deviation\" OR all:\"leverage points\" OR all:\"adaptive scale\")",
+  "papers": [
+    {
+      "title": "Unified Robust Estimation",
+      "id": "http://arxiv.org/abs/2010.02848v5",
+      "abstract": "Robust estimation is primarily concerned with providing reliable parameter estimates in the presence of outliers. Numerous robust loss functions have been proposed in regression and classification, along with various computing algorithms. In modern penalised generalised linear models (GLM), however, there is limited research on robust estimation that can provide weights to determine the outlier status of the observations. This article proposes a unified framework based on a large family of loss functions, a composite of concave and convex functions (CC-family). Properties of the CC-family are investigated, and CC-estimation is innovatively conducted via the iteratively reweighted convex optimisation (IRCO), which is a generalisation of the iteratively reweighted least squares in robust linear regression. For robust GLM, the IRCO becomes the iteratively reweighted GLM. The unified framework contains penalised estimation and robust support vector machine and is demonstrated with a variety of data applications."
+    }
+  ]
+}

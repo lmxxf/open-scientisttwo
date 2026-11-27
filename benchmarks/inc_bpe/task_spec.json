@@ -1,0 +1,14 @@
+{
+  "title": "Exact streaming incremental byte-pair tokenization",
+  "primary_metric": "mse",
+  "higher_is_better": false,
+  "arxiv_query": "id:2605.30813",
+  "seed_dois": [
+    "10.48550/arXiv.2605.30813"
+  ],
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve IncrementalBPE(vocab,rules,config), append(byte) returning last token ID, and tokens() returning all current prefix token IDs. Exact priority-ranked BPE, not longest-match tokenization.",
+  "eval_timeout": 120,
+  "metric_atol": 0.0,
+  "metric_rtol": 0.5,
+  "metric_description": "Median CPU wall-time includes OS/CPU noise; rerun tolerance 50%, not bitwise timings."
+}

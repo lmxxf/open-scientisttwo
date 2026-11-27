@@ -1,0 +1,11 @@
+{
+  "config": {
+    "method": "trimmed_least_squares",
+    "iterations": 20,
+    "retain_fraction": 0.8,
+    "initialization": "huber_irls"
+  },
+  "summary": "Edited only model.py. Preserved fit_predict API; added Huber IRLS initialization followed by alternating residual trimming and least-squares refitting. iterations=0 returns OLS.",
+  "validation": "No tests run or data inspected.",
+  "novelty": 0
+}

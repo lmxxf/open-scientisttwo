@@ -1,0 +1,34 @@
+{
+  "ablations": [
+    {
+      "config": {
+        "method": "huber_irls",
+        "iterations": 0,
+        "delta": 1.345,
+        "scale": "residual_mad",
+        "scale_floor": 1e-08
+      },
+      "reason": "Remove robustness entirely by returning the initial ordinary least-squares fit."
+    },
+    {
+      "config": {
+        "method": "huber_irls",
+        "iterations": 1,
+        "delta": 1.345,
+        "scale": "residual_mad",
+        "scale_floor": 1e-08
+      },
+      "reason": "Remove repeated refinement, retaining only one residual-scale estimate and one weighted least-squares update."
+    },
+    {
+      "config": {
+        "method": "huber_irls",
+        "iterations": 20,
+        "delta": 1.345,
+        "scale": "residual_mad",
+        "scale_floor": 1e-300
+      },
+      "reason": "Effectively remove the selected numerical scale floor while retaining a positive value required by the implementation; measure whether the original floor affects stability or accuracy."
+    }
+  ]
+}

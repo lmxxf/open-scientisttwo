@@ -1,0 +1,27 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 14
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "90dd5a6971ac70351d762aab8818b44b4fd2b08cf6e14e61c15b56b66e067195",
+      "data.py": "8c2f544fe750098a54050829ad102f08cd4ec5aee55c46b6a0dc2a3373bebd03"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.1214/aoms/1177703732",
+        "title": "Robust Estimation of a Location Parameter",
+        "url": "https://api.crossref.org/works/10.1214%2Faoms%2F1177703732"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "I inspected AGENTS.md, manuscript.md, and only the selected snapshot's model.py and config.json. The Method matches the code: intercept augmentation; OLS initialization with rcond=None; exactly 20 IRLS updates; centered residual MAD divided by 0.6744897501960817 and floored at 1e-8; cutoff 1.345 times scale; weights 1 within the cutoff and cutoff/absolute residual otherwise; square-root-weighted least squares; and prediction using the final coefficients. The stated standardized Huber loss matches these weights. The manuscript correctly qualifies that recomputing scale does not establish minimization of a single fixed-scale objective. Configuration matches the supplied selection. This source audit does not independently verify reported MSEs or execution history."
+  }
+}

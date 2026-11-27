@@ -1,0 +1,6 @@
+{
+  "method": "trimmed_least_squares",
+  "iterations": 20,
+  "retain_fraction": 0.8,
+  "initialization": "huber_irls"
+}
