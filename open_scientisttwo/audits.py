@@ -35,9 +35,16 @@ def lookup(query):
     if query in _LOOKUP_CACHE:
         return _LOOKUP_CACHE[query]
     url = 'https://export.arxiv.org/api/query?' + urllib.parse.urlencode({'search_query': query, 'max_results': 2})
-    res = execute(['curl', '--fail', '--silent', '--show-error', '--retry', '3', '--retry-delay', '2', '--max-time', '40', url], '/tmp', 90)
-    _LOOKUP_CACHE[query] = res
-    return res
+    last_err = None
+    for attempt in range(4):
+        try:
+            res = execute(['curl', '--fail', '--silent', '--show-error', '--retry', '3', '--retry-delay', '2', '--max-time', '40', url], '/tmp', 90)
+            _LOOKUP_CACHE[query] = res
+            return res
+        except Exception as exc:
+            last_err = exc
+            __import__('time').sleep(1.5 * (attempt + 1))
+    raise last_err
 
 
 def reference(doi):
@@ -135,7 +142,8 @@ def verify_references(manuscript):
     text = Path(manuscript).read_text()
     if '## References\n' not in text:
         raise ValueError('missing bibliography')
-    entries = text.split('## References\n', 1)[1].strip().splitlines()
+    ref_block = text.split('## References\n', 1)[1].split('\n## ', 1)[0]
+    entries = ref_block.strip().splitlines()
     verified = []
     for entry in entries:
         match = re.fullmatch(r'- (.+)\. DOI: (10\.\S+)', entry)

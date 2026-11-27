@@ -87,9 +87,8 @@ def write_manuscript(root, response, claims, refs, spec):
     text='# '+response['title']+'\n\n## Abstract\n'+response['abstract']+'\n'
     for key,title in SECTIONS:
         text+='\n## '+title+'\n'+response[key]+'\n'
-        if key=='experiments':
-            text+=f"\n| Experiment | {spec['primary_metric']} |\n|---|---|\n"+rows+'\n'
     text+='\n## References\n'+'\n'.join(f"- {r['title']}. DOI: {r['doi']}" for r in refs)+'\n'
+    text+=f"\n## Appendix A: Complete Experimental Trajectory Manifest\n\n| Experiment | {spec['primary_metric']} |\n|---|---|\n"+rows+'\n'
     (root/'manuscript.md').write_text(text)
     compiler=shutil.which('pdflatex')
     if not compiler:
@@ -109,11 +108,11 @@ def write_manuscript(root, response, claims, refs, spec):
         latex+='\\begin{abstract}\n'+render(response['abstract'],native)+'\n\\end{abstract}\n'
         for key,title in SECTIONS:
             latex+='\\section{'+title+'}\n'+render(response[key],native)+'\n'
-            if key=='experiments':
-                latex+='\\begin{longtable}{lr}\\toprule Experiment & '+escape(spec['primary_metric'])+r'\\\midrule'+'\n'
-                latex+='\n'.join(escape(c['label'])+f" & {c.get('value',c.get('mse')):.9f}"+r'\\' for c in claims)
-                latex+='\n\\bottomrule\\end{longtable}\n'
-        latex+='\\section*{References}\n'+'\n\n'.join(escape(r['title'])+'. DOI: '+escape(r['doi']) for r in refs)+'\n\\end{document}\n'
+        latex+='\\section*{References}\n'+'\n\n'.join(escape(r['title'])+'. DOI: '+escape(r['doi']) for r in refs)+'\n'
+        latex+='\\appendix\\section{Complete Experimental Trajectory Manifest}\n'
+        latex+='\\begin{longtable}{lr}\\toprule Experiment & '+escape(spec['primary_metric'])+r'\\\midrule'+'\n'
+        latex+='\n'.join(escape(c['label'])+f" & {c.get('value',c.get('mse')):.9f}"+r'\\' for c in claims)
+        latex+='\n\\bottomrule\\end{longtable}\n\\end{document}\n'
         (root/'manuscript.tex').write_text(latex)
         results=[]
         for _ in range(2):

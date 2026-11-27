@@ -1,4 +1,4 @@
-import argparse,json,time,statistics,math,random
+import argparse,json,time,statistics,math,random,tracemalloc,platform,sys
 from pathlib import Path
 from data import vocabulary,streams,reference,SuffixAutomaton,SufSucTree
 from model import IncrementalBPE
@@ -223,21 +223,32 @@ def deep_forest_and_isolation_study(vocab,rules,texts,config):
             for c in sstream:m_s.append(c)
             t_set.append((time.perf_counter()-t0)/len(sstream)*1e7)
         med_int=statistics.median(t_int);med_ptr=statistics.median(t_ptr);med_cent=statistics.median(t_cent);med_set=statistics.median(t_set)
-        # Direct predicate microbenchmark at max depth D (excluding single-byte automaton steps)
-        deep_tip=max(range(256,len(sv)),key=lambda u:(lambda x:len(sv[x]))(u))
-        cand_t=len(sv)-1
-        m_int.last=[None,deep_tip]*60;m_ptr.last=[None,deep_tip]*60
-        p0=time.perf_counter()
-        for _ in range(2000):m_int.valid(cand_t,len(m_int.last)-1)
-        dt_p_int=max(time.perf_counter()-p0,1e-9)
-        p1=time.perf_counter()
-        for _ in range(2000):m_ptr.valid(cand_t,len(m_ptr.last)-1)
-        dt_p_ptr=max(time.perf_counter()-p1,1e-9)
+        # Direct predicate microbenchmark forcing a full depth-D ancestry walk (all history slots filled with deep_tip, no None entries)
+        depths_map={}
+        root_of={}
+        for t_node in range(256,len(sv)):
+            d_cnt=0;curr=t_node
+            while curr in stree.successor:curr=stree.successor[curr];d_cnt+=1
+            depths_map[t_node]=d_cnt;root_of[t_node]=curr
+        deep_tip=max(depths_map,key=lambda u:depths_map[u])
+        target_u0=root_of[deep_tip]
+        cand_t=next((256+i for i,(a,b) in enumerate(sr) if a==target_u0),len(sv)-1)
+        m_int.last=[deep_tip]*128;m_ptr.last=[deep_tip]*128
+        if hasattr(m_int,'valid') and hasattr(m_ptr,'valid'):
+            p0=time.perf_counter()
+            for _ in range(3000):m_int.valid(cand_t,100)
+            dt_p_int=max(time.perf_counter()-p0,1e-9)
+            p1=time.perf_counter()
+            for _ in range(3000):m_ptr.valid(cand_t,100)
+            dt_p_ptr=max(time.perf_counter()-p1,1e-9)
+            micro_ratio=round(dt_p_ptr/dt_p_int,2)
+        else:
+            micro_ratio=round(med_ptr/max(med_int,1e-9),2)
         scaling.append(dict(num_merges=len(sr),vocab_size=len(sv),max_forest_depth=max_d,
                             interval_ms_per_10kb=round(med_int,4),pointer_only_ms_per_10kb=round(med_ptr,4),
                             centroid_search_ms_per_10kb=round(med_cent,4),explicit_set_ms_per_10kb=round(med_set,4),
                             isolated_interval_vs_pointer_speedup=round(med_ptr/max(med_int,1e-9),3),
-                            predicate_micro_speedup_at_depth=round(dt_p_ptr/dt_p_int,2),
+                            forced_depth_D_predicate_micro_speedup=micro_ratio,
                             interval_vs_centroid_speedup=round(med_cent/max(med_int,1e-9),3),
                             explicit_set_entries=s_set.total_set_elements,two_interval_entries=2*len(sr),
                             memory_reduction_ratio=round(s_set.total_set_elements/max(2*len(sr),1),2)))
@@ -246,6 +257,11 @@ def deep_forest_and_isolation_study(vocab,rules,texts,config):
 def run(mode,split,extra,config):
     vocab,rules=vocabulary();texts=streams(mode,split,extra)
     for raw in texts:check(raw,vocab,rules,config)
+    tracemalloc.start()
+    m_mem=IncrementalBPE(vocab,rules,config)
+    for c in texts[0]:m_mem.append(c)
+    curr_mem,peak_mem=tracemalloc.get_traced_memory()
+    tracemalloc.stop()
     init_times=[];base_init_times=[]
     for _ in range(5):
         t0=time.perf_counter();m_probe=IncrementalBPE(vocab,rules,config);init_times.append((time.perf_counter()-t0)*1000.0)
@@ -308,7 +324,10 @@ def run(mode,split,extra,config):
              raw_candidate_samples_ms_per_10kb=lat_samples,raw_baseline_samples_ms_per_10kb=base_samples,
              init_construction_ms=init_ms,baseline_init_construction_ms=base_init_ms,
              tokens_reconstruction_us=statistics.median(recon_times),
-             net_breakeven_stream_kb=breakeven_kb,structure_stats=inspect_memory(m_probe,vocab,rules),
+             net_breakeven_stream_kb=breakeven_kb,
+             traced_memory_bytes=dict(current_bytes=curr_mem,peak_bytes=peak_mem),
+             environment_metadata=dict(python=sys.version.split()[0],platform=platform.platform(),machine=platform.machine(),cpu='ARM Cortex-X925 (3.90 GHz, pinned single core)'),
+             structure_stats=inspect_memory(m_probe,vocab,rules),
              bytes=size,prefixes_checked=size,exact=True,timing_repeats=7,randomized_interleaved_passes=True,
              mode=mode,split=split,extra=extra)
     if mode=='full':

@@ -1,33 +1,30 @@
-# Exact Streaming Incremental Byte-Pair Tokenization: Rank-Ordered DFS Interval Compilation & Deep-Forest Scaling
+# Exact Streaming Incremental Byte-Pair Tokenization: Linear-Time Rank-Ordered Two-Interval Compilation & Theoretical Differentiation
 
-## 1. Formal Problem Definition and Prefix-Consistency Semantics
+## 1. Formal Problem Definition and Prefix-Consistency Guarantee
 
-Let $\Sigma = \{0, 1, \dots, 255\}$ denote the atomic byte alphabet and $\mathcal{R} = ((a_0, b_0), \dots, (a_{R-1}, b_{R-1}))$ be a priority-ordered sequence of merge rules defining a proper/canonical vocabulary $\mathcal{V}$ of size $M = 256 + R$ (Sennrich et al., 2016; Kudo & Richardson, 2018; Zouhar et al., 2023; Berglund & van der Merwe, 2023). Rule $r \in \{0, \dots, R-1\}$ maps the adjacent token pair $(a_r, b_r)$ to token ID $t = 256 + r$ with predecessor $p(t) = a_r$, successor $s(t) = b_r$, priority rank $\operatorname{rank}(t) = r$, and byte length $\ell(t) = \ell(a_r) + \ell(b_r)$.
+Let $\Sigma = \{0, 1, \dots, 255\}$ be the byte alphabet and $\mathcal{R} = ((a_0, b_0), \dots, (a_{R-1}, b_{R-1}))$ be a priority-ordered sequence of merge rules defining a proper/canonical vocabulary $\mathcal{V}$ of size $M = 256 + R$ (Sennrich et al., 2016; Kudo & Richardson, 2018; Zouhar et al., 2023; Berglund & van der Merwe, 2023). Rule $r \in \{0, \dots, R-1\}$ maps $(a_r, b_r) \to t = 256 + r$ with predecessor $p(t) = a_r$, successor $s(t) = b_r$, rank $\operatorname{rank}(t) = r$, and byte length $\ell(t) = \ell(a_r) + \ell(b_r)$.
 
-Given a streaming byte sequence $x_{1:n} = x_1 x_2 \dots x_n \in \Sigma^*$, priority-ranked Byte-Pair Encoding repeatedly merges the available adjacent pair of minimum rank (breaking equal-rank ties from left to right) until no rule applies, producing the exact canonical tokenization $\theta(x_{1:n}) = (t_1, t_2, \dots, t_m)$.
+Given a streaming byte sequence $x_{1:n} \in \Sigma^*$, priority-ranked BPE repeatedly merges the adjacent pair of minimum rank (breaking ties left-to-right), yielding $\theta(x_{1:n}) = (t_1, \dots, t_m)$. An **exact streaming incremental BPE transducer** (Jiang & Gong, 2026) processes one byte $x_n$ per step via `append(x_n)` returning $H[n] = t_m$, while `tokens()` reconstructs $\theta(x_{1:n})$ matching batch BPE at every byte prefix $1 \le k \le n$.
 
-An **exact streaming incremental BPE transducer** (Jiang & Gong, 2026) consumes one byte $x_n$ per step via `append(x_n)` and maintains prefix history $H[1..n]$ such that:
-1. `append(x_n)` immediately returns the final token $H[n] = t_m$ of $\theta(x_{1:n})$;
-2. `tokens()` reconstructs the complete exact sequence $\theta(x_{1:n})$ matching batch priority-ranked BPE at **every** byte prefix $1 \le k \le n$.
+## 2. Formal Differentiation from Jiang & Gong (2026) and Linear-Time $O(M+R)$ Compilation
 
-## 2. Successor Forest Predicate, Centroid Search, and the Two-Interval Compilation Theorem
-
-Orienting each merge token $t \ge 256$ to its right operand $s(t)$ forms a successor forest $\mathcal{F}_{\text{suc}}$ rooted at the 256 byte atoms. An Aho-Corasick recognizer (Aho & Corasick, 1975; double-array engineering in `arXiv:2207.13870`) identifies suffix candidates ending at position $n$. A merge candidate $t$ is valid at position $n$ iff the predecessor token $k = H[n - \ell(s(t))]$ satisfies:
+Orienting each merge token $t \ge 256$ to its right operand $s(t)$ forms a successor forest $\mathcal{F}_{\text{suc}}$ rooted at byte atoms. A merge candidate $t$ recognized by the Aho-Corasick automaton (Aho & Corasick, 1975; double-array layout in `arXiv:2207.13870`) is valid at position $n$ iff $k = H[n - \ell(s(t))]$ satisfies:
 $$\operatorname{Accept}(t, k) \iff k = p(t) \;\lor\; \exists c \in \operatorname{Child}_{\mathcal{F}_{\text{suc}}}(p(t)) \text{ s.t. } k \in \operatorname{Desc}(c) \land \operatorname{rank}(c) > \operatorname{rank}(t).$$
 
-- **Pointer Walk Baseline ($O(D)$ per candidate)**: Walks $u \leftarrow s(u)$ from $k$ up to $p(t)$, degrading linearly with successor forest depth $D$.
-- **Centroid / Binary-Search Tree ($O(\log D)$ or $O(\log |\operatorname{Child}|)$, Jiang & Gong 2026)**: Uses DFS interval containment $L_{p(t)} < L_k < R_{p(t)}$ followed by binary/centroid search to locate the child subtree $c$ containing $k$.
-- **Explicit Hash-Set Compilation ($O(RM)$ space)**: Materializes the set $A_t$ for each rule $t$, causing quadratic memory blowup on large/deep vocabularies.
-- **Rank-Ordered DFS Two-Interval Compilation ($O(1)$ time, $2R$ intervals / $O(R)$ linear space)**:
-  When `SufSucTree` traverses children $c \in \operatorname{Child}(a)$ in increasing merge-rank order $\operatorname{rank}(c)$, all higher-priority (forbidden) children with $\operatorname{rank}(c) \le \operatorname{rank}(t)$ form a contiguous prefix block $[L_a + 1, q_t)$ in preorder DFS numbering, while all admissible lower-priority children with $\operatorname{rank}(c) > \operatorname{rank}(t)$ collapse into a **single contiguous suffix interval** $[q_t, R_a)$! Including the singleton parent interval $[L_a, L_a + 1)$ (and updating `cutoff[s(t)] = R_t` prior to recording $t$ to enforce strict equal-rank overlap exclusion $p(t) = s(t)$), every candidate's acceptance region is exactly representable by at most **two half-open integer intervals**:
-  $$\mathcal{I}_t = [L_{p(t)}, L_{p(t)} + 1) \;\cup\; [q_t, R_{p(t)}).$$
+### How Rank-Ordered Two-Interval Compilation Differs from Jiang & Gong's (2026) Prefix Last-Token Condition
+In Jiang & Gong (`arXiv:2605.30813`), the *Prefix Last-Token Condition* uses standard DFS subtree intervals $[L_u, R_u)$ to test **unconstrained ancestry** $k \in \operatorname{Desc}(p(t))$ in $O(1)$ time, **but** because sibling order in their general successor forest is arbitrary, checking the **strict priority condition** ($\operatorname{rank}(c) > \operatorname{rank}(t)$ for the specific child subtree $c \in \operatorname{Child}(p(t))$ containing $k$) still requires locating which child $c$ contains $k$ at runtime via centroid decomposition / binary search ($O(\log \Delta)$ or $O(\log^2 L)$ per step).
+- **Concrete Running Example**: Suppose predecessor $a = p(t)$ has three successor children $c_1, c_2, c_3$ with merge ranks $r(c_1)=5, r(c_2)=12, r(c_3)=20$, and candidate $t$ has rank $r(t)=12$. Under an arbitrary DFS order $(c_2, c_3, c_1)$, the forbidden subtrees ($r(c) \le 12$, i.e., $c_1$ and $c_2$) are non-adjacent in DFS numbering, requiring runtime child lookup.
+- **Our Rank-Ordered Two-Interval Theorem (Theorem 1)**: By enforcing **rank-ordered sibling traversal** ($r(c_1) < r(c_2) < r(c_3)$) during DFS indexing, all higher-or-equal priority (forbidden) children $\{c \in \operatorname{Child}(a) : r(c) \le r(t)\}$ are guaranteed to form a **single contiguous prefix** $[L_a + 1, q_t)$ of $a$'s descendant interval $[L_a + 1, R_a)$, while all admissible children $\{c \in \operatorname{Child}(a) : r(c) > r(t)\}$ collapse into **one contiguous suffix interval** $[q_t, R_a)$! Thus, the entire combined ancestry-and-priority predicate compiles into at most **two half-open intervals** per rule:
+  $$\mathcal{I}_t = [L_{p(t)}, L_{p(t)} + 1) \;\cup\; [q_t, R_{p(t)}),$$
+  completely eliminating runtime child-subtree search ($O(1)$ vs $O(\log \Delta)$) while using strictly $2R$ intervals ($4R$ integers) total.
 
-## 3. Comprehensive Multidimensional & Deep-Forest Evaluation Protocol
+### Theorem 2: Strict $O(M+R)$ Single-Pass Linear-Time Cutoff Sweep (Eliminating $O(R \log \Delta)$ Binary Search)
+Instead of binary-searching `children[p(t)]` in $O(R \log \Delta)$ time during preprocessing, all cutoffs $q_t$ for $t = 256, \dots, 255+R$ can be computed in **strict $O(M+R)$ linear time** via a single increasing-rank sweep:
+- Maintain an array `cutoff[u]` initialized to $L_u + 1$ for all $u \in \mathcal{V}$.
+- For each rule $t = 256 + r$ in increasing rank order $r = 0, \dots, R-1$:
+  1. **First** update `cutoff[s(t)] = R_t` (marking $t$'s own subtree under its successor parent $s(t)$ as forbidden for rules of rank $\ge r$);
+  2. **Then** read $q_t = \text{cutoff}[p(t)]$ and record $\mathcal{I}_t = (L_{p(t)}, L_{p(t)}+1, q_t, R_{p(t)})$.
+- Updating `cutoff[s(t)]` *before* reading `cutoff[p(t)]` automatically enforces strict equal-rank self-overlap exclusion ($r(c) > r(t)$) even when $p(t) = s(t)$!
 
-To eliminate confounding and rigorously establish both integrated and isolated causal gains, `eval.py` enforces a strict cache-free evaluation protocol and outputs rich multidimensional metrics in `*_metrics.json`:
-1. **Randomized Interleaved Paired Passes & Student-$t$ 95% Confidence Intervals**:
-   - Runs 7 randomized interleaved paired passes between the candidate model and pointer baseline, reporting median, mean, standard deviation, exact Student-$t$ ($\text{df}=6, t_{0.975}=2.4469$) 95% confidence intervals, raw paired sample arrays, paired difference CI, construction overhead, and net amortization break-even stream length.
-2. **Cache-Free Predicate Isolation (`deep_forest_and_isolation.randomized_cache_free_isolation`)**:
-   - Directly benchmarks `selected` (Two-Interval), `pointer_predicate_only` (same dense transitions & atomic fastpath, switching only the predicate to pointer walks), `centroid_search` ($O(\log D)$ DFS child binary search), `explicit_set` ($O(RM)$ frozenset), and `baseline_pointer` under identical cache-free conditions.
-3. **Deep-Forest & Multi-Scale Stress Sweep (`deep_forest_and_isolation.deep_forest_scaling_sweep`)**:
-   - Evaluates scaling across $(R, D) \in \{(72, 4), (160, 12), (320, 24), (512, 36)\}$, measuring how `Two-Interval` maintains constant $O(1)$ validation latency and compact $2R$ linear memory while `Pointer Walk` degrades with depth $D$ (yielding $1.5\times \sim 4\times+$ isolated predicate speedup on deep forests) and `Explicit Set` suffers $10\times \sim 35\times$ memory expansion.
+## 3. Comprehensive Evaluation in `eval.py`
+`eval.py` reports 7-pass randomized interleaved paired latency with exact Student-$t$ ($\text{df}=6$) 95% CIs, `tracemalloc` peak memory bytes, hardware/platform metadata (`ARM Cortex-X925`), cache-free mechanism isolation (`selected` vs `pointer_predicate_only` vs `centroid_search` vs `explicit_set`), and a synthetic deep-forest scaling sweep ($R \in [72, 512], D \in [4, 36]$) including a forced depth-$D$ predicate microbenchmark (`forced_depth_D_predicate_micro_speedup`). Write the paper as a standalone ICLR research article without referencing internal workspace filenames.
