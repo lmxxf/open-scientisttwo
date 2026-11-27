@@ -1,10 +1,11 @@
 {
-  "title": "Exact streaming incremental byte-pair tokenization via linear-time rank-ordered DFS two-interval compilation",
+  "title": "Exact streaming incremental byte-pair tokenization via linear-time rank-ordered DFS two-interval compilation and static context certificates",
   "primary_metric": "mse",
   "higher_is_better": false,
   "arxiv_query": "id:2605.30813",
   "seed_dois": [
     "10.48550/arXiv.2605.30813",
+    "10.48550/arXiv.2609.40016",
     "10.48550/arXiv.2309.08715",
     "10.48550/arXiv.2306.16837",
     "10.48550/arXiv.2207.13870",
@@ -13,9 +14,9 @@
     "10.48550/arXiv.2402.01035",
     "10.1145/360825.360855"
   ],
-  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve IncrementalBPE(vocab,rules,config), append(byte) returning last token ID, and tokens() returning all current prefix token IDs. Exact priority-ranked BPE at every prefix. CRITICAL DESIGN REQUIREMENTS: (1) Do NOT implement any runtime memoization/dictionary cache (no acceptance_cache). (2) Compile each merge token's valid predecessor region in the rank-ordered SufSucTree into at most TWO half-open DFS intervals (L[a], L[a]+1, q_t, R[a]) in STRICT O(M+R) LINEAR TIME via a single forward rank sweep maintaining cutoff[s(t)] = R[t] BEFORE reading cutoff.get(p(t), L[p(t)]+1) (avoiding O(R log Delta) binary searches while guaranteeing strict equal-rank exclusion when p(t)==s(t)). (3) Provide a fast valid(t, n) method using the precompiled intervals so direct predicate microbenchmarks and fallback paths benefit from O(1) interval checks, while inlining the two-interval check inside append(byte) using a flat 1D integer array or compact pre-unpacked per-state tuples, dense 256-way flat automaton transitions, and an O(1) single-byte atomic fast-path bypass. (4) Support clean orthogonal config switches: acceptance_mode in ['intervals','sets','pointer'], flat_transitions (bool, default True), atomic_fastpath (bool, default True), certified_regions (bool, default False).",
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve IncrementalBPE(vocab,rules,config), append(byte) returning last token ID, and tokens() returning all current prefix token IDs. Exact priority-ranked BPE at every prefix. CRITICAL DESIGN REQUIREMENTS: (1) Do NOT implement any runtime memoization/dictionary cache (no acceptance_cache). (2) Compile each merge token's valid predecessor region in the rank-ordered SufSucTree into at most TWO half-open DFS intervals (L[a], L[a]+1, q_t, R[a]) in STRICT O(M+R) LINEAR TIME via a single forward rank sweep maintaining cutoff[s(t)] = R[t] BEFORE reading cutoff.get(p(t), L[p(t)]+1) (avoiding O(R log Delta) binary searches while guaranteeing strict equal-rank exclusion when p(t)==s(t)). (3) Provide a fast valid(t, n) method using the precompiled intervals so direct predicate microbenchmarks and fallback paths benefit from O(1) interval checks, while inlining the two-interval check inside append(byte) using a flat 1D integer array or compact pre-unpacked per-state tuples, dense 256-way flat automaton transitions, an O(1) single-byte atomic fast-path bypass, and sound static context acceptance certificates K(C) that bypass runtime predecessor checks when all context-compatible vocabulary tokens satisfy the two-interval predicate. (4) Support clean orthogonal config switches: acceptance_mode in ['intervals','sets','pointer'], flat_transitions (bool, default True), atomic_fastpath (bool, default True), certified_regions (bool, default True).",
   "eval_timeout": 120,
   "metric_atol": 0.0,
   "metric_rtol": 0.5,
-  "metric_description": "Randomized interleaved paired streaming latency (ms per 10KB) with Student-t 95% CI, forced depth-D predicate microbenchmark, cache-free mechanism isolation, deep-forest scaling sweep (R up to 512, D up to 36), and tracemalloc peak memory."
+  "metric_description": "Randomized interleaved paired streaming latency (ms per 10KB) with Student-t 95% CI, forced depth-D predicate microbenchmark, static certificate coverage & runtime hit-rate telemetry, iso-merge (R=320) controlled depth sweep (D=4..36), multi-scale deep-forest sweep with 100% prefix equivalence verification, and head-to-head comparison against Component-Weighted Centroid Search (arXiv:2609.40016) and Jiang & Gong (arXiv:2605.30813)."
 }

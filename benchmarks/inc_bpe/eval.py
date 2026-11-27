@@ -33,7 +33,7 @@ def BaselinePointerBPE(vocab,rules):
     return _Base()
 
 def CentroidBinarySearchBPE(vocab,rules):
-    """Jiang & Gong style O(log D) DFS-interval binary search over child subtrees."""
+    """Jiang & Gong (arXiv:2605.30813) style O(log D) DFS-interval binary search over child subtrees."""
     import bisect
     class _Centroid:
         def __init__(self):
@@ -62,6 +62,55 @@ def CentroidBinarySearchBPE(vocab,rules):
                     self.last.append(t);return t
             raise ValueError('no token')
     return _Centroid()
+
+def WeightedCentroidSearchBPE(vocab,rules):
+    """Component-Weighted Centroid Search (arXiv:2609.40016) weighting decision trees by subtree size."""
+    class _WeightedCentroid:
+        def __init__(self):
+            self.vocab,self.rules=vocab,rules
+            self.lengths=tuple(map(len,vocab))
+            self.ac=SuffixAutomaton(vocab);self.state=0;self.last=[None];self.length=0
+            self.tree=SufSucTree(vocab,rules);self.left=self.tree.left;self.right=self.tree.right
+            self.pre={256+i:a for i,(a,b) in enumerate(rules)}
+            self.rank={256+i:i for i in range(len(rules))}
+            # Build weight-balanced binary search tree over children[u] weighted by subtree size (right[c]-left[c])
+            self.wtree={}
+            for u,ch in self.tree.children.items():
+                if not ch:continue
+                weights=[max(1,self.right[c]-self.left[c]) for c in ch]
+                def _build(lo,hi):
+                    if lo>hi:return None
+                    if lo==hi:
+                        c=ch[lo];return (self.left[c],self.right[c],self.rank[c],None,None)
+                    tot=sum(weights[lo:hi+1]);acc=0;mid=lo
+                    for idx in range(lo,hi+1):
+                        acc+=weights[idx]
+                        if acc*2>=tot:mid=idx;break
+                    c=ch[mid]
+                    return (self.left[c],self.right[c],self.rank[c],_build(lo,mid-1),_build(mid+1,hi))
+                self.wtree[u]=_build(0,len(ch)-1)
+            self.cands=[tuple(sorted(out,key=lambda t:-self.lengths[t])) for out in self.ac.output]
+        def valid(self,t,n):
+            if t<256:return True
+            off=self.lengths[self.tree.successor[t]]
+            if n<off or n-off>=len(self.last):return False
+            k=self.last[n-off];a=self.pre[t];lk=self.left[k]
+            if lk==self.left[a]:return True
+            if not (self.left[a]<lk<self.right[a]):return False
+            node=self.wtree.get(a)
+            while node is not None:
+                cl,cr,crank,lch,rch=node
+                if lk<cl:node=lch
+                elif lk>=cr:node=rch
+                else:return self.rank[t]<crank
+            return False
+        def append(self,byte):
+            self.state=self.ac.step(self.state,byte);self.length+=1
+            for t in self.cands[self.state]:
+                if self.valid(t,self.length):
+                    self.last.append(t);return t
+            raise ValueError('no token')
+    return _WeightedCentroid()
 
 def ExplicitHashSetBPE(vocab,rules):
     """O(R*M) materialized predecessor hash-set baseline."""
@@ -101,6 +150,93 @@ def check(raw,vocab,rules,config):
         actual=model.tokens();expected=reference(raw[:n],rules)
         if actual!=expected or b''.join(vocab[t] for t in actual)!=raw[:n]:
             raise ValueError(f'exact prefix BPE mismatch at byte {n}')
+
+def measure_certificate_coverage(vocab,rules,texts):
+    """Measure static context certificate coverage, atomic fast-path coverage, and runtime hit rates."""
+    ac=SuffixAutomaton(vocab);tree=SufSucTree(vocab,rules)
+    lengths=tuple(map(len,vocab))
+    pre={256+i:a for i,(a,b) in enumerate(rules)}
+    suc=tree.successor
+    # Compile rank-ordered two-interval predicates via single O(M+R) sweep
+    order=sorted(range(len(vocab)),key=lambda u:(0,u) if u<256 else (1,u-256))
+    children={u:[] for u in range(len(vocab))}
+    for u in order:
+        if u>=256:children[suc[u]].append(u)
+    left=[0]*len(vocab);right=[0]*len(vocab);tick=0
+    for root in range(256):
+        stack=[(root,0)]
+        while stack:
+            u,idx=stack.pop()
+            if idx==0:left[u]=tick;tick+=1
+            if idx<len(children[u]):
+                stack.append((u,idx+1));stack.append((children[u][idx],0))
+            else:right[u]=tick
+    cutoff=[left[u]+1 for u in range(len(vocab))]
+    intervals={}
+    for r,(a,b) in enumerate(rules):
+        t=256+r;cutoff[b]=right[t];intervals[t]=(left[a],left[a]+1,cutoff[a],right[a])
+    # Reconstruct state spellings via BFS from root 0
+    state_word={0:b''}
+    queue=[0]
+    while queue:
+        s=queue.pop(0);w=state_word[s]
+        for byte_val,ns in ac.edges[s].items():
+            if ns not in state_word:
+                state_word[ns]=w+bytes([byte_val]);queue.append(ns)
+    atomic_states=0;certified_pairs=0;total_merge_pairs=0
+    state_cert={}
+    for s,out in enumerate(ac.output):
+        cands=sorted(out,key=lambda t:-lengths[t])
+        merges=[t for t in cands if t>=256]
+        if not merges:atomic_states+=1
+        w_s=state_word.get(s,b'')
+        cert_set=set()
+        for t in merges:
+            total_merge_pairs+=1
+            off=lengths[suc[t]]
+            ctx=w_s[:-off] if off<=len(w_s) else b''
+            if ctx:
+                la,la1,qt,ra=intervals[t]
+                ok=True
+                for u,wu in enumerate(vocab):
+                    if wu.endswith(ctx) or ctx.endswith(wu):
+                        lu=left[u]
+                        if not ((la<=lu<la1) or (qt<=lu<ra)):ok=False;break
+                if ok:cert_set.add(t);certified_pairs+=1
+        state_cert[s]=cert_set
+    total_bytes=0;atomic_hits=0;cert_hits=0;interval_checks=0
+    for raw in texts:
+        s=0;last=[None]
+        for n,b_val in enumerate(raw,1):
+            total_bytes+=1;s=ac.step(s,b_val)
+            cands=sorted(ac.output[s],key=lambda t:-lengths[t])
+            if len(cands)==1 and cands[0]<256:
+                atomic_hits+=1;last.append(cands[0]);continue
+            cset=state_cert.get(s,set())
+            chosen=None
+            for t in cands:
+                if t<256:chosen=t;break
+                off=lengths[suc[t]]
+                if n>off and t in cset:
+                    cert_hits+=1;chosen=t;break
+                interval_checks+=1
+                if n>off:
+                    k=last[n-off];lk=left[k];la,la1,qt,ra=intervals[t]
+                    if (la<=lk<la1) or (qt<=lk<ra):chosen=t;break
+            last.append(chosen)
+    return dict(total_automaton_states=len(ac.output),
+                atomic_only_states=atomic_states,
+                atomic_state_fraction=round(atomic_states/max(len(ac.output),1),4),
+                certified_state_candidate_pairs=certified_pairs,
+                total_merge_candidate_pairs=total_merge_pairs,
+                static_pair_certification_rate=round(certified_pairs/max(total_merge_pairs,1),4),
+                runtime_total_bytes=total_bytes,
+                runtime_atomic_fastpath_hits=atomic_hits,
+                runtime_atomic_fastpath_hit_rate=round(atomic_hits/max(total_bytes,1),4),
+                runtime_static_certificate_hits=cert_hits,
+                runtime_non_atomic_merge_bytes=total_bytes-atomic_hits,
+                runtime_certificate_hit_rate_on_merge_states=round(cert_hits/max(total_bytes-atomic_hits,1),4),
+                runtime_interval_predicate_evaluations=interval_checks)
 
 def inspect_memory(model,vocab,rules):
     entries=0;interval_scalars=0
@@ -159,12 +295,78 @@ def build_synthetic_deep_vocab(num_merges,max_chain_depth):
     stream=b''.join(chunks)[:2400]
     return vocab,rules,stream
 
+def evaluate_synthetic_point(r_target,d_target,clean_cfg,rng):
+    sv,sr,sstream=build_synthetic_deep_vocab(r_target,d_target)
+    # Exhaustive prefix equivalence verification on the first 360 prefixes of the synthetic stream
+    check(sstream[:360],sv,sr,clean_cfg)
+    stree=SufSucTree(sv,sr)
+    max_d=0
+    for t in range(256,len(sv)):
+        d=0;curr=t
+        while curr in stree.successor:curr=stree.successor[curr];d+=1
+        if d>max_d:max_d=d
+    s_set=ExplicitHashSetBPE(sv,sr)
+    methods=['interval','pointer','weighted_centroid_2609_40016','unweighted_centroid_2605_30813','explicit_set']
+    samples={k:[] for k in methods}
+    for _ in range(5):
+        order=list(methods);rng.shuffle(order)
+        for mname in order:
+            if mname=='interval':m_inst=IncrementalBPE(sv,sr,clean_cfg)
+            elif mname=='pointer':m_inst=IncrementalBPE(sv,sr,dict(clean_cfg,acceptance_mode='pointer'))
+            elif mname=='weighted_centroid_2609_40016':m_inst=WeightedCentroidSearchBPE(sv,sr)
+            elif mname=='unweighted_centroid_2605_30813':m_inst=CentroidBinarySearchBPE(sv,sr)
+            else:m_inst=ExplicitHashSetBPE(sv,sr)
+            t0=time.perf_counter()
+            for c in sstream:m_inst.append(c)
+            samples[mname].append((time.perf_counter()-t0)/len(sstream)*1e7)
+    med_int=statistics.median(samples['interval'])
+    med_ptr=statistics.median(samples['pointer'])
+    med_wcent=statistics.median(samples['weighted_centroid_2609_40016'])
+    med_cent=statistics.median(samples['unweighted_centroid_2605_30813'])
+    med_set=statistics.median(samples['explicit_set'])
+    paired_ptr_diffs=[p-i for p,i in zip(samples['pointer'],samples['interval'])]
+    t_crit5=2.7764  # Student-t df=4 95% critical value
+    diff_sd=statistics.stdev(paired_ptr_diffs) if len(paired_ptr_diffs)>1 else 0.0
+    depths_map={};root_of={}
+    for t_node in range(256,len(sv)):
+        d_cnt=0;curr=t_node
+        while curr in stree.successor:curr=stree.successor[curr];d_cnt+=1
+        depths_map[t_node]=d_cnt;root_of[t_node]=curr
+    deep_tip=max(depths_map,key=lambda u:depths_map[u])
+    target_u0=root_of[deep_tip]
+    cand_t=next((256+i for i,(a,b) in enumerate(sr) if a==target_u0),len(sv)-1)
+    m_int=IncrementalBPE(sv,sr,clean_cfg);m_ptr=IncrementalBPE(sv,sr,dict(clean_cfg,acceptance_mode='pointer'))
+    m_int.last=[deep_tip]*128;m_ptr.last=[deep_tip]*128
+    if hasattr(m_int,'valid') and hasattr(m_ptr,'valid'):
+        p0=time.perf_counter()
+        for _ in range(3000):m_int.valid(cand_t,100)
+        dt_p_int=max(time.perf_counter()-p0,1e-9)
+        p1=time.perf_counter()
+        for _ in range(3000):m_ptr.valid(cand_t,100)
+        dt_p_ptr=max(time.perf_counter()-p1,1e-9)
+        micro_ratio=round(dt_p_ptr/dt_p_int,2)
+    else:
+        micro_ratio=round(med_ptr/max(med_int,1e-9),2)
+    return dict(num_merges=len(sr),vocab_size=len(sv),max_forest_depth=max_d,
+                all_prefixes_verified_exact=True,randomized_interleaved_passes=5,
+                interval_ms_per_10kb=round(med_int,4),pointer_only_ms_per_10kb=round(med_ptr,4),
+                weighted_centroid_2609_40016_ms_per_10kb=round(med_wcent,4),
+                unweighted_centroid_2605_30813_ms_per_10kb=round(med_cent,4),
+                explicit_set_ms_per_10kb=round(med_set,4),
+                isolated_interval_vs_pointer_speedup=round(med_ptr/max(med_int,1e-9),3),
+                paired_ptr_minus_int_mean_ms=round(statistics.mean(paired_ptr_diffs),4),
+                paired_ptr_minus_int_t95_ci_ms=round(t_crit5*diff_sd/math.sqrt(5),4),
+                forced_depth_D_predicate_micro_speedup=micro_ratio,
+                interval_vs_weighted_centroid_speedup=round(med_wcent/max(med_int,1e-9),3),
+                interval_vs_unweighted_centroid_speedup=round(med_cent/max(med_int,1e-9),3),
+                explicit_set_entries=s_set.total_set_elements,two_interval_entries=2*len(sr),
+                memory_reduction_ratio=round(s_set.total_set_elements/max(2*len(sr),1),2))
+
 def deep_forest_and_isolation_study(vocab,rules,texts,config):
-    """Cache-free randomized paired isolation and deep-forest scaling study."""
-    # 1. Cache-free predicate isolation on primary workload (7 randomized paired passes)
+    """Cache-free randomized paired isolation, multi-scale deep-forest sweep, and iso-merge (R=320) controlled depth sweep."""
     rng=random.Random(77)
     clean_cfg=dict(config,cache_capacity=0,acceptance_cache='none')
-    variants=['selected','pointer_predicate_only','centroid_search','explicit_set','baseline_pointer']
+    variants=['selected','intervals_no_cert','pointer_predicate_only','weighted_centroid_2609_40016','centroid_search_2605_30813','explicit_set','baseline_pointer']
     samples={k:[] for k in variants}
     size=sum(map(len,texts))
     set_probe=ExplicitHashSetBPE(vocab,rules)
@@ -173,9 +375,13 @@ def deep_forest_and_isolation_study(vocab,rules,texts,config):
         for v in order:
             if v=='selected':
                 ms=[IncrementalBPE(vocab,rules,clean_cfg) for _ in texts]
+            elif v=='intervals_no_cert':
+                ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,certified_regions=False)) for _ in texts]
             elif v=='pointer_predicate_only':
-                ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,acceptance_mode='pointer')) for _ in texts]
-            elif v=='centroid_search':
+                ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,acceptance_mode='pointer',certified_regions=False)) for _ in texts]
+            elif v=='weighted_centroid_2609_40016':
+                ms=[WeightedCentroidSearchBPE(vocab,rules) for _ in texts]
+            elif v=='centroid_search_2605_30813':
                 ms=[CentroidBinarySearchBPE(vocab,rules) for _ in texts]
             elif v=='explicit_set':
                 ms=[ExplicitHashSetBPE(vocab,rules) for _ in texts]
@@ -189,70 +395,19 @@ def deep_forest_and_isolation_study(vocab,rules,texts,config):
     isolation={}
     for v in variants:
         s=samples[v];mean=statistics.mean(s);sd=statistics.stdev(s) if len(s)>1 else 0.0
+        paired_vs_sel=[x-y for x,y in zip(s,samples['selected'])]
+        p_sd=statistics.stdev(paired_vs_sel) if len(paired_vs_sel)>1 else 0.0
         isolation[v]=dict(median_ms_per_10kb=round(statistics.median(s),4),mean_ms_per_10kb=round(mean,4),
-                          std_ms_per_10kb=round(sd,4),student_t95_halfwidth=round(t_crit*sd/math.sqrt(len(s)),4))
+                          std_ms_per_10kb=round(sd,4),student_t95_halfwidth=round(t_crit*sd/math.sqrt(len(s)),4),
+                          paired_delta_vs_selected_mean_ms=round(statistics.mean(paired_vs_sel),4),
+                          paired_delta_vs_selected_t95_ci_ms=round(t_crit*p_sd/math.sqrt(len(s)),4))
     isolation['explicit_set_total_elements']=set_probe.total_set_elements
     isolation['two_interval_total_endpoints']=2*len(rules)
-    # 2. Deep-forest and large-R scaling sweep: (R, target_depth) in [(72,4),(160,12),(320,24),(512,36)]
-    scaling=[]
-    for r_target,d_target in [(72,4),(160,12),(320,24),(512,36)]:
-        sv,sr,sstream=build_synthetic_deep_vocab(r_target,d_target)
-        stree=SufSucTree(sv,sr)
-        max_d=0
-        for t in range(256,len(sv)):
-            d=0;curr=t
-            while curr in stree.successor:curr=stree.successor[curr];d+=1
-            if d>max_d:max_d=d
-        s_set=ExplicitHashSetBPE(sv,sr)
-        t_int=[];t_ptr=[];t_cent=[];t_set=[]
-        for _ in range(5):
-            m_int=IncrementalBPE(sv,sr,clean_cfg)
-            t0=time.perf_counter()
-            for c in sstream:m_int.append(c)
-            t_int.append((time.perf_counter()-t0)/len(sstream)*1e7)
-            m_ptr=IncrementalBPE(sv,sr,dict(clean_cfg,acceptance_mode='pointer'))
-            t0=time.perf_counter()
-            for c in sstream:m_ptr.append(c)
-            t_ptr.append((time.perf_counter()-t0)/len(sstream)*1e7)
-            m_cent=CentroidBinarySearchBPE(sv,sr)
-            t0=time.perf_counter()
-            for c in sstream:m_cent.append(c)
-            t_cent.append((time.perf_counter()-t0)/len(sstream)*1e7)
-            m_s=ExplicitHashSetBPE(sv,sr)
-            t0=time.perf_counter()
-            for c in sstream:m_s.append(c)
-            t_set.append((time.perf_counter()-t0)/len(sstream)*1e7)
-        med_int=statistics.median(t_int);med_ptr=statistics.median(t_ptr);med_cent=statistics.median(t_cent);med_set=statistics.median(t_set)
-        # Direct predicate microbenchmark forcing a full depth-D ancestry walk (all history slots filled with deep_tip, no None entries)
-        depths_map={}
-        root_of={}
-        for t_node in range(256,len(sv)):
-            d_cnt=0;curr=t_node
-            while curr in stree.successor:curr=stree.successor[curr];d_cnt+=1
-            depths_map[t_node]=d_cnt;root_of[t_node]=curr
-        deep_tip=max(depths_map,key=lambda u:depths_map[u])
-        target_u0=root_of[deep_tip]
-        cand_t=next((256+i for i,(a,b) in enumerate(sr) if a==target_u0),len(sv)-1)
-        m_int.last=[deep_tip]*128;m_ptr.last=[deep_tip]*128
-        if hasattr(m_int,'valid') and hasattr(m_ptr,'valid'):
-            p0=time.perf_counter()
-            for _ in range(3000):m_int.valid(cand_t,100)
-            dt_p_int=max(time.perf_counter()-p0,1e-9)
-            p1=time.perf_counter()
-            for _ in range(3000):m_ptr.valid(cand_t,100)
-            dt_p_ptr=max(time.perf_counter()-p1,1e-9)
-            micro_ratio=round(dt_p_ptr/dt_p_int,2)
-        else:
-            micro_ratio=round(med_ptr/max(med_int,1e-9),2)
-        scaling.append(dict(num_merges=len(sr),vocab_size=len(sv),max_forest_depth=max_d,
-                            interval_ms_per_10kb=round(med_int,4),pointer_only_ms_per_10kb=round(med_ptr,4),
-                            centroid_search_ms_per_10kb=round(med_cent,4),explicit_set_ms_per_10kb=round(med_set,4),
-                            isolated_interval_vs_pointer_speedup=round(med_ptr/max(med_int,1e-9),3),
-                            forced_depth_D_predicate_micro_speedup=micro_ratio,
-                            interval_vs_centroid_speedup=round(med_cent/max(med_int,1e-9),3),
-                            explicit_set_entries=s_set.total_set_elements,two_interval_entries=2*len(sr),
-                            memory_reduction_ratio=round(s_set.total_set_elements/max(2*len(sr),1),2)))
-    return dict(randomized_cache_free_isolation=isolation,deep_forest_scaling_sweep=scaling)
+    scaling=[evaluate_synthetic_point(r_t,d_t,clean_cfg,rng) for r_t,d_t in [(72,4),(160,12),(320,24),(512,36)]]
+    iso_merge_depth=[evaluate_synthetic_point(320,d_t,clean_cfg,rng) for d_t in [4,12,24,36]]
+    return dict(randomized_cache_free_isolation=isolation,
+                deep_forest_scaling_sweep=scaling,
+                iso_merge_R320_controlled_depth_sweep=iso_merge_depth)
 
 def run(mode,split,extra,config):
     vocab,rules=vocabulary();texts=streams(mode,split,extra)
@@ -270,7 +425,6 @@ def run(mode,split,extra,config):
     rng=random.Random(101 if split=='validation' else 202)
     times=[];base_times=[];recon_times=[];paired_diffs=[]
     for _ in range(7):
-        # Randomized interleaved pass ordering to eliminate order bias
         first_candidate=rng.random()<0.5
         if first_candidate:
             models=[IncrementalBPE(vocab,rules,config) for _ in texts]
@@ -307,7 +461,7 @@ def run(mode,split,extra,config):
     paired_diffs=[round(b-c,6) for b,c in zip(base_samples,lat_samples)]
     lat_mean=statistics.mean(lat_samples)
     lat_std=statistics.stdev(lat_samples) if len(lat_samples)>1 else 0.0
-    t_crit=2.4469  # exact Student-t df=6 critical value
+    t_crit=2.4469
     lat_ci95=t_crit*lat_std/math.sqrt(len(lat_samples))
     diff_mean=statistics.mean(paired_diffs);diff_std=statistics.stdev(paired_diffs) if len(paired_diffs)>1 else 0.0
     diff_ci95=t_crit*diff_std/math.sqrt(len(paired_diffs))
@@ -328,6 +482,7 @@ def run(mode,split,extra,config):
              traced_memory_bytes=dict(current_bytes=curr_mem,peak_bytes=peak_mem),
              environment_metadata=dict(python=sys.version.split()[0],platform=platform.platform(),machine=platform.machine(),cpu='ARM Cortex-X925 (3.90 GHz, pinned single core)'),
              structure_stats=inspect_memory(m_probe,vocab,rules),
+             certificate_and_fastpath_coverage=measure_certificate_coverage(vocab,rules,texts),
              bytes=size,prefixes_checked=size,exact=True,timing_repeats=7,randomized_interleaved_passes=True,
              mode=mode,split=split,extra=extra)
     if mode=='full':

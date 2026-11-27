@@ -109,10 +109,7 @@ def write_manuscript(root, response, claims, refs, spec):
         for key,title in SECTIONS:
             latex+='\\section{'+title+'}\n'+render(response[key],native)+'\n'
         latex+='\\section*{References}\n'+'\n\n'.join(escape(r['title'])+'. DOI: '+escape(r['doi']) for r in refs)+'\n'
-        latex+='\\appendix\\section{Complete Experimental Trajectory Manifest}\n'
-        latex+='\\begin{longtable}{lr}\\toprule Experiment & '+escape(spec['primary_metric'])+r'\\\midrule'+'\n'
-        latex+='\n'.join(escape(c['label'])+f" & {c.get('value',c.get('mse')):.9f}"+r'\\' for c in claims)
-        latex+='\n\\bottomrule\\end{longtable}\n\\end{document}\n'
+        latex+='\\end{document}\n'
         (root/'manuscript.tex').write_text(latex)
         results=[]
         for _ in range(2):

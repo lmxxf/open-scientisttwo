@@ -5,6 +5,9 @@
   "arxiv_query": "id:2508.10480",
   "seed_dois": [
     "10.48550/arXiv.2508.10480",
+    "10.48550/arXiv.2410.06324",
+    "10.48550/arXiv.1902.00724",
+    "10.48550/arXiv.2212.02748",
     "10.48550/arXiv.2104.12225",
     "10.48550/arXiv.1703.00443",
     "10.48550/arXiv.1910.12430",
@@ -12,9 +15,9 @@
     "10.48550/arXiv.2102.04626",
     "10.48550/arXiv.2601.06244"
   ],
-  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve solve(problem,config) returning a finite vector y satisfying M@y=b and lower<=y<=upper while minimizing 0.5*y.T@Q@y + q.T@y + alpha*sum(sin(y)). Never access hidden reference values. CRITICAL DESIGN REQUIREMENTS: (1) FAST O(d*k^2) ACTIVE-FACE GEOMETRY FOR d UP TO 128: Precompute the reduced quadratic Hessian H0 = V.T @ Q @ V once per problem; when constructing the face tangent basis B_A for active set A (where V_A @ B_A = 0), compute QR/SVD only on the small |A| x (d-m) submatrix V_A (or when A is small, use fast QR column-space complement) and Cholesky factorize R = Z.T @ H @ Z so that even at d=96 and d=128 solve_time_ms is < 1.2 ms (outperforming OSQP/ADMM across all dimensions!). (2) TRUE FACTORIZATION-REUSED IMPLICIT DIFFERENTIATION: Cache the final converged (Z, R_cholesky_factor) from solve() so that any backward/adjoint query uses O(d*k + k^2) triangular back-substitution without rebuilding or re-factorizing the reduced Hessian. (3) Keep the solver clean with ONLY the executed mechanisms and orthogonal boolean config toggles: nullspace_reduction (default True), exact_hessian (default True), active_face_caching (default True), row_equilibration (default False), armijo_line_search (default False). Do NOT add broken auxiliary directional_derivative functions with unverified least-squares heuristics.",
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve solve(problem,config) returning a finite vector y satisfying M@y=b and lower<=y<=upper while minimizing 0.5*y.T@Q@y + q.T@y + alpha*sum(sin(y)). Never access hidden reference values. CRITICAL DESIGN REQUIREMENTS: (1) FAST O(d*k^2) ACTIVE-FACE GEOMETRY FOR d UP TO 128: Precompute the reduced quadratic Hessian H0 = V.T @ Q @ V once per problem; when constructing the face tangent basis B_A for active set A (where V_A @ B_A = 0), compute QR/SVD or Householder updates on the small |A| x (d-m) submatrix V_A and Cholesky factorize R = Z.T @ H @ Z so that even at d=96 and d=128 solve_time_ms is < 1.1 ms (outperforming OSQP/ADMM across all dimensions!). (2) TRUE FACTORIZATION-REUSED IMPLICIT DIFFERENTIATION: Cache the final converged (Z, R_cholesky_factor) from solve() and expose an explicit adjoint/VJP helper (e.g. solve_adjoint(v) or attribute last_tangent_Z / last_cholesky_L) so that any backward/adjoint query uses O(d*k + k^2) triangular back-substitution without rebuilding or re-factorizing the reduced Hessian. (3) Keep the solver clean with ONLY the executed mechanisms and orthogonal boolean config toggles: nullspace_reduction (default True), exact_hessian (default True), active_face_caching (default True), row_equilibration (default False), armijo_line_search (default False).",
   "eval_timeout": 120,
   "metric_atol": 0.0,
   "metric_rtol": 0.5,
-  "metric_description": "Composite projection error mse = rs_mean + 50*cv_max + 0.05*solve_time_ms with minimized primal-dual KKT certificate, cached-DR & tuned OSQP/ADMM baselines, factor-reused implicit differentiation backward pass & end-to-end neural layer training, and d<=128 degeneracy stress sweep."
+  "metric_description": "Randomized interleaved paired projection evaluation (mse = rs_mean + 50*cv_max + 0.05*solve_time_ms) with Student-t 95% CIs, scale-normalized KKT certificates, clean 2x2 cache-free factorial isolation, direct retained-Cholesky-factor O(dk+k^2) backward VJP benchmark vs refactorized Jacobian and unrolled splitting, 25-epoch end-to-end training, and 5-pass randomized d<=128 degeneracy stress sweep."
 }
