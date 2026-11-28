@@ -254,3 +254,23 @@ python submit_paperreview_ai.py --token <PINET_TOKEN> --poll 20 --interval 60 \
      - `drone-gpt` 三值回归分：`3.10 (v1)` $\to$ `4.40 (v2–v4)` $\to$ **`5.50 / 10 (v5)`（拿下 `Question_Importance: +1`、`Writing_Clarity: +1`，其余 5 维全 `0`，`0` 个 `-1`！）**；
      - `drone-gpt` 细粒度加权分：`4.74 (v1)` $\to$ `5.47 (v2)` $\to$ `5.78 (v4)` $\to$ **`6.39 / 10 (v5)`（累计暴涨 `+1.65` 分，`Experimental_Soundness` 从 `3.5 -> 5.5`、`Prior_Work_Context` 从 `2.0 -> 6.0`、`Writing_Clarity` 达 `7.0/10`）**；
      - 内置七维审稿分：**`5.57 / 10 (Accept)`**。
+
+---
+
+## 2026-11-28 11:54 —— 扩充 5 篇谷歌《ScientistTwo》全阵容基准、35 维联立视差反演与二阶框架自进化（`dd9cf33`）
+
+1. **新增 3 道谷歌《ScientistTwo》原论文同款代表作基准（凑齐 5 篇顶会全阵容）**：
+   - **第 3 题 [`benchmarks/ts_rag`](benchmarks/ts_rag)**（对标谷歌 §4.3 + 图 12 + 表 11 + 附录 D 全文 15 页展示的 NeurIPS 2025 旗舰案例 `TS-RAG`，`arXiv:2503.07649`）：
+     - v1 首次出厂即通过正交趋势解耦 + 延续不一致性惩罚岭回归 + 滚动原点预测门控，将 7 通道 42 条非平稳序列的全量验证 MSE 从原版 `TS-RAG` 基线的 **`0.523566` 压至 `0.095488`（降低 `81.76%`，提升 `5.48×`；留出测试集 `0.218618`；对比谷歌原版 `DynaSpec-RAG` 仅微降 `2.47%`）**；
+     - v1 首次盲审即在 `stanford_local_verifier.py` 上拿下 **`5.20 / 10`（`+1:1, 0:6, -1:0`，`0` 个 `-1`！细粒度 `5.91 / 10`，内置审稿 `5.29 / 10 Accept`）**。
+   - **第 4 题 [`benchmarks/tsae_koopman`](benchmarks/tsae_koopman)**（对标谷歌附录 B 表 16 第二题 ICLR 2026 `T-SAE`，`arXiv:2511.05541`）：
+     - v1 首次出厂将综合损失从 `0.255520` 压至 `0.234528`（留出测试集 `0.242735`），17 项声明与 8 篇 DOI `I1–I4` 一次全过，`stanford_local_verifier.py` 盲审 `4.40 / 10`（细粒度 `5.46 / 10`）。
+   - **第 5 题 [`benchmarks/dmsqd_cma`](benchmarks/dmsqd_cma)**（对标谷歌附录 B 表 16 第四题 ICLR 2026 `DMSQD / CMA-MAE`，`arXiv:2601.01082` + `arXiv:2205.10752`）：
+     - v1 首次出厂将高维质量多样性损失 `1 - normalized_qd_score` 从基线 **`0.711088`（`QD-Score = 0.2889`）压至 `0.234736`（留出测试集 `0.242709`，归一化 `QD-Score` 飙至 `0.7573`，提升 `2.62×`）**，并在 Stage 4 自动通过减法消融砍掉冗余的 `reachability_gate` 与 `archive_threshold_annealing` 晋升 `pruned`；
+     - v1 首次盲审即拿下 **2 个 `+1`（`Writing_Clarity: +1 [8.0/10]`, `Question_Importance: +1 [8.0/10]`，总分 `4.70 / 10`，细粒度 `5.72 / 10`，内置审稿 `5.29 / 10 Accept`）**。
+2. **5 篇 × 7 维 = 35 维联立视差反演揪出的三大框架级进化（commit `dd9cf33`）**：
+   - **进化 1（Post-Pruning Re-Ablation，根治 Stage 4 消融对象错位）**：此前的 Stage 4 先跑 `ablation0..4` 再跑 `pruned`，导致 `pruned` 胜出成为最终方案后，论文里的 5 组消融仍针对瘦身前的旧配置（5 篇中有 4 篇被 `drone-gpt` 批 `subtraction targets a different configuration`）。现已在 `pipeline.py` 中实现：一旦 `pruned` 胜出替换 `self.best`，自动围绕最终 `pruned` 配置重新规划并重跑 5 组单组件减法消融；
+   - **进化 2（Pre-Writer Literature Grounding Sync，打通 Stage 1 与 Stage 6 检索差）**：在 Stage 1 自动调用 `Review retrieval planner` 检索近邻 `arXiv` 文献并入 `references.json`（连带完整摘要与跨进程磁盘缓存 `/tmp/open_scientisttwo_arxiv_cache.json`），使 `Writer` 在 `Related Work` 中 100% 覆盖审稿器会检索到的所有近邻文献；
+   - **进化 3（LaTeX 双盲署名与行内排版 + 3 道新题 Comparator Parity 升级）**：将 PDF 署名从 `\author{Open-ScientistTwo Research Report}` 升级为标准 ICLR 双盲署名 `\author{Anonymous Authors}`，支持 `*italic*` 与 `` `code` `` 转换；并将 `dmsqd_cma` 扩充至 12 个独立任务（4 维 × 3 种子）+ 对角 `CMA-ME / CMA-MAE` 基线、为 `tsae_koopman` 所有基线配备对等的字典精修与 20 步预算、为 `ts_rag` 加入匹配正则化强度的常数岭回归控制组。
+3. **当前后台进度**：
+   - `task-1231`（`ts_rag` v2）、`task-1232`（`tsae_koopman` v2）、`task-1233`（`dmsqd_cma` v2）正在执行 `Post-Pruning Re-Ablation` + `Writer` + `I1–I4` + `stanford_local_verifier.py` 盲审打分，产物将自动落盘至 `benchmarks/results/{ts_rag_v2, tsae_koopman_v2, dmsqd_cma_v2}`。
