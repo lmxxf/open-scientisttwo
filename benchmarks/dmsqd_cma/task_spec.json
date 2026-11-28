@@ -1,0 +1,21 @@
+{
+  "title": "High-dimensional quality-diversity optimization via natural-gradient covariance matrix adaptation, archive soft-threshold annealing, and frontier novelty guidance",
+  "primary_metric": "mse",
+  "higher_is_better": false,
+  "arxiv_query": "id:2601.01082",
+  "seed_dois": [
+    "10.48550/arXiv.2601.01082",
+    "10.48550/arXiv.2205.10752",
+    "10.48550/arXiv.1912.02400",
+    "10.48550/arXiv.2106.03894",
+    "10.48550/arXiv.2007.05352",
+    "10.48550/arXiv.2305.01264",
+    "10.48550/arXiv.2504.02177",
+    "10.48550/arXiv.2009.08438"
+  ],
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve optimize_qd(task, config) returning a dict with 'archive_q' (g x g float array, -inf for empty cells) and 'archive_x' (g x g x d float array of elite solutions) using at most task['budget_generations'] * task['batch_size'] evaluations via evaluate_candidates(X, task). Never access hidden task['opt_center'], task['rot_Q'], task['proj_B'], or task['eig_weights'] directly—only call evaluate_candidates(X, task) and archive_cell_indices(desc, g). CRITICAL DESIGN REQUIREMENTS: (1) CMA-MAE ARCHIVE SOFT-THRESHOLD ANNEALING & RANK-MU COVARIANCE MATRIX ADAPTATION: Maintain a soft archive acceptance threshold t_e initialized to t_min and updated via t_e <- (1 - alpha_a) t_e + alpha_a f(x) so Improvement emitters rank candidates by Delta_i = f(x_i) - t_{cell(x_i)} (discovering new cells with high priority while steadily climbing quality in occupied cells), and update the emitter search mean m and diagonal/low-rank covariance matrix C via rank-mu natural-gradient evolution path updates. (2) FRONTIER NOVELTY / SPARSE-NEIGHBORHOOD BOUNDARY DISCOVERY & SURROGATE INTERPOLATION: Guide a subset of offspring along the local descriptor Jacobian / finite-difference direction between high-performing adjacent archive elites toward unoccupied frontier cells, and refine top elites via local quadratic/ridge surrogate interpolation. (3) Expose clean orthogonal boolean config switches: cma_covariance_adaptation (default True), archive_threshold_annealing (default True), frontier_boundary_guidance (default True), local_surrogate_refinement (default True), dimension_adaptive_smoothing (default True).",
+  "eval_timeout": 120,
+  "metric_atol": 1e-9,
+  "metric_rtol": 1e-6,
+  "metric_description": "Quality-Diversity loss mse = 1.0 - normalized_qd_score across dimensions d in [24, 36, 48, 64], reporting QD-Score, Archive Coverage (%), Mean Elite Quality, and CVaR-10% Tail Quality against Vanilla MAP-Elites (arXiv:2009.08438), CMA-ME (arXiv:1912.02400), and Fixed-Annealing CMA-MAE (arXiv:2205.10752) with paired Student-t 95% CIs and complete 2x2 factorial mechanism isolation."
+}

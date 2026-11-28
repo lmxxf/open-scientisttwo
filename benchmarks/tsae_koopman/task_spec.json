@@ -1,0 +1,21 @@
+{
+  "title": "Temporal sparse autoencoders with bidirectional Koopman dynamical priors and graph-Laplacian proximal dictionary learning",
+  "primary_metric": "mse",
+  "higher_is_better": false,
+  "arxiv_query": "id:2511.05541",
+  "seed_dois": [
+    "10.48550/arXiv.2511.05541",
+    "10.48550/arXiv.2604.03919",
+    "10.48550/arXiv.2611.03420",
+    "10.48550/arXiv.2608.29057",
+    "10.48550/arXiv.2309.08600",
+    "10.48550/arXiv.2406.04093",
+    "10.48550/arXiv.2408.05147",
+    "10.48550/arXiv.1712.09707"
+  ],
+  "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve run_tsae(bundle, config) returning a dict with keys 'D_est' (shape d_in x m_dict), 'K_est' (shape m_dict x m_dict), 'reconstructions' (list of T x d_in arrays for bundle['eval_cases']), and 'latents' (list of T x m_dict nonnegative sparse arrays). Never access hidden bundle['D_true'], bundle['K_true'], case['X_clean'], or case['Z_true']. CRITICAL DESIGN REQUIREMENTS: (1) JOINT PROXIMAL DICTIONARY REFINEMENT & TOP-K/FISTA SPARSE INFERENCE: Refine dictionary D from bundle['D_init'] using bundle['train_sequences'] (and unlabelled X_obs trajectories) via alternating orthogonalized dictionary updates (normalizing columns to unit L2 norm) and accelerated FISTA + hard/soft Top-K sparse support selection matching bundle['k_active']. (2) BIDIRECTIONAL KOOPMAN OPERATOR ESTIMATION & GRAPH-LAPLACIAN TEMPORAL SMOOTHING: Estimate the latent Koopman transition matrix K_est = argmin_K sum_t ||Z_{t+1} - Z_t K^T||_F^2 + rho ||K - I||_F^2 in closed form via ridge-regularized cross-covariance over sequential latents, and couple the sparse latent inference with the bidirectional temporal quadratic penalty mu_lap * ||Delta_t Z||_F^2 + mu_koop * sum_t ||Z_{t+1} - Z_t K_est^T||_2^2 (solved via fast tridiagonal/proximal sweep before final Top-K support projection). (3) Expose clean orthogonal boolean config switches: dictionary_refinement (default True), temporal_laplacian_smoothing (default True), koopman_dynamical_prior (default True), topk_support_projection (default True), fista_momentum (default True).",
+  "eval_timeout": 120,
+  "metric_atol": 1e-9,
+  "metric_rtol": 1e-6,
+  "metric_description": "Composite T-SAE loss mse = clean_recon_mse + 0.35*(1 - feature_support_f1) + 0.25*koopman_rollout_mse + 0.15*sparsity_violation, evaluated against Framewise ISTA-SAE (arXiv:2309.08600), TopK-SAE (arXiv:2406.04093), and Laplacian-Only T-SAE (arXiv:2511.05541) with paired Student-t 95% CIs, complete 2x2 factorial mechanism isolation, and sequence-noise/sparsity scaling sweeps."
+}
