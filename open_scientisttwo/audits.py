@@ -58,13 +58,19 @@ def reference(doi):
         entry = tree.find('a:entry', ns)
         if entry is None or identifier not in entry.findtext('a:id', '', ns):
             raise ValueError('arXiv reference not found')
-        res = dict(doi=doi, title=' '.join(entry.findtext('a:title', '', ns).split()), url='https://arxiv.org/abs/'+identifier)
+        authors = [a.findtext('a:name', '', ns).strip() for a in entry.findall('a:author', ns) if a.findtext('a:name', '', ns)]
+        pub = (entry.findtext('a:published', '', ns) or '')[:4]
+        res = dict(doi=doi, title=' '.join(entry.findtext('a:title', '', ns).split()), url='https://arxiv.org/abs/'+identifier,
+                   authors=', '.join(authors[:4]) + (' et al.' if len(authors) > 4 else ''), year=pub)
         _REF_CACHE[key] = res
         return res
     url = 'https://api.crossref.org/works/' + urllib.parse.quote(doi, safe='')
     with urllib.request.urlopen(url, timeout=40) as response:
         message = json.load(response)['message']
-    res = {'doi': message['DOI'], 'title': message['title'][0], 'url': url}
+    c_authors = [' '.join(filter(None, [a.get('given', ''), a.get('family', '')])).strip() for a in message.get('author', [])]
+    c_year = str(message.get('issued', {}).get('date-parts', [['']])[0][0] or '')
+    res = {'doi': message['DOI'], 'title': message['title'][0], 'url': url,
+           'authors': ', '.join(c_authors[:4]) + (' et al.' if len(c_authors) > 4 else ''), 'year': c_year}
     _REF_CACHE[key] = res
     return res
 

@@ -1,0 +1,57 @@
+{
+  "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/inc_bpe_v5/manuscript.pdf",
+  "seconds": 67.64,
+  "numerical_score": 5.5,
+  "fine_weighted_score": 6.52,
+  "positive_count": 2,
+  "neutral_count": 5,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The central compilation and certificate arguments hold under the stated criterion, but empirical scope, certificate instrumentation, and complete mechanism isolation have caveats.",
+    "Experimental_Soundness": "A careful local prototype includes held-out streams, randomized paired timings, uncertainty, and depth controls; tiny workloads and incomplete final-design subtraction prevent +1.",
+    "Writing_Clarity": "The manuscript reads as an organized standalone article with clear proofs, pseudocode, tables, and explicit limitations rather than an internal audit log.",
+    "Prior_Work_Context": "Relevant retrieved works are covered and acceptance compilation is distinguished from candidate search, but formal differentiation and comparisons with published systems remain limited.",
+    "Question_Importance": "Efficient exact prefix tokenization is relevant to streaming language-model systems and agent workloads.",
+    "Originality": "Rank-ordered DFS intervals and conservative certificates form a useful specialization, but the manuscript does not establish a sufficiently nontrivial departure from established techniques.",
+    "Value_to_Community": "The characterization and local measurements are potentially useful, but their demonstrated utility remains constrained by prototype scale."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 6.5,
+    "Experimental_Soundness": 5.5,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.5,
+    "Question_Importance": 8.0,
+    "Originality": 5.5,
+    "Value_to_Community": 6.0
+  },
+  "sections": {
+    "summary": "The paper compiles a rank-constrained predecessor relation for exact incremental BPE into two DFS intervals per merge rule, constructs the cutoffs in linear time, and adds conservative positive context certificates. The central compilation proofs appear correct under the stated assumptions. Experiments support local performance improvements, but production relevance and complete component attribution remain unestablished.",
+    "strengths": "Theorem 1 correctly exploits rank-ordered contiguous child subtrees. Theorem 2's update-before-read sweep handles equal operands and strict rank exclusion correctly. The certificate argument soundly overapproximates possible predecessors through suffix compatibility. The paper distinguishes constant-time predicates from candidate-scan complexity and interval compilation from total preprocessing. Randomized paired timings, confidence intervals, fixed-vocabulary depth sweeps, hardware details, and qualified memory measurements strengthen the evidence.",
+    "weaknesses": "The primary workload contains only 72 merges and three 768-byte streams per split; synthetic scaling reaches only 512 merges. Local centroid-search implementations do not establish competitiveness with published optimized systems. The factorial study omits pointer predicates with positive certificates, and subtraction experiments use a reference containing negative certificates rather than the final configuration. Several component effects lack paired uncertainty. Certificate coverage comes from an independent replay rather than direct instrumentation of the budgeted compiler. Novelty is principally a compact specialization of standard ordered-tree interval techniques.",
+    "detailed_comments": "The two-interval equivalence and cutoff invariant are internally consistent, including self-overlap. The certificate proof is valid because the actual predecessor and known context end at the same position. However, end-to-end correctness relies on an imported canonical prefix-last-token criterion; Proposition 4 should explicitly identify the prior result establishing both this criterion and reconstruction through stored prefix histories. Its proof does not independently derive those properties from greedy merge semantics. The manuscript correctly avoids claiming constant-time updates or the logarithmic search guarantees of the closest incremental algorithms. The isolated certificate-free comparison supports an interval benefit, and paired certificate contrasts exclude zero, but the roughly fourfold integrated gain includes substantial automaton engineering effects. The seven timing passes measure repeated execution on fixed tiny workloads, not uncertainty across sampled corpora or vocabularies. Fixed vocabulary size controls one scaling factor, while changing token and candidate distributions still limits whole-stream interpretation. Memory accounting is appropriately qualified, but production-scale resident memory and preprocessing remain unknown. The abstract's certificate-hit figures should be explicitly labeled as replay diagnostics, consistent with the qualifications later in the paper. The article otherwise has a coherent standalone structure, explicit algorithms, proofs, tables, and limitations, without internal log filenames or duplicated appendices.",
+    "questions": "Which precise theorem in the prior incremental-BPE work establishes the assumed acceptance criterion and prefix-history reconstruction under these canonicality assumptions? Can the missing pointer-plus-positive-certificates cell and paired subtraction contrasts be measured around the final configuration? Do directly instrumented compiler verdicts reproduce the reported replay coverage? How do construction cost, resident memory, candidate counts, and latency behave on production vocabularies and long natural streams? What benefit remains against optimized published incremental implementations using comparable recognition layouts?",
+    "assessment": "I lean toward rejection at the current scope. The paper offers a credible and clearly explained algorithmic refinement, but the empirical workload is too small and mechanism attribution too incomplete to establish a substantial ICLR contribution. My assessment concerns the supplied manuscript and retrieved literature; I did not independently reproduce the measurements."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

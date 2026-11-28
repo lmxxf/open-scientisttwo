@@ -1,0 +1,57 @@
+{
+  "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/pinet_hcnn_v5/manuscript.pdf",
+  "seconds": 60.31,
+  "numerical_score": 5.5,
+  "fine_weighted_score": 6.39,
+  "positive_count": 2,
+  "neutral_count": 5,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The conditional theorems hold, but empirical coupling and speedup claims retain important isolation and scope caveats.",
+    "Experimental_Soundness": "A careful local prototype includes held-out evaluation, randomized paired timing, and factorial controls, but lacks strong matched baselines and complete component validation.",
+    "Writing_Clarity": "The paper has a coherent standalone structure, explicit assumptions, proofs, pseudocode, tables, and clear limitations without internal-log clutter.",
+    "Prior_Work_Context": "Ten relevant works receive technical comparisons, but the novelty boundary against solver-coupled differentiation and classical projection sensitivity remains incomplete.",
+    "Question_Importance": "Reliable hard-constrained differentiable optimization layers address an important learning and decision-making problem.",
+    "Originality": "The construction is a useful specialization of established nullspace Newton and implicit-differentiation machinery rather than a clearly fresh algorithmic synthesis.",
+    "Value_to_Community": "The characterization and implementation lessons are useful, but current evidence supports a constrained technical note."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 6.5,
+    "Experimental_Soundness": 5.5,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.5,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.5
+  },
+  "sections": {
+    "summary": "The paper develops a specialized differentiable solver for strongly convex quadratic\u2013sinusoidal objectives under affine equalities and box constraints. It combines nullspace reduction, active-face Newton iterations, cached geometry, and retained-factor adjoints. The stated conditional mathematical results are sound, but novelty and empirical validation remain insufficient for a strong ICLR contribution.",
+    "strengths": "The strong-convexity bound, conditional quadratic-convergence argument, stable-face adjoint formula, and critical-cone projection characterization are mathematically coherent. The manuscript carefully distinguishes optimizer derivatives from finite-iterate curvature operators and weak-activity directional derivatives. Randomized paired timing, a cache-free factorial experiment, numerical residuals, and explicit limitations substantially improve the credibility of the small-scale findings.",
+    "weaknesses": "Experiments cover only six synthetic problems per primary split and dimensions up to 128. Baselines are local fixed-budget implementations with per-call setup, whereas the proposed method reuses geometry and warm starts. The retained-factor interface itself is not benchmarked; its proxy comparison also contrasts one VJP with full-Jacobian reconstruction. Critical-cone treatment has no dedicated numerical accuracy experiment or demonstrated subtraction effect. The central ingredients substantially overlap established active-set Newton and implicit-differentiation methods.",
+    "detailed_comments": "1. Mathematical verification: Proposition 1 correctly gives mu = 0.3 - 0.8 sin(0.25), approximately 0.10208. Proposition 2's alpha/(2 mu) local error constant follows from the reduced Hessian Lipschitz bound. Theorem 3 follows directly from fixed-face stationarity, and its O(dk + k^2) arithmetic bound is valid when factors are already available and triangular substitutions are used. Theorem 4's projection expansion and cluster-point argument are valid for a polyhedron. These results do not establish global convergence, finite face identification, or exact sensitivities at unconverged outputs, as the paper acknowledges.\n2. Implementation boundary: feasibility preservation assumes exact feasible initialization and exact active coordinates, whereas the algorithm uses tolerances and a capped initialization without a mandatory failure. Dependent active normals also deserve attention: a minimum-norm least-squares multiplier solution can contain incompatible signs even when another sign-compatible representation exists. The manuscript should characterize the resulting release/termination behavior under degeneracy.\n3. Novelty: the supplied OptNet abstract already describes solver-coupled differentiation with virtually no additional backward cost; dQP explicitly exploits active-set systems sharing the same matrix; Lewis and Wylie provide the active-manifold Newton framework. The nonquadratic specialization and explicit terminal-factor interface are useful, but a new general differentiation principle is not established. The critical-cone result should be contextualized as established projection sensitivity theory. The retrieved first-order layer is also absent from the discussion.\n4. Experimental attribution: the reduction/curvature factorial is useful and preserves accuracy across cells, but has no paired uncertainty intervals. Forward speedups combine algorithmic effects with unequal setup reuse and warm-start policies. Matched caching, matched stopping tolerances, and time-to-accuracy curves against optimized packages would provide stronger evidence. Disabling all Newton iterations is a basic optimization sanity check, not a competitive mechanism ablation. Removing the directional helper leaves the measured forward task unchanged and therefore supplies no empirical evidence for that component.\n5. Statistics and scaling: the primary paired intervals quantify repeated execution over fixed instances, not generalization across independent optimization problems. Dimension, row scaling, and boundary structure change jointly in the stress experiment. At d = 128, the proposed timing SD of 3.5687 ms greatly exceeds its 0.8399 ms median, limiting latency conclusions.\n6. Reproducibility: seeds, precision, CPU, and operating environment are reported, but NumPy/BLAS versions, thread settings, and frequency control are missing. Single-solve traced allocations do not establish process memory usage or growth of uncapped face caches. The split construction, reference-solution procedure, and selection protocol need more detail. The text is otherwise organized as a standalone article with theorem statements, proofs, pseudocode, and tables; PDF extraction artifacts are not evidence of poor original typesetting. I assessed the supplied text and literature only and did not independently execute the implementation.",
+    "questions": "Can matched-cache and matched-warm-start comparisons against optimized solvers confirm the speedups at common accuracy targets? Can Algorithm 2 be benchmarked directly against a factor-reconstructing VJP with identical output requirements? What new result remains beyond established active-set Newton, shared-system differentiation, and classical critical-cone sensitivity? How are infeasible initialization, iteration limits, and dependent active normals handled explicitly? Can independent problem seeds, orthogonal stress sweeps, weak-activity directional tests, and complete memory measurements substantiate the broader computational claims?",
+    "assessment": "Weak reject. This is a careful and technically sound specialization with unusually candid measurement boundaries. However, the conceptual advance is incremental, the decisive retained-interface experiment is missing, and small synthetic workloads with unmatched local baselines do not establish broad practical value."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

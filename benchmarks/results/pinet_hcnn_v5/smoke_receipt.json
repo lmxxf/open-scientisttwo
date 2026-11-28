@@ -1,0 +1,46 @@
+{
+  "success": true,
+  "best": {
+    "label": "initial",
+    "snapshot": "initial_full",
+    "config": {
+      "name": "critical_cone_directional_differentiation",
+      "constraint_class": "Polyhedral Euclidean projection, including weakly active constraints",
+      "regular_point_backward": "Use the certified face tangent projector.",
+      "degenerate_point_derivative": "For input direction d, solve min_v 0.5*||v-d||^2 over the critical cone T_C(x) intersect (z-x)^perp.",
+      "reverse_mode_policy": "Expose a documented adjacent-face generalized-Jacobian selection; do not label it a unique classical derivative.",
+      "factor_reuse": "Reuse available face factors within critical-cone subproblems.",
+      "ablation": "Compare with treating every tight inequality as an equality."
+    },
+    "value": 0.011213589460229526
+  },
+  "baseline_full": 0.09046244730911152,
+  "final_test": 0.01109487299603564,
+  "local_score": 5.571428571428571,
+  "local_decision": "Accept",
+  "claims": 16,
+  "roles": 26,
+  "protected_hashes": {
+    "eval.py": "e97f13db9fca19f1a25a7643785670aece0f5a78e13dec78f85cd7fe1f48cf39",
+    "data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+    "task_spec.json": "36b47c9e507bf856a39c746ae5da8f3b042c0550f53620597a0d0700eee32090"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/pinet_hcnn",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-pinet-v5"
+  ],
+  "seconds": 2158.361893428955
+}

@@ -1,0 +1,68 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 17
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "3471aaa92b7c446a6c53e6f2943f94237b4a159b4086635acab65b5fe91a20d4",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2605.30813",
+        "title": "Incremental BPE Tokenization",
+        "url": "https://arxiv.org/abs/2605.30813"
+      },
+      {
+        "doi": "10.48550/arXiv.2609.40016",
+        "title": "Component-Weighted Centroid Search for Exact Incremental BPE",
+        "url": "https://arxiv.org/abs/2609.40016"
+      },
+      {
+        "doi": "10.48550/arXiv.2309.08715",
+        "title": "Formalizing BPE Tokenization",
+        "url": "https://arxiv.org/abs/2309.08715"
+      },
+      {
+        "doi": "10.48550/arXiv.2306.16837",
+        "title": "A Formal Perspective on Byte-Pair Encoding",
+        "url": "https://arxiv.org/abs/2306.16837"
+      },
+      {
+        "doi": "10.48550/arXiv.2207.13870",
+        "title": "Engineering faster double-array Aho-Corasick automata",
+        "url": "https://arxiv.org/abs/2207.13870"
+      },
+      {
+        "doi": "10.48550/arXiv.1508.07909",
+        "title": "Neural Machine Translation of Rare Words with Subword Units",
+        "url": "https://arxiv.org/abs/1508.07909"
+      },
+      {
+        "doi": "10.48550/arXiv.1808.06226",
+        "title": "SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing",
+        "url": "https://arxiv.org/abs/1808.06226"
+      },
+      {
+        "doi": "10.48550/arXiv.2402.01035",
+        "title": "Getting the most out of your tokenizer for pre-training and domain adaptation",
+        "url": "https://arxiv.org/abs/2402.01035"
+      },
+      {
+        "doi": "10.1145/360825.360855",
+        "title": "Efficient string matching",
+        "url": "https://api.crossref.org/works/10.1145%2F360825.360855"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The selected pruned config enables intervals, dense transitions, atomic bypass, and positive certificates while disabling rejection certificates, matching manuscript.md. model.py constructs rank-ordered successor-forest DFS intervals and updates cutoff[b]=right[t] before reading cutoff[a], including identical operands. Executed acceptance is lo<=L[k]<hi or q<=L[k]<end with k=H[n-offset]. Certificates use suffix-comparable vocabulary spellings, coalesced DFS regions, conservative per-interval containment, and the documented default budget of 2,000,000 compatibility tests; incomplete or empty domains remain CHECK. append checks the stream boundary before accepting certificates, scans candidates by decreasing length, and reconstructs tokens through prefix history as described. The supplied score 2.808493364783418 rounds to the manuscript's 2.8085; experimental measurements were not independently rerun."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "critical_cone_directional_differentiation",
+  "constraint_class": "Polyhedral Euclidean projection, including weakly active constraints",
+  "regular_point_backward": "Use the certified face tangent projector.",
+  "degenerate_point_derivative": "For input direction d, solve min_v 0.5*||v-d||^2 over the critical cone T_C(x) intersect (z-x)^perp.",
+  "reverse_mode_policy": "Expose a documented adjacent-face generalized-Jacobian selection; do not label it a unique classical derivative.",
+  "factor_reuse": "Reuse available face factors within critical-cone subproblems.",
+  "ablation": "Compare with treating every tight inequality as an equality."
+}

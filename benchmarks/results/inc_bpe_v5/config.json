@@ -1,0 +1,12 @@
+{
+  "acceptance_mode": "intervals",
+  "flat_transitions": true,
+  "atomic_fastpath": true,
+  "certified_regions": true,
+  "certificate_domain": "boundary_aware_compatibility_intervals",
+  "certificate_outcomes": [
+    "accept",
+    "check"
+  ],
+  "rejection_certificates": false
+}

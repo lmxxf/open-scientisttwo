@@ -1,0 +1,73 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 16
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "e97f13db9fca19f1a25a7643785670aece0f5a78e13dec78f85cd7fe1f48cf39",
+      "data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+      "task_spec.json": "36b47c9e507bf856a39c746ae5da8f3b042c0550f53620597a0d0700eee32090"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2508.10480",
+        "title": "Pinet: Optimizing hard-constrained neural networks with orthogonal projection layers",
+        "url": "https://arxiv.org/abs/2508.10480"
+      },
+      {
+        "doi": "10.48550/arXiv.2410.06324",
+        "title": "Differentiation Through Black-Box Quadratic Programming Solvers",
+        "url": "https://arxiv.org/abs/2410.06324"
+      },
+      {
+        "doi": "10.48550/arXiv.1902.00724",
+        "title": "Active-set Newton methods and partial smoothness",
+        "url": "https://arxiv.org/abs/1902.00724"
+      },
+      {
+        "doi": "10.48550/arXiv.2212.02748",
+        "title": "An Online Newton's Method for Time-varying Linear Equality Constraints",
+        "url": "https://arxiv.org/abs/2212.02748"
+      },
+      {
+        "doi": "10.48550/arXiv.2104.12225",
+        "title": "DC3: A learning method for optimization with hard constraints",
+        "url": "https://arxiv.org/abs/2104.12225"
+      },
+      {
+        "doi": "10.48550/arXiv.1703.00443",
+        "title": "OptNet: Differentiable Optimization as a Layer in Neural Networks",
+        "url": "https://arxiv.org/abs/1703.00443"
+      },
+      {
+        "doi": "10.48550/arXiv.1910.12430",
+        "title": "Differentiable Convex Optimization Layers",
+        "url": "https://arxiv.org/abs/1910.12430"
+      },
+      {
+        "doi": "10.48550/arXiv.1711.08013",
+        "title": "OSQP: An Operator Splitting Solver for Quadratic Programs",
+        "url": "https://arxiv.org/abs/1711.08013"
+      },
+      {
+        "doi": "10.48550/arXiv.2102.04626",
+        "title": "Physics-informed neural networks with hard constraints for inverse design",
+        "url": "https://arxiv.org/abs/2102.04626"
+      },
+      {
+        "doi": "10.48550/arXiv.2601.06244",
+        "title": "Hard Constraint Projection in a Physics Informed Neural Network",
+        "url": "https://arxiv.org/abs/2601.06244"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The selected initial_full/config.json matches the supplied configuration. In initial_full/model.py, _run implements the manuscript's reduced Newton step with R=Z^T[Q-diag(alpha*sin(y))]Z; solve_adjoint computes -Z L^{-T}L^{-1}Z^T v using retained triangular factors. projection_directional_derivative constructs Mv=0 and normalized-normal orthogonality, imposes one-sided bounds at tight coordinates, and solves the critical-cone projection with Q=I, q=-direction, zero initialization, and 4d+20 iterations. Disabling critical-cone treatment instead fixes all tight coordinates and returns V(V^T direction). These details match manuscript Algorithms 1–2 and Theorems 3–4, including tolerances, local geometry caching, iteration-limit caveats, and the conditional interpretation of reverse-mode generalized-Jacobian membership. The cone helper caches geometry locally rather than reusing forward Cholesky factors; the manuscript describes this accurately. Source inspection establishes formula alignment, not independent reproduction of reported experimental scores."
+  }
+}

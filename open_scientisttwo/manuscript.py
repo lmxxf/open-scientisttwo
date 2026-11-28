@@ -13,6 +13,7 @@ def escape(text):
     return ''.join(mapping.get(c, c if ord(c)<128 else '[U+%04X]' % ord(c)) for c in text)
 
 def _render_inline(text, math=True):
+    text = re.sub(r'\[([^\]]+)\]\((https?://[^)]+)\)', r'\1', text)
     if not math:
         return escape(text)
     parts = re.split(r'(\$\$[\s\S]*?\$\$|(?<!\$)\$[^$\n]+\$(?!\$))',text)
@@ -52,7 +53,7 @@ def render(text, math=True):
             headers = [c.strip() for c in stripped.strip('|').split('|')]
             ncols = len(headers)
             col_spec = 'l' + 'r' * max(0, ncols - 1)
-            out.append(r'\begin{center}\footnotesize\begin{longtable}{' + col_spec + r'}\toprule')
+            out.append(r'\begin{center}\footnotesize\resizebox{\ifdim\width>\textwidth\textwidth\else\width\fi}{!}{\begin{tabular}{' + col_spec + r'}\toprule')
             out.append(' & '.join(_render_inline(h, math) for h in headers) + r'\\\midrule')
             i += 2
             while i < len(lines):
@@ -66,7 +67,7 @@ def render(text, math=True):
                     cells = cells[:ncols]
                 out.append(' & '.join(_render_inline(c, math) for c in cells) + r'\\')
                 i += 1
-            out.append(r'\bottomrule\end{longtable}\end{center}')
+            out.append(r'\bottomrule\end{tabular}}\end{center}')
             continue
         out.append(_render_inline(line, math))
         i += 1
@@ -98,7 +99,7 @@ def write_manuscript(root, response, claims, refs, spec):
         latex=r'''\documentclass[11pt,a4paper]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath,amssymb,booktabs,longtable,geometry,hyperref}
+\usepackage{amsmath,amssymb,booktabs,longtable,graphicx,geometry,hyperref}
 \geometry{margin=25mm}
 \hypersetup{colorlinks=true,urlcolor=blue}
 \setlength{\parskip}{6pt}
@@ -108,7 +109,13 @@ def write_manuscript(root, response, claims, refs, spec):
         latex+='\\begin{abstract}\n'+render(response['abstract'],native)+'\n\\end{abstract}\n'
         for key,title in SECTIONS:
             latex+='\\section{'+title+'}\n'+render(response[key],native)+'\n'
-        latex+='\\section*{References}\n'+'\n\n'.join(escape(r['title'])+'. DOI: '+escape(r['doi']) for r in refs)+'\n'
+        ref_lines = []
+        for idx, r in enumerate(refs, 1):
+            auth = r.get('authors', '').strip()
+            yr = r.get('year', '').strip()
+            prefix = f'[{idx}] ' + (f'{escape(auth)} ({escape(yr)}). ' if auth and yr else (f'{escape(auth)}. ' if auth else ''))
+            ref_lines.append(prefix + escape(r['title']) + '. DOI: ' + escape(r['doi']))
+        latex+='\\section*{References}\n'+'\n\n'.join(ref_lines)+'\n'
         latex+='\\end{document}\n'
         (root/'manuscript.tex').write_text(latex)
         results=[]
