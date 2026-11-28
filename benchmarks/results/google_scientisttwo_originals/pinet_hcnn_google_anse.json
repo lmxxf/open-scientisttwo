@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/google_st_originals/Others_ANSE.pdf",
+  "seconds": 69.49,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 4.52,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The exact-equality identity holds, but the central unconditional DLFF restoration theorem is false, and gradient, convergence, and optimality claims exceed the provided verification.",
+    "Experimental_Soundness": "Held-out evaluation and two scales are positives, but the restoration experiment is not reproducibly matched to the method, the suboptimality metric has an unresolved sign problem, and mechanism ablations and uncertainty estimates are inadequate.",
+    "Writing_Clarity": "The academic organization is clear, but undefined operators, missing pseudocode, the unexplained DLFF-60 procedure, and inconsistent publication metadata prevent a fully standalone presentation.",
+    "Prior_Work_Context": "The bibliography covers relevant research families, but closest-method differentiation is mostly qualitative; the empty retrieval file supplies no independent evidence for stronger novelty conclusions.",
+    "Question_Importance": "Efficient differentiable optimization with reliable hard constraints is important for control, robotics, and learning-to-optimize.",
+    "Originality": "Nullspace elimination, row scaling, splitting, and Krylov adjoints form a potentially useful specialization, but a genuinely new valid synthesis is not established; the proposed distinctive barrier guarantee fails.",
+    "Value_to_Community": "The reduced-space implementation and negative solver findings could inform a useful technical contribution, but current theoretical and experimental deficiencies substantially constrain its value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 2.0,
+    "Experimental_Soundness": 3.0,
+    "Writing_Clarity": 6.0,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 8.5,
+    "Originality": 4.5,
+    "Value_to_Community": 4.5
+  },
+  "sections": {
+    "summary": "ANSE combines exact nullspace parameterization, row equilibration, reduced-space optimization, and matrix-free implicit differentiation for constrained neural networks. The equality construction is correct under its stated assumptions, and the reported benchmarks suggest useful computational savings. However, the central DLFF feasibility and diffeomorphism theorem is false as stated, the convergence argument does not establish the implemented algorithm's guarantees, and the experiments do not adequately isolate the claimed mechanisms.",
+    "strengths": "The paper addresses an important problem: efficient neural optimization with hard constraints. Exact nullspace parameterization correctly enforces consistent affine equalities when the basis and particular solution are computed accurately. Experiments include held-out splits, two problem sizes, convex and non-convex objectives, and comparisons with relevant optimization-layer methods. Reporting the hypernetwork's failure and removing unnecessary backward-solver machinery are useful negative findings. Hardware and floating-point precision are specified.",
+    "weaknesses": "Theorem 3 fails mathematically, invalidating the strongest feasibility guarantee. The manuscript does not specify how a logarithmic barrier is evaluated at infeasible truncated iterates, nor reconcile a single-step formula with the experimental DLFF-60 procedure. Theorem 2 lacks sufficient assumptions and does not match the displayed iteration clearly. Main numerical results use one seed; five-seed shading is not a confidence interval. Most ablations cover only the small non-convex case and are not orthogonal component removals. Memory measurements, preprocessing costs, timing protocols, and baseline tuning details are absent. The supplied literature retrieval is empty, limiting independent novelty verification.",
+    "detailed_comments": "1. Theorem 1 is a standard, correct algebraic identity. Its approximate 1e-14 residual is an empirical scale, not a universal bound: basis construction error, conditioning, dimension, and cancellation also matter. Static-M preprocessing avoids repeated factorizations, but context-dependent QR still requires online factorization, while the learned variant reports equality violation 0.38. Thus exact, factorization-free enforcement is demonstrated only for the static setting.\n2. Theorem 3 has a direct counterexample. Let the reduced feasible interval be 0 < w < 0.001, with phi(w) = -log(w)-log(0.001-w). At w = 0.00025, its gradient is approximately -2666.67. With eta = 150, the stated update produces w approximately 0.00691665, outside the interval. Bounding displacement by 1/eta cannot guarantee preservation of arbitrarily narrow feasible regions. Moreover, the real logarithmic barrier is undefined at the infeasible inputs the method claims to restore. Smoothness of a function does not establish Jacobian nonsingularity or global invertibility; the norm in the denominator also requires a separate smoothness analysis at zero gradient. A sampled minimum singular value proves none of these global properties.\n3. Theorem 2 does not define g and h sufficiently or establish a nonempty fixed-point set. A composition of a proximal map and a reflected proximal map is not automatically the standard Douglas\u2013Rachford operator, and averagedness alone does not imply feasibility of its fixed points. Equations 3\u20135 do not transparently implement the appendix operator. The proximal set K and its computational realization are insufficiently specified. An observed condition number and fitted geometric rate cannot establish a general linear convergence theorem.\n4. The backward comparison appears to compare iterative and dense solutions of the same adjoint system. This checks linear-solver accuracy, not whether the adjoint equals the derivative of a finitely truncated forward computation. Independent finite-difference or converged-unrolling checks, fixed-point residuals, active-set regularity assumptions, and backward failure rates are needed.\n5. The reported relative suboptimality divides by J(y*), rather than a positive scale such as max(epsilon, abs(J(y*))). Unless positivity is established, negative reference objectives can cause worse solutions to receive zero reported suboptimality. The source and accuracy of non-convex reference solutions are unspecified. '100% optimality' means passing a 5% reference-gap threshold, not certified optimality, and should be described accordingly.\n6. Main comparisons share test instances, but paired uncertainty estimates, randomized timing order, seed-level confidence intervals, and baseline tuning are missing. Timing needs batch sizes, compilation and warm-up policy, device synchronization, transfer accounting, preprocessing costs, and peak memory. The 14-hour JAXopt comparison is not sufficiently documented to establish a fair efficiency advantage.\n7. Equality ablations change architecture and enforcement strategy simultaneously; equilibration and solver diagnostics are largely restricted to one small task. There is no clean factorial or subtractive study across scales separating nullspace reduction, cached preprocessing, row scaling, iteration budget, and polishing. Low-budget machine-precision feasibility particularly requires verification given the invalid restoration theorem. SOCP and motion-planning appendices lack enough protocol and baseline detail to support broad extension claims.\n8. The article has a recognizable academic structure and no substantial internal-log clutter. Nevertheless, it lacks executable pseudocode, leaves important operators undefined, and introduces DLFF-60 without specifying its relationship to Equation 6. The ICLR 2025 publication header conflicts with references dated 2026, and the author block is inconsistent with blind-review presentation.\n9. retrieved_literature.json contains no abstracts or search results. I therefore cannot establish novelty or citation validity from retrieved evidence. The manuscript cites relevant families, but does not formally distinguish its contribution from PiNet, RAYEN, HardNet, classical nullspace elimination, and established feasibility-restoration constructions. Row normalization is also presented as Ruiz equilibration without explaining the distinction from iterative equilibration.",
+    "questions": "What fully specified algorithm handles infeasible inputs before evaluating the barrier, and what replaces the false Theorem 3? What does DLFF-60 execute, including initialization, iteration count, stopping criteria, and differentiation? Can the authors provide the exact reduced splitting operator and a valid convergence proof matching its implementation? Are non-convex reference objectives positive and globally certified, and what happens when suboptimality is recomputed using a positive denominator? Do independently checked gradients agree across truncation budgets and active-set transitions? Do paired multi-seed results and orthogonal subtraction ablations retain the speed and feasibility advantages at large scale when preprocessing, compilation, synchronization, and memory are accounted for?",
+    "assessment": "Reject in the current form. The useful equality parameterization and promising reported efficiency results do not compensate for a central theorem with an explicit counterexample and insufficiently specified algorithmic and experimental mechanisms. A revised submission would need a valid feasibility-restoration method, proofs aligned with the actual iteration, corrected evaluation metrics, and independently validated multi-scale experiments."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

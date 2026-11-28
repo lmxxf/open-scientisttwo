@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/google_st_originals/Others_LC-FTT.pdf",
+  "seconds": 83.36,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 4.78,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Eq. 7 does not estimate Eq. 4 as stated; causal mechanism claims lack matched controls, and universal non-regression claims exceed or contradict reported evidence.",
+    "Experimental_Soundness": "Multiple dimensions, seeds, and baselines are valuable, but estimator-strength and perturbation-scale mismatches undermine the central ablations. Held-out tuning and consistent paired statistical procedures are not established.",
+    "Writing_Clarity": "The article is organized and largely readable, with pseudocode and distinct appendices. Inflated terminology, inconsistent statistical descriptions, missing table uncertainties, and revision-oriented prose prevent a positive score.",
+    "Prior_Work_Context": "The manuscript provides a substantial relevant bibliography and identifies DMS as its parent method, but formal differentiation from standard regularization is weak. The retrieved literature file is empty.",
+    "Question_Importance": "Reliable exploration and surrogate calibration in high-dimensional quality-diversity optimization are consequential problems for search and control.",
+    "Originality": "A dimension-dependent finite-difference penalty in DMS is a plausible specialization, but no nontrivial geometric theorem or clearly isolated new algorithmic mechanism is established.",
+    "Value_to_Community": "The 10D results and negative controls could support a useful technical note after correction, but current mathematical and attribution problems limit broader value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.0,
+    "Experimental_Soundness": 3.5,
+    "Writing_Clarity": 6.0,
+    "Prior_Work_Context": 5.0,
+    "Question_Importance": 8.0,
+    "Originality": 4.5,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "LC-FTT adds a dimension-dependent, stochastic finite-difference smoothness penalty to Discount Model Search. The manuscript reports convincing descriptive QD-score improvements on two 10D synthetic tasks, alongside broader benchmark comparisons. However, the stated estimator does not estimate the defined Dirichlet energy, the mechanism controls are confounded, and repeated non-regression guarantees are unsupported. I recommend rejection.",
+    "strengths": "The problem of reliable continuous discount models for high-dimensional quality-diversity search is important. The paper supplies pseudocode, explicit hyperparameters, multiple benchmark dimensions, five-seed results, selected raw observations, and confidence intervals. The reported 10D Sphere and Rastrigin QD-score improvements exhibit complete separation between the two methods' seed-level results. Active-regularizer Brax experiments and anisotropy tests broaden the investigation. Section 3.2 explicitly acknowledges that the implemented regularizer is an ordinary Euclidean gradient penalty.",
+    "weaknesses": "The mathematical definition and estimator differ by a dimension factor. No theorem establishes the contact-geometric construction, adaptive schedule, or performance guarantees. Exact-gradient comparisons do not establish matched regularization strength, and the Gaussian-noise control does not match the finite-difference perturbation distribution. Non-significance is repeatedly treated as proof of non-regression despite negative observed differences. Statistical descriptions conflate paired and independent tests. Hardware, memory, complete runtime comparisons, held-out tuning protocols, and reproducible definitions of several additional experiments are missing. The retrieved literature file contains no results, preventing independent novelty verification against retrieved sources.",
+    "detailed_comments": "1. Mathematical mismatch: for a unit vector v uniformly distributed on S^(k-1), E[(g^T v)^2] = ||g||^2/k. Consequently, Eq. 7 approaches Eq. 4 divided by k as epsilon approaches zero. Estimating Eq. 4 requires multiplying Eq. 7 by k, or changing the direction distribution. As written, the effective local gradient-penalty coefficient is c0 max(0,1-2/k)/k, which decreases for k>4 rather than saturating. This changes the interpretation of dimension adaptation and can confound comparisons with exact Autograd. At finite epsilon, the estimator additionally penalizes finite-scale secants rather than precisely the pointwise Dirichlet energy.\n2. Contact geometry: the pullback of alpha=df-p^T ds to a Legendrian graph is zero. A nonzero gradient energy requires an additional metric and construction; it does not follow from the vanishing contact form alone. Moreover, the objective need not be a single-valued function of the measure, so introducing p=gradient_s f requires qualification. The discount surrogate is a well-defined scalar function, but its jet lift supplies no demonstrated new algorithmic constraint. There are no formal theorems or proofs supporting the geometric terminology or guarantees.\n3. Mechanism isolation: the paper does not report a clean comparison of the adaptive schedule with a fixed coefficient, a simple 2D-off switch, and dimension-corrected alternatives under matched tuning budgets. Varying c0 while retaining c(k) cannot isolate the schedule. The Autograd baseline must match the missing 1/k factor before its lower score can establish any advantage of finite differences. Gaussian noise with covariance epsilon^2 I has expected squared radius k epsilon^2, whereas the directional probe has squared radius epsilon^2. Recovering only 9% under this unmatched control does not isolate hypersphere probing. Direction-count variance measurements do not establish downstream QD benefits under equal computation budgets.\n4. Claims exceed evidence: failure to reject a difference does not establish equivalence or non-inferiority. Table 5's 50D QD interval includes meaningful losses and its mean difference is negative. Table 8 reports a statistically significant loss for unnormalized LC-FTT at 1000-fold anisotropy. These findings contradict blanket claims of performance 'without ever regressing.' On 10D Rastrigin, QD improves while coverage declines. On Humanoid-10D, CMA-MAE substantially exceeds both discount methods in final QD and coverage. These outcomes should constrain the abstract and conclusions.\n5. Statistical reporting: Welch's two-sample test and Mann\u2013Whitney U are independent-sample procedures, although the manuscript repeatedly describes paired differences. A paired analysis should use seed-level differences and an appropriate paired interval or test, with the pairing protocol specified. For five observations per group, the minimum exact two-sided U-test p-value without ties is 2/binomial(10,5)=0.00794. The reported Brax p=0.004 therefore requires clarification of sidedness, approximation, or sample construction; it is not necessarily impossible under a different stated procedure. Numerous tasks, metrics, checkpoints, and hyperparameters are examined without a declared primary endpoint or multiplicity policy. Table 1 describes mean/s.e.m. reporting but displays means without their standard errors, and its coverage significance marker conflicts with the p<0.01 caption because Sphere coverage has p=0.0159.\n6. Scale and reproducibility: the synthetic LP configuration implies 15 emitters times 36 candidates times 10,000 iterations, or 5.4 million evaluations per run, so this is not merely a tiny evaluation-count study. Nevertheless, effective task diversity is concentrated in related synthetic domains, and 784 pixel coordinates do not establish robustness to 784 independent behavioral degrees of freedom. The paper lacks a held-out benchmark or tuning split, complete Brax descriptor definitions, detailed DNS/SQUAD implementation and tuning protocols, hardware identification, precision, peak memory, and end-to-end time relative to DMS. Isolated millisecond training costs cannot substantiate overall efficiency.\n7. Literature and presentation: retrieved_literature.json contains empty search results and abstract lists; independent prior-art verification is therefore unavailable within the supplied material. The manuscript itself has a substantial QD bibliography, but little formal differentiation from ordinary stochastic gradient regularization of DMS. Spectral bias toward low frequencies does not by itself establish the asserted high-frequency failure mechanism. The article has a recognizable standalone structure, numbered equations, pseudocode, tables, and distinct appendices, without internal log filenames or duplicate appendix headings. Its clarity is reduced by inflated geometric terminology, inconsistent statistical language, and a main-text sentence explicitly addressing an earlier concern. The ICLR 2025 header also conflicts chronologically with cited 2026 work and should be corrected.",
+    "questions": "1. Does the implemented estimator multiply by k, and were exact-Autograd baselines matched to its effective penalty strength? 2. What subtraction experiments isolate the functional form of c(k) from simply disabling regularization in 2D and choosing a tuned fixed coefficient elsewhere? 3. Can the finite-difference advantage survive matched-radius, matched-strength, and matched-compute controls? 4. Which benchmarks, seeds, and checkpoints were reserved from hyperparameter selection, and what was the prespecified primary endpoint? 5. What exact test produced the five-seed Brax p=0.004, and how are pairing and multiple comparisons handled? 6. What non-inferiority margin supports the parity claims, given the negative 50D mean and significant extreme-anisotropy loss? 7. Can the authors provide complete descriptor definitions, baseline configurations, hardware, peak memory, and end-to-end runtime?",
+    "assessment": "Reject. The reported 10D improvements justify further investigation, but the submission currently fails to establish a distinct contact-geometric contribution or isolate its proposed adaptive finite-difference mechanism. The estimator normalization error and unsupported non-regression claims materially affect the central interpretation. Corrected mathematics, matched subtraction controls, transparent statistical procedures, and narrower claims are required."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

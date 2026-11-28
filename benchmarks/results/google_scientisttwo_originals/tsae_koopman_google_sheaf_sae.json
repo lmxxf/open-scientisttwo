@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/google_st_originals/Interpretability_SHEAF-SAE.pdf",
+  "seconds": 73.09,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 4.94,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Boundary-energy and cohomology claims are mathematically inconsistent, and several empirical leadership claims contradict reported tables.",
+    "Experimental_Soundness": "Held-out evaluation and broad controls are positives, but subtraction results undermine component necessity, bundled diagnostics fail isolation, and statistical uncertainty is unreported.",
+    "Writing_Clarity": "Readable academic structure and tables coexist with rebuttal markers, undefined central losses, and inconsistent descriptions of the final method.",
+    "Prior_Work_Context": "The bibliography is substantial, but technical differentiation from closest frameworks is incomplete; the retrieval file supplies no comparison evidence.",
+    "Question_Importance": "Temporally coherent and causally useful sparse representations address a significant interpretability problem.",
+    "Originality": "The combination is potentially interesting, but the established ingredients and unsubstantiated cohomological interpretation do not demonstrate a fresh mathematical synthesis.",
+    "Value_to_Community": "Potentially useful empirical findings remain, especially the negative capacity-allocation result, but current correctness and attribution problems constrain their value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.0,
+    "Experimental_Soundness": 4.0,
+    "Writing_Clarity": 5.5,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "SHEAF-SAE combines temporal dictionary learning, decoder-space sheaf penalties, bounded linear latent dynamics, support normalization, and hierarchical reconstruction. The manuscript reports promising probing improvements on two language models, but central mathematical statements are incorrect and the ablations do not establish the claimed mechanisms.",
+    "strengths": "The problem of extracting temporally coherent, causally useful SAE features is important. Evaluation includes held-out activations, several SAE baselines, three probing datasets, RAVEL interventions, and substantial component analyses. Hardware, peak VRAM, and step times are reported. The authors acknowledge that InfoNCE drives context probing and that static capacity outperforms expensive dynamic allocation.",
+    "weaknesses": "The boundary-energy claim contradicts the defined restriction maps; the main-text cohomology formula uses the wrong domain dimension; support-exclusive gradients are not established by the STE equations. Mechanism attribution is weakened by redundant components, bundled controls, and contradictory rollout results. Seed variability and confidence intervals are absent. Several superiority statements contradict tables. The paper retains reviewer-response markers and obsolete architectural claims.",
+    "detailed_comments": "1. Equations (1)\u2013(3) give ||W z_u - phi W z_v||^2. As phi approaches zero, this approaches ||W z_u||^2, not zero. Appendix A.1 explicitly obtains this residual term, contradicting Section 3.1 and the abstract. Coupling disappears, but a boundary-dependent shrinkage penalty remains.\n2. Equation (9) states dim H^0 = dW - rank(delta), whereas vertex stalks are R^h and the window contains W+1 vertices. The correct domain dimension is |V_t|h, as Appendix A.2 recognizes. Equation (10) likewise uses inconsistent matrix dimensions. For a path with injective decoder maps and strictly positive gates, edge constraints imply z_u = phi z_v, giving h-dimensional global sections regardless of topic complexity. With noninjective maps, decoder nullspaces introduce further structural nullity. A semantic-complexity interpretation therefore requires proof beyond rank-nullity.\n3. Equation (8) does not generally guarantee zero inactive-coordinate gradients: normalization depends on all coordinates, and the STE introduces derivatives through the mask. Exact zeros may follow under additional assumptions about activation values and encoder derivatives, but those assumptions and the backward rule are unspecified.\n4. A bounded singular-value parameterization establishes nonexpansiveness if U and V remain orthogonal. It does not establish Koopman-invariant observables or semantic directionality. Orthogonality maintenance is unspecified. Identity is a weak predictive baseline; zero, mean, shuffled-transition, and matched regularized linear predictors are needed to exclude contraction and predictable marginal structure.\n5. Table 4 shows removing Sheaf improves FFW semantics and removing Koopman improves MMLU context. Table 5's soft sigmoid matches or exceeds hard STE, undermining STE-specific attribution. Table 7 rejects dynamic capacity. Table 10 bundles Sheaf, Koopman, and STE, preventing orthogonal attribution; the full model has worse horizon degradation than Temporal on both models, and the Gemma bundled variant does not exhibit the claimed flat rollout. Table 8 also favors simpler unconstrained or diagonal predictors over bounded SVD on prediction error.\n6. The abstract and Table 11 caption claim SAEBench probing leadership on both models, but Gemma Matryoshka scores 0.7478 versus SHEAF's 0.7200. Table 3's blanket matched-budget superiority claim conflicts with Persistent SAE's Gemma MMLU semantics, 0.695 versus 0.694. Gated SAE is called denser in the RAVEL discussion despite Table 13 reporting lower L0. These inconsistencies require correction.\n7. Held-out splits are described, but document-level independence, sequence-ID label construction, randomized paired training, multiple seeds, and uncertainty estimates are insufficiently documented. Calling RAVEL results a statistical cluster is unsupported without statistical analysis. One width, one layer per model, and short rollout tests do not constitute broad scaling validation. Hardware reporting is useful, but precision, timing methodology, optimizer memory scope, and whether activation extraction is included remain unclear.\n8. The supplied retrieved_literature.json contains no retrieved papers or abstracts. Consequently, novelty against retrieved works cannot be independently established. The manuscript has a broad bibliography, but needs formal differentiation from ordinary weighted temporal regularization, linear latent dynamics, hierarchical SAEs, and established sheaf constructions.\n9. Organization is recognizable, but reviewer identifiers such as W2, Q2, and S1 and the Extended Rebuttal Analyses appendix compromise standalone presentation. The introduction and overview still advertise dynamic allocation as a core innovation although the final default removes it. InfoNCE and boundary-TV terms central to the results lack complete mathematical definitions, and executable pseudocode is absent.",
+    "questions": "Can the authors correct the boundary penalty and cohomology dimensions and characterize nullity for their actual path sheaf? What precise backward rule guarantees support-exclusive gradients? Which static partition produced each reported checkpoint? Can matched-seed subtraction experiments isolate Sheaf, Koopman, normalization, and masking, with confidence intervals and shuffled/zero/mean predictive controls? How are sequence-ID splits constructed without document leakage? Can all superiority statements be reconciled with Tables 3, 8, 10, and 11?",
+    "assessment": "Reject in the current form. The application is worthwhile and the empirical effort substantial, but mathematical errors and unsupported mechanism claims prevent acceptance. This assessment evaluates the supplied manuscript and empty retrieval record; it does not independently verify experimental execution or bibliographic authenticity."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

@@ -61,9 +61,9 @@ def extract_pdf_text(pdf_path: Path) -> str:
 
 def retrieve_literature(text: str, query: str) -> dict:
     ns = {"a": "http://www.w3.org/2005/Atom"}
-    arxiv_ids = sorted(set(re.findall(r"10\.48550/arXiv\.([0-9]{4}\.[0-9]{4,5})", text, flags=re.I)))
+    arxiv_ids = sorted(set(re.findall(r"(?:10\.48550/arXiv\.|arXiv:)([0-9]{4}\.[0-9]{4,5})", text, flags=re.I)))
     cited_papers = []
-    for aid in arxiv_ids[:10]:
+    for aid in arxiv_ids[:6]:
         try:
             xml = lookup("id:" + aid)
             tree = ET.fromstring(xml)
@@ -74,13 +74,11 @@ def retrieve_literature(text: str, query: str) -> dict:
                     "abstract": " ".join((e.findtext("a:summary", "", ns) or "").split()),
                 })
         except Exception:
-            continue
+            break
     search_papers = []
-    for q in [query, "all:tokenization", "all:optimization"]:
-        if not q:
-            continue
+    if query:
         try:
-            xml = lookup(q)
+            xml = lookup(query)
             tree = ET.fromstring(xml)
             for e in tree.findall("a:entry", ns):
                 search_papers.append({
@@ -88,10 +86,8 @@ def retrieve_literature(text: str, query: str) -> dict:
                     "title": " ".join((e.findtext("a:title", "", ns) or "").split()),
                     "abstract": " ".join((e.findtext("a:summary", "", ns) or "").split()),
                 })
-            if search_papers:
-                break
         except Exception:
-            continue
+            pass
     return {"query": query, "cited_arxiv_abstracts": cited_papers, "search_results": search_papers}
 
 

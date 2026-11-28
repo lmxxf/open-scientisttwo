@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/google_st_originals/Others_DynaSpec-RAG.pdf",
+  "seconds": 66.38,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 4.89,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Exact boundary continuity does not follow from Eq. 2, and strict negative-transfer prevention contradicts Tables 1, 7, and 10. The narrower validation aggregate guarantee is valid but insufficient for the central claims.",
+    "Experimental_Soundness": "Held-out splits and multi-horizon evaluations are reported, but subtraction results do not establish several claimed component benefits. Changing evaluation subsets, unexplained run differences, and absent randomized paired uncertainty analyses prevent reliable mechanism attribution.",
+    "Writing_Clarity": "The manuscript has a conventional, readable academic structure without audit-report clutter. Inconsistent numerical results, ambiguous normalization, missing pseudocode, and contradictory guarantee language limit precision.",
+    "Prior_Work_Context": "The bibliography is substantial, but differentiation against closest retrieval and spectral approaches is mostly qualitative. The supplied MQRetNN and SERAF records require more explicit technical positioning.",
+    "Question_Importance": "Improving retrieval reliability and avoiding harmful corrections in foundation-model time-series forecasting is an important community problem.",
+    "Originality": "The output-space combination is a plausible specialization, but its ingredients are established and no nontrivial theorem or convincingly isolated new mechanism is demonstrated.",
+    "Value_to_Community": "The lightweight correction approach and disclosed regressions could inform a useful technical paper, but unsupported guarantees and unresolved attribution currently constrain broader value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.0,
+    "Experimental_Soundness": 3.5,
+    "Writing_Clarity": 6.0,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "DynaSpec-RAG adds boundary-shifted retrieved trajectories, a two-band FFT decomposition, learned temporal gates, and validation-selected residual scaling to a frozen forecasting backbone. The reported average MSE improvements are promising, but the manuscript overstates continuity, safety, zero-shot generalization, and component necessity. Several subtraction ablations do not support the claimed mechanisms, and statistical uncertainty is unreported.",
+    "strengths": "The problem of harmful retrieval in foundation-model forecasting is important. Output-space correction is practical and parameter-efficient. The manuscript reports chronological splits, comparisons with frozen and retrieval-augmented baselines, five additional transfer datasets, extended horizons, and several component ablations. Reporting Electricity regressions and weaker variants provides useful evidence despite conflicting narrative claims. Parameter count, GPU type, training time, and module latency are supplied.",
+    "weaknesses": "The claimed boundary-continuity guarantee does not follow from the equations. The validation objective guarantees neither separate MSE/MAE non-regression nor test-time safety. Target-dataset supervised adapter training and labeled dataset-specific calibration undermine the primary zero-shot framing. Learned attention and several other proposed components have weak or absent isolated benefits. There are no confidence intervals, repeated-seed results, or documented randomized paired comparisons. Full memory costs and reproducibility details are missing.",
+    "detailed_comments": "1. Mathematical validity: Eq. 2 implies y_tilde_i(1)-x_q(T) = scale_q/scale_i * (y_i(1)-x_i(T)), which is generally nonzero. Appendix A assumes the historical increment is approximately zero; this cannot establish exact C0 continuity. The operator transfers the historical boundary increment, and it does not match the query's terminal slope. Moreover, arbitrary temporal gates and residual addition do not impose continuity on the final forecast. Table 5 reports identical SDE, 0.1026, with and without continuation; Table 4 gives Monolithic a slightly better SDE than Full Dual-Band. These measurements do not support the asserted elimination of boundary discontinuities.\n2. Safety: Including beta=0 proves only that the selected normalized validation MSE-plus-MAE sum is at most 2, assuming positive denominators. It does not ensure either metric individually improves, and it provides no test-distribution guarantee. Table 7 explicitly reports regressions on 2/7 datasets with dual-metric calibration. Table 1 shows ETTh1 MAE and both Electricity metrics worsen. Table 10 also shows a positive MAE change for bizitobs_l2c. The abstract and conclusion's strict prevention claims contradict these results. Section 3.4 acknowledges the validation-only limitation, but the remainder of the paper must consistently respect it.\n3. Evaluation regime: The adapter is trained on pooled training splits of the seven evaluated datasets, retrieval uses their in-domain histories, and beta is selected using labeled validation futures. Freezing the backbone does not make this entire procedure zero-shot on unseen target datasets. The five GIFT-Eval datasets offer a more meaningful transfer test, but dataset-specific beta calibration still uses target-domain supervision. Specify exactly which labels and histories each method receives and include a transfer condition with source-selected, fixed calibration.\n4. Subtraction attribution: Table 9 gives uniform averaging the same rounded MSE and better MAE than Content+Distance Attention, with lower latency; distance-only attention has slightly better MSE. Learned content attention is therefore not established as necessary. Table 4's dual-band advantage over Monolithic is only 0.0004 average MSE, with equal rounded MAE and worse SDE; Low-Only has better average MAE. Table 6's temporal gate gains over scalar gates are small, and nonzero temporal variance is an architectural property rather than evidence of useful transient detection. Table 8's spectral-loss effect is also small. Retrain capacity-matched variants under identical splits, initialization controls, calibration rules, and paired evaluation; remove components whose benefits cannot be distinguished from noise.\n5. Statistical and protocol reporting: No seed counts, uncertainty intervals, paired significance analyses, or randomized execution protocols are documented. Forecast windows are temporally dependent, so uncertainty should account for series-level or temporal-block dependence. Ablations use differing dataset subsets and changing baseline values, preventing a unified attribution to the final model. Tables 1 and 2 also report different results for ostensibly identical configurations without explaining the run or protocol differences. Table 11 omits the deployed cutoff of four bins despite claiming comparison with that default. Extended-horizon tests compare against a backbone without RAG rather than the strongest retrieval baseline, so they do not isolate the proposed fusion mechanism.\n6. Method specification: Section 3.2 says operations use the normalized query frame, whereas Eq. 2 constructs a trajectory in original query units. Eq. 1 subsequently multiplies residuals by scale_q. Explicitly specify the conversion before decomposition and subtraction to remove possible double-scaling ambiguity. Multiplying a band-limited signal by a time-varying gate generally introduces frequencies outside that band, so final corrections are not strictly frequency-disentangled. Gate widths, temperature initialization, numerical handling of zero variance/distances, training-time beta, checkpoint selection, retrieval-pool construction, and the definition of SDE need specification. No formal theorem or algorithm pseudocode is provided.\n7. Novelty and literature: The bibliography covers retrieval forecasting and spectral forecasting reasonably broadly, but technical differentiation remains qualitative. The supplied MQRetNN abstract already establishes retrieval-selected cross-entity attention and historical population information; SERAF establishes complementary retrieval views and selective use of retrieved patterns and futures. Neither supplied abstract establishes this exact output-space spectral gate, so they do not demonstrate direct duplication. However, broad selective-retrieval or attention novelty is untenable, and a precise comparison is needed. The current formulation appears to specialize established normalization, FFT filtering, attention, gating, and validation blending rather than establish a new mathematical framework.\n8. Resources and presentation: A100 hardware, 265,746 parameters, 30.6-minute training, and 4.02-ms module latency are useful disclosures. Parameter fraction is not a memory measurement: report peak training/inference memory, precision, retrieval-index size, cached embeddings, hardware configuration, timing methodology, and complete pipeline latency. The manuscript is organized as a standalone paper without internal audit filenames or duplicate appendix headings. Nevertheless, inconsistent numbers, unsupported causal explanations, missing pseudocode, and repeated safety overclaims prevent a high clarity score.",
+    "questions": "Can the authors replace the continuity claim with the exact property their operator satisfies and explain the unchanged SDE in Table 5? Can they restrict D-Guard's guarantee to its actual validation aggregate and reconcile all test regressions? Which target-domain labels are used for adapter training, checkpoint selection, and calibration? Do spectral splitting, temporal gates, content attention, and spectral loss each improve a shared final configuration under repeated, paired experiments? Why do Tables 1 and 2 differ, and where is the deployed four-bin cutoff result? What are peak memory usage, index size, and end-to-end latency?",
+    "assessment": "Reject in the current form. The application is important and the prototype suggests useful modest improvements, but central guarantee claims are mathematically unsupported or contradicted by reported results. The experimental evidence does not yet isolate the necessity of the proposed synthesis. A revised empirical paper could be valuable with accurate adaptation terminology, corrected guarantees, simpler validated components, and statistically supported comparisons."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

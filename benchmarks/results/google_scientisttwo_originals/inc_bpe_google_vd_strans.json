@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/google_st_originals/LLMs_VD-STrans.pdf",
+  "seconds": 84.2,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 5.11,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Universal exactness lacks properization and bypass justification; multiple coverage, cycle-time, throughput, and portability claims conflict with or exceed the reported evidence.",
+    "Experimental_Soundness": "Additive ablations do not isolate components orthogonally; randomized paired measurement, held-out selection, repetitions, and confidence intervals are undocumented.",
+    "Writing_Clarity": "The paper is organized and standalone, but ambiguous priority notation, incomplete algorithm specification, and inconsistent numerical claims prevent the highest rating.",
+    "Prior_Work_Context": "The bibliography covers relevant algorithmic and hardware work, but technical novelty boundaries remain moderate; the supplied retrieval contains no works for independent comparison.",
+    "Question_Importance": "Exact incremental BPE with predictable computational cost addresses a widely used infrastructure primitive.",
+    "Originality": "Small-tree vectorization and atomic bypass form a useful specialization of an established framework, without a demonstrated new foundational algorithm or theorem.",
+    "Value_to_Community": "Topology measurements and implementation insights could be useful, but unresolved correctness, attribution, uncertainty, and resource reporting constrain their present value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.5,
+    "Experimental_Soundness": 3.5,
+    "Writing_Clarity": 6.5,
+    "Prior_Work_Context": 6.0,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "VD-STrans accelerates an existing incremental BPE algorithm by flattening small suffix-successor trees, evaluating interval predicates with AVX2, bypassing selected atomic-token cases, and retaining CST fallback. The manuscript reports a 1.123\u00d7 geometric-mean speedup across 72 configurations. I find the engineering direction plausible, but correctness details, mechanism isolation, statistical evidence, and several performance claims are insufficiently supported.",
+    "strengths": "The problem is important for tokenizer infrastructure. Evaluation spans 12 vocabularies, three text domains, and two document regimes. The manuscript credits the existing incremental algorithm and includes scalar-layout controls, cutoff sweeps, cache-working-set experiments, and synthetic fallback stress tests. Its organization resembles a standalone research paper rather than an internal audit report.",
+    "weaknesses": "The component study is additive rather than orthogonal subtractive ablation, and SIMD contributes only approximately 0.9% beyond flattening without uncertainty estimates. No held-out tuning/evaluation split, randomized execution order, paired timing protocol, confidence intervals, or repetition counts are documented. Exactness of vocabulary properization and atomic bypass is not established. Memory costs and preprocessing costs are missing. Claims of single-cycle execution, gigabyte-per-second throughput, complete branch immunity, and demonstrated ARM performance exceed the evidence.",
+    "detailed_comments": "1. Mathematical support: The deepest-valid-candidate selection follows conditionally from the cited monotonic-path theorem and correct interval construction; this is a reasonable specialization of the existing framework. However, Appendix A.2 does not independently establish the theorem: it invokes sibling mutual exclusion and asserts the required prefix-state reachability without deriving them. Definition 1's phrase 'higher priority rank' is ambiguous relative to increasing numerical ranks and Equation 3. State the precise inequality and dictionary assumptions.\n2. Exactness boundary: Appendix A.3 describes rewriting noncanonical operands but gives neither an algorithm preserving rule ordering and tie semantics nor a proof that properization preserves tokenization for every input. Agreement on sampled corpora cannot establish universal equivalence. Atomic candidates require explicit handling because suc(t) and their interval predicates are undefined. Explain how atomic bypass maintains history entries subsequently needed by longer-token queries and whether emitted tokens remain revisable.\n3. Kernel specification: Padded lanes still perform history loads before their interval checks fail; safe offsets must be specified. Signed AVX2 comparisons operate on uint32_t arrays, so timestamp bounds and sentinel encodings require explicit invariants. The listing contains a mask-zero branch and eight scalar indexed history loads; the broader claims of eliminating indirect access and all control-flow branches are inaccurate. A constant number of instructions is not constant cycle latency, especially across cache misses.\n4. Attribution: Table 3 reports 1.128\u00d7 for Flat-Scalar, 1.138\u00d7 for Flat-SIMD, and 1.197\u00d7 for Full. Most measured improvement therefore comes from layout and bypass rather than SIMD. Remove SIMD and bypass independently from the full method, retain matched layout and transition-table implementations, and report paired uncertainty. Explain the different populations and configurations behind 1.079\u00d7 in the cutoff study, 1.197\u00d7 in the component study, and 1.123\u00d7 overall.\n5. Experimental confidence: Thirty concurrent workers do not document independent replications or control shared-cache and memory-bandwidth interference. Report process/core placement, randomized paired scheduling, warmup, repetitions, confidence intervals, compiler flags, and baseline versions. No held-out corpus split is specified for choosing K. Synthetic fallback and cache sweeps are useful but do not replace end-to-end input-length scaling and real stream-level latency measurements.\n6. Reporting inconsistencies: Table 2 gives flat-tree coverage of 98.673%\u201399.866%, contradicting the abstract's 99.1%\u201399.8%, Figure 1's 99.9%, and the claim that fallback represents less than 0.8% throughout. At 2.80 GHz, 2.41 ns corresponds to approximately 6.75 cycles, not 5.31. The reported 28.436 MiB/s does not establish gigabyte-per-second streaming throughput. Regex-segmented speedup claims need an explicitly described additional evaluation regime.\n7. Resource accounting: FDV8 stores 128 bytes per represented tree before metadata and alignment overhead; 200,000 such records would occupy approximately 25.6 MB. Report actual incremental index memory, retained CST memory, automaton memory, history growth, construction time, and peak RSS. The tiled-transition claims of greater than 82% savings and single-cycle lookup lack supporting measurements and a complete lookup specification.\n8. Novelty and presentation: retrieved_literature.json contains no abstracts or search results, so independent novelty verification against retrieved works is unavailable. The manuscript nevertheless cites substantial relevant literature and identifies its principal predecessor. The apparent contribution is a hardware-conscious specialization of that predecessor using established DFS intervals, flat layouts, SIMD predicates, and bit scans. A formal accounting of what is inherited versus new is needed. The paper has clean sectioning, tables, and appendices without internal-log clutter, but lacks complete algorithm pseudocode and contains an ICLR 2025 header alongside 2026 references.",
+    "questions": "Can the authors provide a semantics-preserving properization algorithm and proof, including rule ordering and tie handling? What exact invariant makes atomic bypass safe for future history queries? What are the paired confidence intervals for removing SIMD and bypass independently from the full method? How were K and implementation choices selected separately from final evaluation data? What are absolute throughput, per-byte latency, construction time, and peak memory for every baseline? Which ARM and multi-CPU results were actually measured rather than inferred from lane capacity?",
+    "assessment": "Reject in the current form. The manuscript presents a potentially useful tokenizer engineering improvement, but the claimed vectorization mechanism is weakly isolated, experimental confidence is unreported, and several correctness and hardware claims overreach the supplied evidence. This assessment is based on the provided manuscript and empty literature retrieval, without independent execution or external literature verification."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}
