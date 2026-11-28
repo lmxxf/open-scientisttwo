@@ -33,21 +33,25 @@ TRIPLE_KEYS = [
     "Value_to_Community",
 ]
 
-# Exact linear regression coefficients solved with 0.0000 residual from the 5 official Stanford ICLR reports:
-# - inc_bpe v1:   [ 0, -1, +1, -1,  0,  0, -1] -> 2.40
-# - inc_bpe v2:   [ 0, -1,  0,  0, +1,  0,  0] -> 4.40
-# - inc_bpe v3:   [ 0,  0,  0,  0, +1,  0,  0] -> 5.20  (=> w_Soundness = 0.80, beta_0 + w_Importance = 5.20)
-# - pinet_hcnn v1:[+1,  0, +1,  0,  0, -1, -1] -> 4.60
-# - pinet_hcnn v2:[ 0,  0, +1,  0,  0,  0,  0] -> 4.50  (=> beta_0 + w_Clarity = 4.50)
-OFFICIAL_INTERCEPT = 4.20
+# Exact least-squares regression coefficients fitted across all 10 official paperreview.ai ICLR reports
+# (max rounding residual <= 0.025, matching paperreview.ai's 1-decimal rounding):
+# - Intercept               = 3.950
+# - Question_Importance     = 1.275  (3.950 + 1.275 = 5.225 -> 5.2 on inc_bpe v3)
+# - Prior_Work_Context      = 1.000
+# - Experimental_Soundness  = 0.825  (5.225 - 0.825 = 4.400 -> 4.4 on inc_bpe v2)
+# - Claims_Support          = 0.725
+# - Writing_Clarity         = 0.550  (3.950 + 0.550 = 4.500 -> 4.5 on pinet v2/5.6h, tsae 5.6h; +1.275 = 5.775 -> 5.8 on ts_rag 5.6h)
+# - Originality             = 0.350  (5.775 + 0.350 = 6.125 -> 6.1 on dmsqd 5.6h; 5.225 + 0.350 = 5.575 -> 5.6 on inc_bpe 5.6h)
+# - Value_to_Community      = 0.275
+OFFICIAL_INTERCEPT = 3.95
 OFFICIAL_WEIGHTS = {
-    "Claims_Support": 1.50,
-    "Experimental_Soundness": 0.80,
-    "Writing_Clarity": 0.30,
-    "Prior_Work_Context": 0.60,
-    "Question_Importance": 1.00,
-    "Originality": 0.70,
-    "Value_to_Community": 0.70,
+    "Claims_Support": 0.725,
+    "Experimental_Soundness": 0.825,
+    "Writing_Clarity": 0.550,
+    "Prior_Work_Context": 1.000,
+    "Question_Importance": 1.275,
+    "Originality": 0.350,
+    "Value_to_Community": 0.275,
 }
 
 
