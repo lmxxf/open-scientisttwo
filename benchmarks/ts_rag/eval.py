@@ -62,30 +62,38 @@ def baseline_timesnet_fft(case, top_modes=4):
     return (intercept + slope * future_t) + recon[L:]
 
 
-def baseline_matched_constant_ridge(case, top_k=8, lam=0.11):
-    """Matched-strength isotropic constant ridge regression over detrended top-k neighbors (control isolating continuation-disagreement weighting from pure ridge shrinkage)."""
+def baseline_matched_constant_ridge(case, top_k=12, lam=0.05):
+    """Matched degree-2 Legendre detrended isotropic constant-ridge control (isolating curvature damping, robust despiking, and spectral-temporal retrieval from unregularized quadratic Legendre trend + isotropic ridge)."""
     x = np.asarray(case["query"], dtype=float)
     keys = np.asarray(case["bank_keys"], dtype=float)
     vals = np.asarray(case["bank_vals"], dtype=float)
     L, H = len(x), case["horizon"]
-    t_idx = np.arange(L, dtype=float)
-    slope_x, int_x = np.polyfit(t_idx, x, 1)
-    rx = x - (int_x + slope_x * t_idx)
-    # Detrend bank keys linearly
-    t_mean = np.mean(t_idx); t_c = t_idx - t_mean; t_var = np.sum(t_c ** 2)
-    slopes_k = (keys @ t_c) / t_var
-    ints_k = np.mean(keys, axis=1) - slopes_k * t_mean
-    rk = keys - (ints_k[:, None] + slopes_k[:, None] * t_idx[None, :])
-    fut_t = np.arange(L, L + H, dtype=float)
-    rv = vals - (ints_k[:, None] + slopes_k[:, None] * fut_t[None, :])
-    sims = (rk @ rx) / (np.linalg.norm(rk, axis=1) * (np.linalg.norm(rx) + 1e-8) + 1e-8)
+    t = np.linspace(-1.0, 1.0, L)
+    v = np.polynomial.legendre.legvander(t, 2)
+    q, r = np.linalg.qr(v)
+    coeff_x = x @ q
+    rx = x - coeff_x @ q.T
+    poly_x = np.linalg.solve(r, coeff_x.T).T
+    u = 2.0 * np.arange(1, H + 1) / max(L - 1, 1)
+    fut_basis = np.polynomial.legendre.legvander(1.0 + u, 2)
+    trend_x = poly_x @ fut_basis.T
+    scale_x = max(float(np.sqrt(np.mean(rx ** 2))), 1e-8)
+    qx = rx / scale_x
+
+    coeff_k = keys @ q
+    rk = keys - coeff_k @ q.T
+    poly_k = np.linalg.solve(r, coeff_k.T).T
+    trend_k = poly_k @ fut_basis.T
+    scale_k = np.maximum(np.sqrt(np.mean(rk ** 2, axis=1)), 1e-8)
+    nk = rk / scale_k[:, None]
+    fk = (vals[:, :H] - trend_k) / scale_k[:, None]
+
+    sims = (nk @ qx) / float(L)
     idx = np.argsort(sims)[-top_k:]
-    R_top = rk[idx].T  # L x K
-    V_top = rv[idx].T  # H x K
-    gram = R_top.T @ R_top
-    scale = max(float(np.mean(np.diag(gram))), 1e-6)
-    w = np.linalg.solve(gram + lam * scale * np.eye(top_k), R_top.T @ rx)
-    return (int_x + slope_x * fut_t) + (V_top @ w)
+    design = nk[idx].T
+    gram = (design.T @ design) / float(L)
+    w = np.linalg.solve(gram + lam * np.eye(len(idx)), (design.T @ qx) / float(L))
+    return trend_x + scale_x * (w @ fk[idx])
 
 
 def baseline_mqretnn_knn(case, top_k=8, tau=0.25):

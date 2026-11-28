@@ -1,0 +1,195 @@
+{
+  "mse": 0.25624841773389334,
+  "normalized_qd_score": 0.7437515822661066,
+  "coverage_ratio": 0.9913194444444443,
+  "mean_elite_quality": 0.7501656612086208,
+  "max_elite_quality": 0.8869837112965443,
+  "cvar10_quality": 0.5862090751328243,
+  "baselines": {
+    "vanilla_map_elites_2009_08438": {
+      "mse": 0.703885,
+      "normalized_qd_score": 0.296115,
+      "coverage_ratio": 0.8796,
+      "paired_mse_reduction_mean": 0.447637,
+      "paired_mse_reduction_t95_ci": 0.027071
+    },
+    "diagonal_cma_me_strict_1912_02400": {
+      "mse": 0.44039,
+      "normalized_qd_score": 0.55961,
+      "coverage_ratio": 0.9317,
+      "paired_mse_reduction_mean": 0.184142,
+      "paired_mse_reduction_t95_ci": 0.034594
+    },
+    "diagonal_cma_mae_annealed_2205_10752": {
+      "mse": 0.427095,
+      "normalized_qd_score": 0.572905,
+      "coverage_ratio": 0.9334,
+      "paired_mse_reduction_mean": 0.170846,
+      "paired_mse_reduction_t95_ci": 0.039972
+    }
+  },
+  "per_dimension_breakdown": [
+    {
+      "mse": 0.23296313067161223,
+      "normalized_qd_score": 0.7670368693283878,
+      "coverage_ratio": 1.0,
+      "mean_elite_quality": 0.7670368693283878,
+      "max_elite_quality": 0.8911298961976315,
+      "cvar10_quality": 0.5896375328976164,
+      "task_name": "QD_dim24_rep0",
+      "dim": 24
+    },
+    {
+      "mse": 0.24603703217705986,
+      "normalized_qd_score": 0.7539629678229401,
+      "coverage_ratio": 1.0,
+      "mean_elite_quality": 0.7539629678229401,
+      "max_elite_quality": 0.9521132817292459,
+      "cvar10_quality": 0.524112600973188,
+      "task_name": "QD_dim24_rep1",
+      "dim": 24
+    },
+    {
+      "mse": 0.2554094078854363,
+      "normalized_qd_score": 0.7445905921145637,
+      "coverage_ratio": 1.0,
+      "mean_elite_quality": 0.7445905921145637,
+      "max_elite_quality": 0.9360285297014318,
+      "cvar10_quality": 0.6048624375846934,
+      "task_name": "QD_dim24_rep2",
+      "dim": 24
+    },
+    {
+      "mse": 0.24553867954076192,
+      "normalized_qd_score": 0.7544613204592381,
+      "coverage_ratio": 1.0,
+      "mean_elite_quality": 0.7544613204592381,
+      "max_elite_quality": 0.8735966276989506,
+      "cvar10_quality": 0.5731845742886975,
+      "task_name": "QD_dim36_rep0",
+      "dim": 36
+    },
+    {
+      "mse": 0.24940623447251098,
+      "normalized_qd_score": 0.750593765527489,
+      "coverage_ratio": 1.0,
+      "mean_elite_quality": 0.750593765527489,
+      "max_elite_quality": 0.891988692299283,
+      "cvar10_quality": 0.6045040591837151,
+      "task_name": "QD_dim36_rep1",
+      "dim": 36
+    },
+    {
+      "mse": 0.2903072720334807,
+      "normalized_qd_score": 0.7096927279665193,
+      "coverage_ratio": 0.9722222222222222,
+      "mean_elite_quality": 0.729969663051277,
+      "max_elite_quality": 0.8871709414336117,
+      "cvar10_quality": 0.5493766354433461,
+      "task_name": "QD_dim36_rep2",
+      "dim": 36
+    },
+    {
+      "mse": 0.2010435525887242,
+      "normalized_qd_score": 0.7989564474112758,
+      "coverage_ratio": 0.9930555555555556,
+      "mean_elite_quality": 0.8045435554351309,
+      "max_elite_quality": 0.906838527355365,
+      "cvar10_quality": 0.665195745674619,
+      "task_name": "QD_dim48_rep0",
+      "dim": 48
+    },
+    {
+      "mse": 0.2328952080930904,
+      "normalized_qd_score": 0.7671047919069096,
+      "coverage_ratio": 1.0,
+      "mean_elite_quality": 0.7671047919069096,
+      "max_elite_quality": 0.8868544190593969,
+      "cvar10_quality": 0.5868007341889535,
+      "task_name": "QD_dim48_rep1",
+      "dim": 48
+    },
+    {
+      "mse": 0.2624947847217618,
+      "normalized_qd_score": 0.7375052152782382,
+      "coverage_ratio": 0.9791666666666666,
+      "mean_elite_quality": 0.7531968156033072,
+      "max_elite_quality": 0.888746189736574,
+      "cvar10_quality": 0.5920786002220849,
+      "task_name": "QD_dim48_rep2",
+      "dim": 48
+    },
+    {
+      "mse": 0.28839717022974987,
+      "normalized_qd_score": 0.7116028297702501,
+      "coverage_ratio": 0.9930555555555556,
+      "mean_elite_quality": 0.7165790733350771,
+      "max_elite_quality": 0.8339154906276129,
+      "cvar10_quality": 0.5588465157863175,
+      "task_name": "QD_dim64_rep0",
+      "dim": 64
+    },
+    {
+      "mse": 0.28168836784298446,
+      "normalized_qd_score": 0.7183116321570155,
+      "coverage_ratio": 0.9861111111111112,
+      "mean_elite_quality": 0.7284286973986637,
+      "max_elite_quality": 0.8537051175230616,
+      "cvar10_quality": 0.588033040386172,
+      "task_name": "QD_dim64_rep1",
+      "dim": 64
+    },
+    {
+      "mse": 0.2888001725495468,
+      "normalized_qd_score": 0.7111998274504532,
+      "coverage_ratio": 0.9722222222222222,
+      "mean_elite_quality": 0.7315198225204663,
+      "max_elite_quality": 0.8417168221963686,
+      "cvar10_quality": 0.5978764249644879,
+      "task_name": "QD_dim64_rep2",
+      "dim": 64
+    }
+  ],
+  "runtime_ms": 5997.283,
+  "traced_memory_bytes": {
+    "current_bytes": 1037540,
+    "peak_bytes": 3915183
+  },
+  "environment_metadata": {
+    "python": "3.12.3",
+    "platform": "Linux-6.17.0-1014-nvidia-aarch64-with-glibc2.39",
+    "machine": "aarch64",
+    "cpu": "ARM Cortex-X925 (3.90 GHz, pinned single core)"
+  },
+  "num_tasks": 12,
+  "mode": "full",
+  "split": "test",
+  "extra": false,
+  "factorial_2x2_study": {
+    "full_selected": {
+      "mse": 0.256248,
+      "normalized_qd_score": 0.743752,
+      "coverage_ratio": 0.9913
+    },
+    "cma_on_anneal_on_frontier_off": {
+      "mse": 0.274723,
+      "normalized_qd_score": 0.725277,
+      "coverage_ratio": 0.9734
+    },
+    "cma_on_anneal_off_frontier_off": {
+      "mse": 0.276283,
+      "normalized_qd_score": 0.723717,
+      "coverage_ratio": 0.9688
+    },
+    "cma_off_anneal_on_frontier_off": {
+      "mse": 0.411416,
+      "normalized_qd_score": 0.588584,
+      "coverage_ratio": 0.9167
+    },
+    "cma_off_anneal_off_frontier_off": {
+      "mse": 0.409439,
+      "normalized_qd_score": 0.590561,
+      "coverage_ratio": 0.919
+    }
+  }
+}

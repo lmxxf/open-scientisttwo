@@ -1,0 +1,9 @@
+{
+  "name": "quadratic_prediction_validated_graph",
+  "candidate_neighbors": 8,
+  "graph_mode": "prediction_validated",
+  "robust_graph_penalty": false,
+  "nonlocal_graph": true,
+  "temporal_laplacian_smoothing": true,
+  "attribution": "The best snapshot omits robust_graph_penalty, which defaults to false. Its MSE exactly matches the quadratic control; this does not establish robustness as beneficial. Retain the explicit quadratic configuration and remove robustness claims. An explicit prediction-validated robust reference remains unmeasured."
+}

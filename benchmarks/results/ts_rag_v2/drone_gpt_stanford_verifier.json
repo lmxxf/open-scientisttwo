@@ -1,0 +1,57 @@
+{
+  "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/ts_rag_v2/manuscript.pdf",
+  "seconds": 61.83,
+  "numerical_score": 5.2,
+  "fine_weighted_score": 5.79,
+  "positive_count": 1,
+  "neutral_count": 6,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Both propositions hold and forecasting limitations are explicit, but complete mechanism isolation and reliable individual component benefits are not established.",
+    "Experimental_Soundness": "A careful small synthetic prototype with held-out and paired comparisons; insufficient independent replication, orthogonal attribution, strong baselines, and measured scaling for +1.",
+    "Writing_Clarity": "Generally readable academic structure with equations and pseudocode, but duplicated related-work prose, inconsistent notation, and an unresolved table entry preclude +1.",
+    "Prior_Work_Context": "Adequate bibliography and broad positioning; formal differentiation from the closest training-free methods remains incompletely substantiated.",
+    "Question_Importance": "Robust, computationally lightweight forecasting under drift and imperfect historical observations is important to the community.",
+    "Originality": "A coherent specialization of polynomial detrending, spectral similarity, and local ridge transfer; no demonstrated nontrivial theoretical or algorithmic departure.",
+    "Value_to_Community": "Potentially useful transparent technical note, presently constrained by synthetic workload size and limited external validation."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 6.0,
+    "Experimental_Soundness": 5.0,
+    "Writing_Clarity": 6.5,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 7.5,
+    "Originality": 4.5,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "The paper presents a training-free forecaster combining isolated-spike clipping, quadratic detrending, temporal/Fourier neighbor retrieval, signed ridge reconstruction, and damped continuation transfer. The two propositions are mathematically correct but establish standard projection and ridge properties, not forecasting guarantees. Reported improvements are substantial on a small synthetic benchmark, with useful paired comparisons and factorial controls. The evidence supports a carefully scoped prototype rather than a broadly validated forecasting advance.",
+    "strengths": "The estimator is specified through explicit equations, numerical constants, pseudocode, and computational costs. The paper correctly distinguishes historical reconstruction guarantees from future prediction risk. Evaluation includes separate validation/test generation seeds, paired baseline intervals, a complete trend-by-regression factorial design, five component removals, and query-noise perturbations. Limitations candidly disclose synthetic data, clean memory continuations, surrogate baselines, dependence concerns, and incomplete runtime measurements.",
+    "weaknesses": "Evaluation uses only 42 queries per split, one shared 252-entry memory per split, and a single lookback/horizon configuration. Domain-inspired labels do not constitute real-world datasets. Strong published methods are discussed but not evaluated. Subtraction effects lack uncertainty estimates, and the preprocessing effect is extremely small. Trend removal bundles representation and continuation changes; regression removal does not isolate ridge regularization from fitting signed coefficients. Theoretical novelty is limited to a specialization of established tools. Related work contains a duplicated KReF comparison, and the closest-work characterization cannot be checked against the supplied literature because KReF and RATL are absent from that file.",
+    "detailed_comments": "1. Mathematical validity: Proposition 1 follows directly from Q^T Q = I. Proposition 2 follows from positive definiteness of A^T A/L + lambda I and objective optimality; the comparator penalty difference is correctly retained. Neither proposition implies future-risk improvement, and the manuscript appropriately acknowledges this. These are elementary algebraic facts rather than new forecasting theory. The damped continuation agrees with the quadratic endpoint and recovers ordinary quadratic extrapolation at d = 1, but its choice remains heuristic.\n\n2. Representation attribution: QR orthogonalization of a full-rank quadratic design produces the same projection as ordinary least-squares quadratic detrending in any equivalent basis. The current evidence therefore supports quadratic trend separation, not a distinctive benefit of Legendre coordinates or orthogonalization. The trend-off intervention also changes extrapolation to a constant, so it cannot distinguish better neighbor geometry from better future trend restoration. Separate retrieval-only and continuation-only controls are needed.\n\n3. Regression attribution: Replacing ridge coefficients with uniform weights tests fitted continuation transfer against averaging. It does not separately identify the value of positive regularization, signed coefficients, or unconstrained coefficient sums. Useful controls include regularization sweeps, numerically appropriate unregularized least squares, nonnegative fitting, and simplex-constrained fitting.\n\n4. Experimental interpretation: The reported held-out advantage over the vanilla baseline is large, but that baseline is a local five-neighbor retrieval/persistence implementation rather than published TS-RAG. The matched ridge control is more informative; its validation paired interval includes zero. In the test factorial, removing trend separation changes MSE only from 0.134549 to 0.139041, much less than the validation effect. Without paired uncertainty, the generality of the trend contribution is unresolved. All five subtraction increases are validation results; the preprocessing increase of 0.000511 does not establish a reliable component benefit.\n\n5. Statistical scope: The paired Student-t formula and critical value are appropriate under independent trajectory-level differences. Shared memory and heterogeneous regimes leave that independence and the target population insufficiently characterized. The reported intervals do not quantify variability across independently generated banks or benchmark seeds. Repeated independent banks, regime-stratified results, paired subtraction intervals, and explicit hyperparameter-selection history would materially strengthen confidence. Identical source hashes establish implementation consistency, not freedom from test-informed selection.\n\n6. Scale and deployment: Four query-noise levels are useful robustness tests but do not replace measured bank-size, horizon, lookback, or dimensionality sweeps. Clean latent memory futures favor continuation transfer relative to deployments with noisy observations. Noisy-bank and distribution-shift experiments are needed. Complexity expressions and feature-payload arithmetic are consistent, but combined evaluation-loop timings cannot establish predictor latency, and tracemalloc does not measure total resident memory. Hardware and float64 are reported; isolated cold/warm timings, timing distributions, library versions, and process-memory measurements are missing.\n\n7. Literature and presentation: The supplied abstracts support distinctions from neural retrieval/fusion methods and establish longstanding weighted-neighbor forecasting context. They do not establish novelty of the particular detrending-plus-ridge synthesis. KReF is the closest comparison described by the manuscript, but its technical details are unavailable in the supplied retrieval file and no direct experiment is given. The paper largely follows a standalone academic structure, with no internal log filenames or duplicate Appendix headings. Nevertheless, the repeated KReF paragraph, unexplained G/D/n notation there, record-oriented factorial wording, and unresolved validation drift-error table entry need editing. Extraction artifacts alone should not be treated as proof of poor PDF typesetting.",
+    "questions": "Can the authors separate trend-based retrieval geometry from trend continuation while holding the other fixed? Does orthogonalization improve anything beyond equivalent quadratic least-squares detrending? Which gains require ridge regularization rather than signed local reconstruction? Do subtraction effects persist with paired intervals across independent banks and seeds, particularly preprocessing and the small held-out trend effect? How were all constants selected before test evaluation? Can the method be compared directly with KReF, tuned classical forecasting methods, and appropriate linear baselines on real datasets and noisy memory continuations? Can predictor-only latency and resident memory be measured across bank sizes and horizons?",
+    "assessment": "Below the acceptance threshold for a full ICLR research paper. The manuscript offers a coherent and transparent technical prototype with correct elementary analysis and encouraging local results. Its limited experimental scale, incomplete mechanism attribution, and unresolved novelty boundary prevent a stronger recommendation. This assessment is based on the manuscript and supplied literature; reported experiments were not independently reproduced."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

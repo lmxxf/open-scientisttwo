@@ -11,7 +11,11 @@
     "10.48550/arXiv.2211.14730",
     "10.48550/arXiv.2210.02186",
     "10.48550/arXiv.2310.06625",
-    "10.48550/arXiv.2205.13504"
+    "10.48550/arXiv.2205.13504",
+    "10.48550/arXiv.2103.14200",
+    "10.48550/arXiv.2502.15900",
+    "10.48550/arXiv.2609.03937",
+    "10.48550/arXiv.2608.06748"
   ],
   "coding_guidance": "Edit only model.py; never modify eval.py/data.py/task_spec.json. Preserve forecast(case, config) returning a 1D finite numpy array of length case['horizon'] (24). Never access hidden target/true_trend_future/true_seasonal_future keys. CRITICAL DESIGN REQUIREMENTS: (1) ROBUST PRE-FILTERING & ORTHOGONAL TREND DECOUPLING: Despike isolated history outliers via local rolling median/MAD clipping, then project both query x and memory-bank keys onto an orthogonal polynomial/linear trend basis P_trend to decouple local drift (extrapolating trend cleanly with damped quadratic/linear curvature) from the detrended oscillatory residual r_x = x - P_trend(x). (2) FOURIER SPECTRALHARMONIC EXTRAPOLATION & PHASE-ALIGNED RETRIEVAL: Extract dominant discrete Fourier (rFFT) harmonics from r_x to form a phase-coherent spectral extrapolation y_spec, and retrieve top-K candidate bank trajectories using combined detrended time-domain + Fourier spectral-magnitude similarity. (3) CLOSED-FORM RIDGE PROTOTYPE REGRESSION & ADAPTIVE CONFIDENCE GATING: Instead of uniform top-K averaging, solve the closed-form Tikhonov/ridge linear system (R_K^T R_K + lambda I) w = R_K^T r_x over detrended top-K keys to obtain optimal reconstruction weights w* for future residuals, and fuse the ridge-retrieved forecast with the spectral harmonic extrapolation via an analytical reconstruction-residual confidence gate gamma = exp(-alpha * ||r_x - R_K w*||^2 / ||r_x||^2). Cache bank detrending/rFFT by id(case['bank_keys']) for sub-millisecond inference. (4) Expose clean orthogonal boolean config switches: trend_decoupling (default True), spectral_extrapolation (default True), ridge_prototype_regression (default True), adaptive_confidence_gating (default True), robust_despiking (default True).",
   "eval_timeout": 120,

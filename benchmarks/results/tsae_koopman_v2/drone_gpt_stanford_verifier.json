@@ -1,0 +1,57 @@
+{
+  "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/tsae_koopman_v2/manuscript.pdf",
+  "seconds": 50.75,
+  "numerical_score": 5.5,
+  "fine_weighted_score": 5.97,
+  "positive_count": 2,
+  "neutral_count": 5,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The stated local propositions hold and numerical claims are appropriately bounded, but central mechanism attribution lacks isolated controls.",
+    "Experimental_Soundness": "A careful local prototype includes held-out generated instances, paired comparisons, and subtraction studies, but lacks matched strong baselines, orthogonal mechanism isolation, independent-run uncertainty, and empirical multiscale tests.",
+    "Writing_Clarity": "The manuscript reads as a clean standalone article with explicit equations, proofs, pseudocode, tables, and candid limitations.",
+    "Prior_Work_Context": "Relevant retrieved works are discussed with a comparison table, but differentiation is descriptive rather than a formal resolution of the closest novelty boundaries.",
+    "Question_Importance": "Reliable sparse trajectory recovery under observation noise, dictionary mismatch, and temporal structure is an important representation-learning problem.",
+    "Originality": "Prediction-weighted graph construction is a plausible specialization, but the demonstrated method largely synthesizes established ridge, graph, sparse-inference, and dictionary-learning tools.",
+    "Value_to_Community": "The explicit formulation and transparent prototype findings are useful, but broader value remains constrained by scale, unmatched comparisons, and unresolved mechanism attribution."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 6.0,
+    "Experimental_Soundness": 4.5,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.0,
+    "Question_Importance": 7.5,
+    "Originality": 5.0,
+    "Value_to_Community": 5.5
+  },
+  "sections": {
+    "summary": "PVG-TSC combines dictionary refinement, identity-centered ridge dynamics, temporal quadratic inference, prediction-weighted nonlocal graphs, and delayed sparse support selection. The subproblem propositions are mathematically sound under their stated assumptions. The reported synthetic results are encouraging, but they do not isolate the defining predictive graph mechanism or establish competitive performance under matched adaptation and computation.",
+    "strengths": "The method is explicitly specified through equations, hyperparameters, and pseudocode. The ridge estimator, temporal conditioning bound, projected graph descent argument, support-separation lemma, and tangent dictionary direction are internally consistent. Both temporal mechanisms improve the reported factorial means. The paper reports component metrics, paired comparison intervals, hardware, precision, allocation measurements, and dense computational costs. Its limitations candidly distinguish transductive adaptation, local mathematical guarantees, and small-scale evidence.",
+    "weaknesses": "All experiments use one small dimensional configuration and eight evaluated trajectories per condition. Baselines differ in adaptation access, iteration budgets, sparsity, dictionary updates, and prediction operators. Removing dynamics changes temporal regularization, graph weights, and the evaluated predictor simultaneously. Removing the entire graph does not isolate predictive validation against similarity-only edges. The amplitude-refinement improvement is only 0.000074 without uncertainty estimates. Sequence-level confidence intervals do not account for the shared adapted model. No empirical scaling sweep or real-data evaluation is provided.",
+    "detailed_comments": "Mathematics: Propositions 1\u20135 establish valid elementary properties of constituent operations, rather than a recovery theorem or convergence guarantee for the complete algorithm. In particular, composing temporal and graph proximal operations does not generally compute the proximal map of their sum; acceleration, truncated PCG, changing graphs, and hard projection require separate analysis. The manuscript correctly acknowledges this boundary. Likewise, tangent descent does not prove descent for the specified finite dictionary step, and the support-separation assumption is not measured. The symmetric predictive discrepancy tests mutual one-step compatibility, rather than reverse-time dynamics or propagation across a nonlocal temporal gap; this distinction limits the interpretation of 'bidirectional Koopman priors.' Experiments: Tables 2 and 3 support benefits of implemented component bundles, but not a causal attribution to predictive edge validation. The graph gain is modest relative to its runtime cost, while amplitude refinement adds approximately 2.40 seconds for an unquantified tiny gain. The Student-t intervals are descriptive sequence-level intervals conditional on a shared adaptation run; they do not establish uncertainty across independently generated dictionaries, dynamics, or benchmark collections. The higher-noise experiment changes the underlying realization and therefore cannot isolate noise sensitivity. Many-to-one absolute-cosine atom matching can obscure dictionary collapse and sign incompatibility with nonnegative codes. Prediction is retrospective one-step reconstruction using codes and operators adapted to the evaluated trajectories, rather than a causal forecasting test. Prior work: The supplied literature supports the paper's broad positioning relative to temporal SAEs, sparse Koopman representations, FISTA-inspired dictionary learning, and graph-based video sparse coding. However, the comparison remains mainly descriptive; it does not formally establish what predictive weighting contributes beyond established graph regularization and linear latent dynamics. Writing: This is a coherent standalone academic manuscript with clear sections, propositions, algorithms, and tables, without internal log filenames or audit-report clutter. PDF text extraction artifacts should not themselves be treated as evidence of poor manuscript organization.",
+    "questions": "Can predictive weighting be compared against similarity-only, shuffled-predictor, and identity-predictor graphs with matched candidate edges and regularization? Can transition estimation, temporal dynamics regularization, graph weighting, and prediction evaluation be varied independently? Do the gains survive baselines matched for transductive access, dictionary updates, sparsity, and computation? What are confidence intervals over independently regenerated complete adaptation runs, including paired component subtractions? Can amplitude refinement be removed without a reliable loss increase? How do results change across sequence length, dictionary width, sparsity, and random initialization, and under one-to-one sign-consistent atom alignment?",
+    "assessment": "Weak reject. The submission is clear and unusually candid about its limitations, and I find no substantive error in the stated subproblem proofs. However, the contribution currently amounts to a plausible synthesis supported by a small synthetic prototype. The central predictive graph mechanism remains unidentified experimentally, competitive comparisons are confounded, and the theoretical results do not yet provide a substantial characterization of the complete procedure."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

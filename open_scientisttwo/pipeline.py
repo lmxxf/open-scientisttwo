@@ -137,7 +137,7 @@ class Pipeline:
         response = self.agent('Writer', 'Read baseline_paper.md, task_spec.json, model.py, all *_metrics.json, related_work.xml and references.json. '
             'Write a comprehensive, standalone, camera-ready ICLR academic research paper in English ("We propose...", "Our theoretical analysis establishes...", "Our experiments evaluate...") with formal mathematical theorems/propositions and proofs in $...$ or $$...$$, explicit algorithm pseudocode blocks in ```...```, explicit space/time complexity bounds, and thorough empirical analysis. '
             'CRITICAL STANDALONE PAPER STYLE: Write strictly as a polished, standalone ICLR conference paper presenting ONLY the final proposed method, its self-contained theoretical guarantees, and controlled scientific experiments. '
-            '1) NEVER mention internal workspace filenames, pipeline roles, config flag names, or artifact paths in the paper prose (strictly forbid writing "snapshots/pruned", "*_metrics.json", "final_test_metrics.json", "related_work.xml", "references.json", "baseline_paper.md", "task_spec.json", "mse alias", or "read-only manuscript preparation"). '
+            '1) NEVER mention internal workspace filenames, pipeline roles, config flag names, raw snake_case dictionary keys (e.g., "cma_on_anneal_on", "trend_on_ridge_on"), SHA-256 hashes, or artifact paths in the paper prose or table cells (strictly forbid writing "snapshots/pruned", "*_metrics.json", "final_test_metrics.json", "related_work.xml", "references.json", "baseline_paper.md", "task_spec.json", "mse alias", "the evaluator", "the recorded condition", "the supplied abstract", or "disabled in the evaluated configuration"). Always translate experimental conditions into human-readable English labels and present ONLY the active mechanisms of the final selected method. '
             '2) NEVER narrate the automated development search history or rejected candidate trials in the paper prose or tables (strictly forbid mentioning "initial candidate", "seed0", "evolved0", "seed1", "evolved1", "Development candidate I", "screening validation", "subset screening", "rebuttal0", "additional validation generation", or "trajectory manifest"). '
             '3) Do NOT write any Appendix section, historical trajectory table, duplicate References block inside Related Work, or "Not measured / inapplicable" disclaimers. '
             '4) STRUCTURAL REQUIREMENTS FOR TOP ICLR SCORE: '
@@ -228,10 +228,14 @@ class Pipeline:
             score = self.snapshot('pruned', base_cfg)
             if better(score, self.best['value'], self.spec, equal=True):
                 self.best = dict(config=base_cfg, value=score, label='pruned', snapshot='pruned')
-                # Re-plan and re-run subtraction ablations around the newly promoted pruned configuration so ablations match final method!
-                self.restore(self.best['snapshot'])
-                re_plans = self.agent('Ablation Planner', f'Read model.py and snapshots/pruned/config.json. Final selected pruned method is {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one active component from pruned"}},...]}}. Plan exactly {self.ablation_count} single-component subtraction configurations around snapshots/pruned/config.json using ONLY supported boolean/numeric keys.')['ablations']
-                if len(re_plans) == self.ablation_count:
+                # Iterative Pareto Pruning: re-plan and re-run subtraction ablations around pruned;
+                # if removing any single remaining component improves or matches validation score,
+                # automatically promote that cleaner subtraction config as the new pruned!
+                for _prune_round in range(2):
+                    self.restore(self.best['snapshot'])
+                    re_plans = self.agent('Ablation Planner', f'Read model.py and snapshots/pruned/config.json. Final selected pruned method is {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one active component from pruned"}},...]}}. Plan exactly {self.ablation_count} single-component subtraction configurations around snapshots/pruned/config.json using ONLY supported boolean/numeric keys.')['ablations']
+                    if len(re_plans) != self.ablation_count:
+                        break
                     ablations = []
                     for i, plan in enumerate(re_plans):
                         self.restore(self.best['snapshot'])
@@ -242,6 +246,13 @@ class Pipeline:
                                 continue
                             p_cfg[k_p] = v_p
                         ablations.append(dict(config=p_cfg, value=self.snapshot(p_lbl, p_cfg)))
+                    best_ab = min(ablations, key=lambda x: x['value'] if self.direction == 'min' else -x['value'])
+                    if better(best_ab['value'], self.best['value'], self.direction):
+                        base_cfg = dict(best_ab['config'])
+                        score = self.snapshot('pruned', base_cfg)
+                        self.best = dict(config=base_cfg, value=score, label='pruned', snapshot='pruned')
+                    else:
+                        break
         self.event(4, best=self.best, ablations=ablations)
         self.draft()
         for i in range(self.peer_rounds):

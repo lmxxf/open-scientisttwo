@@ -1,0 +1,9 @@
+{
+  "reachability_gate": false,
+  "archive_threshold_annealing": false,
+  "dimension_adaptive_smoothing": false,
+  "frontier_boundary_guidance": true,
+  "local_surrogate_refinement": true,
+  "cma_covariance_adaptation": true,
+  "transition_ridge": 0.1
+}

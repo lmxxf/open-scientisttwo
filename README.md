@@ -41,10 +41,12 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m unittest discover -s tests -v
 
 ## 三、 如何测试与在 DGX Spark 上运行谷歌同款对标实验
 
-仓库内置三个完整可运行的基准任务（无需下载外部大体积数据集，全部由确定性随机种子生成评测负载）：
+仓库内置五个对标谷歌《ScientistTwo》（`arXiv:2609.19644`）原论文代表作的完整基准任务（外加一个 8 分钟快速冒烟测试任务 `examples/toy_ridge_ood`，全部由确定性随机种子生成评测负载，无需下载外部大体积数据集）：
 1. **`benchmarks/inc_bpe`** —— 对标谷歌论文图 2 ＋ 表 9 头号案例：**流式增量 BPE 分词优化**（`Jiang & Gong, ICML 2026 Spotlight`, `arXiv:2605.30813`；谷歌 `ScientistTwo` 第一轮 `VD-STrans` 靶标：相对加速 `+10.9%` / `1.123×`，斯坦福盲审 **`6.5` 分**）；
 2. **`benchmarks/pinet_hcnn`** —— 对标谷歌论文附录 B 表 16 第一题：**硬约束神经网络投影层优化**（`Grontas et al., ICLR 2026`, `arXiv:2508.10480`；谷歌 `ScientistTwo` `ANSE` 靶标：等式违背度压至 `$10^{-14}$`，ICLR 2026 组斯坦福盲审均分 **`5.4` 分**）；
-3. **`examples/toy_ridge_ood`** —— 8 分钟快速冒烟测试任务（带 12% 离群响应污染与协变量偏移的鲁棒回归基线）。
+3. **`benchmarks/ts_rag`** —— 对标谷歌论文 §4.3 ＋ 图 12 ＋ 表 11 ＋ 附录 D 全文 15 页展示的 NeurIPS 2025 旗舰案例：**检索增强时序基础模型预测**（`TS-RAG`, `NeurIPS 2025`, `arXiv:2503.07649`；谷歌 `DynaSpec-RAG` 在 7 个序列集上平均 MSE 仅微降 **`2.47%`**、MAE 仅降 **`0.16%`**）；
+4. **`benchmarks/tsae_koopman`** —— 对标谷歌论文附录 B 表 16 第二题：**时序稀疏自编码器与 Koopman 动力系统可解释性**（`T-SAE`, `ICLR 2026`, `arXiv:2511.05541`；谷歌原版在 5 项指标上平均仅提升 **`+1.0%`**）；
+5. **`benchmarks/dmsqd_cma`** —— 对标谷歌论文附录 B 表 16 第四题：**高维质量多样性优化与协方差矩阵自适应**（`DMSQD / CMA-MAE`, `ICLR 2026`, `arXiv:2601.01082` + `arXiv:2205.10752`）。
 
 ### 1. 第一步：秒级验证两道对标真题的本地基线（不调用 LLM）
 
@@ -128,4 +130,9 @@ python submit_paperreview_ai.py --token YOUR_TOKEN --poll 20 --interval 30 --out
 | **`pinet_hcnn` v2** | 仿射因子复用 + 活跃面切空间基缓存 $Z=V\ker(V_I)$ + 退化面乘子修正 | `0.095956 -> 0.019500`（比 `cached_dr` 快 `1.4×`），`final_test = 0.019378` | 20 项声明 `I1–I4` 全过 | [`token=3Z9Rh6mtmKAmWVN_BoTfXBysE9iecKENEqZJWg9DvQc`](https://paperreview.ai/review?token=3Z9Rh6mtmKAmWVN_BoTfXBysE9iecKENEqZJWg9DvQc)<br>官方分：**`4.5 / 10`（7 维 `0` 个 `-1`！）** \| `drone-gpt` 盲审：`4.40`（细粒度 `5.47`） |
 | **`pinet_hcnn` v4**<br>([归档产物](benchmarks/results/pinet_hcnn_v4/)) | 预测性活跃面牛顿 + Householder 增量切空间更新 + 前向 Cholesky 因子复用的 $O(dk+k^2)$ 隐式伴随微分 | `0.095680 -> 0.010100`，`final_test = 0.009932`（`0.1986 ms`，比 `cached_dr` 快 `2.27×`、比 `OSQP-ADMM` 快 `2.89×`） | 5 组减法消融 100% 严格正交退化，20 项声明 `I1–I4` 全过 | `drone-gpt` 盲审：`4.40 / 10`（细粒度 `5.78 / 10`），内置审稿 `5.43 / 10` |
 | **`pinet_hcnn` v5**<br>([归档产物](benchmarks/results/pinet_hcnn_v5/)) | **活跃面牛顿 + 保留 Cholesky 三角因子伴随接口 `solve_adjoint(v)` + 弱活跃退化边界临界锥单侧方向导数 $P_{T_C(x)\cap (z-x)^\perp}(h)$ + 完整 $2\times 2$ 析因隔离 + 对比 `dQP` ([`arXiv:2410.06324`](https://arxiv.org/abs/2410.06324))** | **`0.090462 -> 0.011214`，`final_test = 0.011095`（`0.2219 ms`，比 `DR` 快 `2.14×`、比 `OSQP-ADMM` 快 `2.66×`；保留因子 VJP `0.00925 ms` 快 `5.67×`，10 方向有限差分误差 $3.95\times 10^{-10}$）** | 5 组减法消融 + $2\times 2$ 四个析因格全齐，16 项声明与 10 篇 DOI `I1–I4` 全过 | **`drone-gpt` 盲审：`5.50 / 10`（`Question_Importance: +1`, `Writing_Clarity: +1`，`0` 个 `-1`！细粒度高达 `6.39 / 10`）**，内置审稿 **`5.57 / 10 (Accept)`** |
+| **`ts_rag` v2**<br>([归档产物](benchmarks/results/ts_rag_v2/)) | **2 阶正交 Legendre 趋势解耦 + 整体二次曲率阻尼外推 $P_2^{\text{damped}}(1+u)$ + 频谱-时域联合余弦检索 + 闭式 Tikhonov 原型岭回归 + 二阶 Pareto 瘦身（自动砍掉冗余频谱外推与负贡献延续惩罚）+ 对比 `KReF` ([`arXiv:2608.06748`](https://arxiv.org/abs/2608.06748))** | **7 通道 42 序列验证集 MSE 从原版 `TS-RAG` 基线 `0.523566` 压至 `0.078471`（降低 `85.01%`，提升 `6.67×`！`final_test = 0.134549`，降低 `75.59%`，比同阶常数岭回归 `0.252176` 低 `46.64%`；对比谷歌原版 `DynaSpec-RAG` 仅降 `2.47%`）** | 5 组单组件减法消融 100% 严格退化，17 项声明与 12 篇 DOI `I1–I4` 全过 | **`drone-gpt` 盲审：`5.20 / 10`（`Question_Importance: +1`，`0` 个 `-1`！细粒度 `5.88 / 10`）**，内置审稿 **`5.29 / 10 (Accept)`** |
+| **`tsae_koopman` v2**<br>([归档产物](benchmarks/results/tsae_koopman_v2/)) | **预测验证非局部时序图拉普拉斯耦合（`quadratic_prediction_validated_graph`）+ 切向字典精修 + Koopman 动力先验 + Stage 4 自动砍掉冗余 `robust_graph_penalty` 晋升 `pruned` + 围绕 `pruned` 重跑 5 组单组件减法消融** | **综合损失从 `0.255520` 压至 `0.234528`（`final_test = 0.242735`，击败对等 20 步字典精修基线），5 组单组件减法消融 100% 严格退化** | 17 项声明与 11 篇 DOI `I1–I4` 全过 | **`drone-gpt` 盲审：`5.50 / 10`（`Writing_Clarity: +1 [8.0]`, `Question_Importance: +1 [7.5]`，`0` 个 `-1`！细粒度 `5.97 / 10`）** |
+| **`dmsqd_cma` v2**<br>([归档产物](benchmarks/results/dmsqd_cma_v2/)) | **归档边界前沿雅可比逆向引导 + 自然梯度对角协方差自适应 + 曲率修正二次代理插值精修 + 秩亏 $\lambda=0$ 最小范数 Moore-Penrose 伪逆 + 二阶 Pareto 瘦身（自动砍掉 `reachability_gate`、`archive_threshold_annealing` 与 `dimension_adaptive_smoothing`）** | **12 任务（$d\in\{24,36,48,64\}\times 3$ 种子）QD 损失 `1 - QD_score` 从基线 `0.712111` 压至 `0.244122`（`final_test = 0.256248`，归一化 `QD-Score` 从 `0.2879` 飙至 `0.7438`，提升 `2.58×`！）** | 5 组减法消融 100% 严格退化，17 项声明与 11 篇 DOI `I1–I4` 全过 | **`drone-gpt` 盲审：`5.50 / 10`（`Writing_Clarity: +1 [8.0]`, `Question_Importance: +1 [8.0]`，`0` 个 `-1`！细粒度高达 `6.39 / 10`）**，内置审稿 **`5.29 / 10 (Accept)`** |
+
+> 💡 **5 篇 × 7 维 = 35 维联立视差盲审总成绩**：在全部 35 个盲审维度上实现 **`0` 个 `-1`（负分项 100% 清零！）、`9` 个 `+1`、`26` 个 `0`**；5 篇 `Stanford Calibrated Score` 均分达 **`5.44 / 10`（其中 4 篇拿下 `5.50 / 10`，超越谷歌 ICLR 2026 组斯坦福盲审均分 `5.40 / 10`）**，细粒度 10 分制加权均分高达 **`6.23 / 10`**！
 

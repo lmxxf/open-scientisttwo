@@ -1,0 +1,57 @@
+{
+  "pdf": "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/benchmarks/results/dmsqd_cma_v2/manuscript.pdf",
+  "seconds": 58.68,
+  "numerical_score": 5.5,
+  "fine_weighted_score": 6.39,
+  "positive_count": 2,
+  "neutral_count": 5,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The stated mathematical results hold and empirical claims are largely qualified, but central mechanism attribution remains bundled and external validity is limited.",
+    "Experimental_Soundness": "A careful local prototype includes held-out tasks, paired intervals, factorial controls, and useful subtractions; simplified baselines, limited scale, unresolved ridge benefit, and bundled interventions prevent +1.",
+    "Writing_Clarity": "The paper has a coherent standalone structure, explicit theorems, pseudocode, and quantitative tables without internal log filenames or duplicate appendix clutter.",
+    "Prior_Work_Context": "Eleven relevant works are discussed consistently with the supplied literature, but differentiation from the closest gradient/model-based and heterogeneous-emitter approaches is descriptive rather than formally decisive.",
+    "Question_Importance": "Improving evaluation efficiency while balancing quality and behavioral coverage is an important optimization problem.",
+    "Originality": "Descriptor inversion and quadratic refinement form a useful specialization of established surrogate, inverse-model, and adaptive archive-search ideas; a non-trivial new theoretical synthesis is not established.",
+    "Value_to_Community": "The explicit method and controlled findings are useful, but one small synthetic family and incomplete attribution currently support a technical note more strongly than a broadly validated ICLR contribution."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 6.5,
+    "Experimental_Soundness": 5.5,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.5,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.5
+  },
+  "sections": {
+    "summary": "FGQD combines archive-based stochastic search, ridge-estimated descriptor inversion, and diagonal quadratic quality refinement. The manuscript reports substantial matched-budget gains on small synthetic quality-diversity tasks and provides correct guarantees for its deterministic model operators. The contribution is a plausible algorithmic specialization, but limited benchmark diversity, simplified baselines, and incomplete mechanism isolation constrain its significance.",
+    "strengths": "The method is specified through equations, constants, and pseudocode. The archive monotonicity, ridge stability, predicted residual contraction, and quadratic descent proofs are mathematically sound under their stated assumptions. Held-out task comparisons, paired confidence intervals, a complete adaptation-by-annealing factorial, and subtraction experiments provide useful prototype evidence. Limitations candidly distinguish model guarantees from actual noisy proposals and disclose baseline, timing, memory, and statistical limitations.",
+    "weaknesses": "All experiments use one synthetic landscape family, two descriptors, 144 cells, and 672 evaluations per task. The quality family is particularly favorable to quadratic modeling, although rotations and ripples introduce mismatch. Published CMA-ME and CMA-MAE are represented by simplified diagonal comparators with differing adaptation and restart rules. Frontier removal also changes ranking, and adaptation removal disables both variance and step-size adaptation. Descriptor regularization has no statistically resolved benefit. Repeated optimizer seeds, realistic applications, stronger surrogate or heterogeneous-emitter baselines, and budget/archive scaling are absent. Novelty differentiation remains primarily descriptive.",
+    "detailed_comments": "1. Theorem 1 follows correctly from the singular-value bound s/(s^2+lambda) <= 1/(2 sqrt(lambda)) and the spectrum of the regularized residual operator. Its stability statement concerns perturbations to regression targets with the design matrix fixed; it does not establish stability to changing archive locations or parent selection. Full-column-rank contraction applies to the fitted linear map, without an established approximation-error bound for the actual descriptor map.\n2. Proposition 2 correctly proves descent of the curvature-adjusted quadratic. It does not imply descent for the fitted unmodified model or the evaluated noisy, clipped proposal. The manuscript appropriately acknowledges these distinctions. These results are standard ridge-regression and quadratic-optimization identities rather than substantial new convergence theory.\n3. Held-out QD gains against the specified diagonal CMA-MAE comparator are substantial: 0.170846 with reported 95% CI [0.130874, 0.210818]. This supports superiority within the tested protocol, not superiority over complete published CMA-MAE or contemporary model-based QD.\n4. The subtraction results support contributions from the integrated frontier mechanism, refinement, and adaptive distribution updates. They do not isolate descriptor inversion from target selection, injected noise, transition modeling, or directional ranking. The ridge-removal interval [-0.009075, 0.010518] includes zero. The joint-removal nonadditivity is a point contrast without an interaction confidence interval.\n5. Twelve paired tasks with one optimizer seed per task provide task-collection uncertainty, not a separate estimate of algorithmic seed variability. Pooling four dimensions also obscures dimension-specific uncertainty. The conditioning change from 11.25 to 13.5 is modest and uses different landscapes, so it is not an isolated conditioning intervention.\n6. Against the retrieved literature, CMA-ME already supplies adaptive archive search, Multi-Emitter MAP-Elites supplies heterogeneous operators, and differentiable/model-based QD already exploits objective and behavior directions. FGQD's compact black-box implementation differs operationally, but the paper does not establish a strong conceptual novelty boundary through formal comparisons or matched mechanism experiments. Retrieved abstracts alone do not establish that the exact combination appeared previously.\n7. Hardware, float64 storage, asymptotic costs, and representative byte counts are reported usefully. Combined evaluation-loop timing cannot establish optimizer-only latency, and traced allocations cannot establish process peak resident memory. Retained histories also grow with the total evaluation budget.\n8. The manuscript reads as a standalone academic article with explicit methods, proofs, pseudocode, and tables. Its limitations section is lengthy and occasionally corrective, but there are no visible internal log filenames, duplicate appendix headings, or pervasive audit-report clutter. This assessment concerns the supplied manuscript and literature; implementation correctness and numerical results were not independently reproduced.",
+    "questions": "Can descriptor inversion and directional ranking be crossed factorially while holding proposal counts and noise fixed? Can variance adaptation and scalar step-size adaptation be separated? Do the gains persist against complete CMA-ME/CMA-MAE implementations and an appropriate model-based or heterogeneous-emitter baseline? What happens across repeated optimizer seeds, larger budgets and archives, and non-quadratic application domains? Can the transition estimator and local secant estimator be removed separately, and can uncertainty be reported for their interactions and the joint frontier/refinement contrast?",
+    "assessment": "Weak reject for ICLR in its current form. The manuscript is clear and technically credible as a controlled prototype, but its standard theoretical ingredients, narrow empirical workload, and unresolved mechanism attribution do not yet establish a sufficiently strong research contribution."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

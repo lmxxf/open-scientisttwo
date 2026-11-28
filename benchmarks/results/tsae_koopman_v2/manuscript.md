@@ -1,0 +1,346 @@
+# Prediction-Validated Graphs for Temporal Sparse Coding with Bidirectional Koopman Priors
+
+## Abstract
+We propose Prediction-Validated Graph Temporal Sparse Coding (PVG-TSC), a method for recovering sparse latent trajectories from noisy observations and an imperfect overcomplete dictionary. The method combines tangent-space dictionary refinement, identity-centered ridge estimation of latent dynamics, bidirectional temporal inference, and nonlocal graph regularization. Graph edges connect similar reconstructions and are weighted by reciprocal predictive compatibility, allowing temporal and nonlocal information to contribute through distinct quadratic penalties. Sparse inference uses accelerated iterations, delayed nonnegative Top-k projection, and support-restricted amplitude refinement. Our theoretical analysis establishes uniqueness of the dynamics estimator, positive definiteness and conditioning bounds for the temporal proximal system, descent of the projected graph solver, and stability of support selection under a separation condition. Our experiments evaluate reconstruction, support recovery, one-step prediction, and sparsity on synthetic multiregime trajectories. The method achieves composite losses of 0.234528 on validation and 0.242735 on held-out test instances. Held-out loss decreases by 9.08%, 11.10%, and 19.67% relative to framewise ISTA, TopK, and Laplacian temporal reference implementations, respectively; all three paired Student-t 95% confidence intervals for improvement exclude zero. A complete factorial study separates temporal smoothing from learned dynamics, while five component subtractions quantify the contributions of graph regularization, temporal smoothing, dynamics, dictionary refinement, and amplitude refinement.
+
+## Introduction
+Sparse representations provide a direct way to describe high-dimensional observations using a small number of reusable features. For sequential observations, however, feature recovery depends on more than instantaneous reconstruction. Observation noise can change which correlated dictionary atoms are selected, dictionary misalignment can systematically redirect activation mass, and genuine latent transitions can violate an assumption of simple temporal persistence.
+
+We study observations $X^{(s)}\in\mathbb{R}^{T_s\times d}$ represented by nonnegative codes $Z^{(s)}\in\mathbb{R}_+^{T_s\times m}$ and a shared dictionary $D\in\mathbb{R}^{d\times m}$, with $m>d$ and unit-norm dictionary columns. Our central premise is that adjacent-time continuity, learned transition structure, and nonlocal recurrence supply complementary information. Adjacent-time smoothing suppresses rapid variation; a learned operator distinguishes predictable evolution from identity persistence; nonlocal edges connect compatible states across a trajectory.
+
+We propose PVG-TSC to combine these signals. The method alternates dictionary updates and latent inference, estimates a shared transition operator by ridge regression toward the identity, and constructs a graph from current reconstructions. Candidate edges are selected by reconstruction similarity and weighted by how well each endpoint predicts the other under the learned operator. Inference then composes a reconstruction step, a bidirectional temporal quadratic solve, and nonnegative graph smoothing. A delayed Top-k projection selects the final support, followed by restricted amplitude refinement.
+
+The graph construction has a specific statistical purpose. Reconstruction similarity identifies potentially related states, but similarity alone does not indicate whether their latent relationship agrees with the estimated dynamics. Reciprocal predictive weighting provides a second compatibility test. The resulting graph uses a quadratic difference penalty, making its smoothing operation explicit and its optimization properties accessible to analysis.
+
+Our contributions are threefold. First, we formulate a concrete inference procedure coupling predictive graph construction with temporal sparse dictionary learning. Second, we provide self-contained results for its ridge estimator, temporal proximal operator, graph solver, dictionary direction, and support projection. Third, we evaluate the method using paired baseline comparisons, a complete temporal-mechanism factorial design, five single-component subtraction experiments, and a higher-noise condition. These experiments separate reconstruction quality, support recovery, prediction, and sparsity rather than treating reconstruction error as a complete account of representation quality.
+
+## Related Work
+Sparse autoencoders and dictionary learning. Cunningham et al. (2023), [Sparse Autoencoders Find Highly Interpretable Features in Language Models](https://arxiv.org/abs/2309.08600), use sparse reconstruction to identify feature directions associated with superposition and polysemanticity. Their work motivates overcomplete feature dictionaries. PVG-TSC additionally models relationships among sequential codes and refines a noisy initial dictionary through iterative inference. Gao et al. (2024), [Scaling and evaluating sparse autoencoders](https://arxiv.org/abs/2406.04093), directly control sparsity with k-sparse autoencoders and study scaling, dead latents, and feature-quality metrics. We use their cardinality-control principle after a continuous inference phase and subsequently refine amplitudes on the selected support. Lieberum et al. (2024), [Gemma Scope](https://arxiv.org/abs/2408.05147), release extensive JumpReLU SAE suites across Gemma 2 layers and model sizes. Their contribution concerns access to trained representations at scale; ours concerns inference with temporal and predictive relationships.
+
+Temporal representations. Bhalla et al. (2025), [Temporal Sparse Autoencoders](https://arxiv.org/abs/2511.05541), introduce a contrastive objective encouraging consistent high-level features across adjacent language tokens. We share the motivation that sequential structure can distinguish persistent content from local fluctuations. Our formulation uses explicit quadratic temporal differences, a learned linear transition, and nonlocal predictive edges. Dokme and Vishwanath (2026), [Interpreting Video Representations with Spatio-Temporal Sparse Autoencoders](https://arxiv.org/abs/2604.03919), describe temporal instability from hard TopK selection and combine spatiotemporal contrastive objectives with hierarchical feature grouping. We address support instability through delayed projection and structured trajectory inference. Yeo et al. (2026), [Temporal Island Sparse Autoencoders for Interpreting Clinical Time-Series Models](https://arxiv.org/abs/2611.03420), represent clinical concepts using learned temporal Gaussian islands and sparse variable compositions, with a separate prediction selector. PVG-TSC instead represents temporal structure through a shared transition operator and pairwise graph penalties.
+
+Latent dynamics. Lusch, Kutz, and Brunton (2017), [Deep learning for universal linear embeddings of nonlinear dynamics](https://arxiv.org/abs/1712.09707), learn coordinates supporting approximately linear evolution. This motivates our linear latent transition model. Li et al. (2026), [Sparse Koopman Autoencoders Identify Local Dynamical Regimes in Multibasin Systems](https://arxiv.org/abs/2608.29057), use sparse latent supports as inspectable regime variables in systems with multiple basins. Our dynamics estimator is an explicit identity-centered ridge regression, and its predictions additionally determine nonlocal edge weights. We use the transition operator both in adjacent-time inference and in graph construction.
+
+Iterative sparse inference and structured dictionaries. Tolooshams, Dey, and Ba (2019), [Deep Residual Autoencoders for Expectation Maximization-inspired Dictionary Learning](https://arxiv.org/abs/1904.08827), connect alternating dictionary learning with recurrent or residual encoders whose forward computation approximates FISTA sparse inference. Our alternating inference structure follows this optimization perspective while adding temporal and graph operators. Johnson et al. (2016), [Sparse Coding for Alpha Matting](https://arxiv.org/abs/1604.02898), construct sparse representations from foreground and background samples and extend their framework to temporally coherent video matting. Their dictionary construction and task-specific representation differ from our learned latent transition and predictive graph. Ma et al. (2025), [Multi-Dictionary Learning for Low Rank Sparse Coding](https://arxiv.org/abs/2509.10033), study low-rank coefficients for two-dictionary representations and their data complexity. We use a single observation dictionary and dense temporal computations, with structure imposed through latent dynamics and graph differences.
+
+The following comparison summarizes the mechanisms emphasized by these works. Descriptions concern their stated formulations; empirical comparisons in this paper use the three reference implementations defined in our experimental protocol.
+
+| Work | Representation or application | Temporal or structural mechanism | Relationship to PVG-TSC |
+|---|---|---|---|
+| Cunningham et al., 2023 | Language-model sparse features | Sparse reconstruction | Adds shared dynamics and predictive edges |
+| Gao et al., 2024 | Scalable k-sparse SAEs | Direct cardinality control | Delays projection and refines selected amplitudes |
+| Lieberum et al., 2024 | Gemma 2 SAE suite | JumpReLU representations across layers | Studies trajectory inference with a shared dictionary |
+| Bhalla et al., 2025 | Temporal language features | Adjacent-token contrastive consistency | Uses quadratic differences and learned transitions |
+| Dokme and Vishwanath, 2026 | Video representations | Spatiotemporal contrast and hierarchy | Uses delayed support selection and predictive graphs |
+| Yeo et al., 2026 | Clinical time-series concepts | Gaussian temporal islands and variable composition | Uses transition-based trajectory coupling |
+| Li et al., 2026 | Multibasin dynamics | Sparse Koopman representations | Uses dynamics to validate nonlocal edges |
+| Lusch et al., 2017 | Nonlinear dynamical systems | Learned approximately linear coordinates | Fits identity-centered dynamics in sparse coordinates |
+| Tolooshams et al., 2019 | Convolutional dictionary learning | Alternating learning and FISTA inference | Adds temporal proximal and graph operations |
+| Johnson et al., 2016 | Image and video matting | Sample-based sparse coding and temporal coherence | Learns a shared dictionary and latent predictor |
+| Ma et al., 2025 | Structured multidictionary coding | Low-rank two-dictionary coefficients | Uses one observation dictionary and trajectory graphs |
+| PVG-TSC | Noisy multiregime sparse trajectories | Bidirectional dynamics and prediction-validated graph | Joint dictionary adaptation and delayed support selection |
+
+## Methodology
+Problem and adaptation protocol. Let $\mathcal{X}$ contain training trajectories and the unlabeled observed trajectories to be reconstructed. The method adapts its dictionary and transition operator using all trajectories in $\mathcal{X}$; clean observations and ground-truth latent variables are used only for evaluation. For each trajectory, $X\approx ZD^\top$, where $D\in\mathbb{R}^{d\times m}$ has unit columns and each final code row is nonnegative with at most $k$ nonzero entries. We initialize $D$ by column normalization of the supplied dictionary and set $K=I_m$.
+
+For fixed $D$, $K$, and graph adjacency $A$, the constituent latent penalties are
+
+$$f_D(Z)=\tfrac12\|X-ZD^\top\|_F^2,\qquad h(Z)=\lambda_1\|Z\|_1+\iota_{Z\geq0},$$
+
+$$r_K(Z)=\mu_L\|BZ\|_F^2+\mu_K\|\mathcal{E}_KZ\|_F^2,\qquad g_A(Z)=\frac{\lambda_G}{2}\sum_{i<j}A_{ij}\|z_i-z_j\|_2^2.$$
+
+Here $(BZ)_t=z_{t+1}-z_t$ and $(\mathcal{E}_KZ)_t=z_{t+1}-z_tK^\top$. Our finite inference procedure composes updates associated with these penalties and then imposes cardinality. The following equations define that composition directly.
+
+Identity-centered dynamics estimation. Across all current trajectories, define
+
+$$G_0=\sum_s(Z^{(s)}_-)^\top Z^{(s)}_-,\qquad G_1=\sum_s(Z^{(s)}_+)^\top Z^{(s)}_-,$$
+
+where $Z_-$ and $Z_+$ omit the last and first rows, respectively. We solve
+
+$$\min_K\sum_s\|Z^{(s)}_+-Z^{(s)}_-K^\top\|_F^2+\rho\|K-I_m\|_F^2,$$
+
+using $\rho=0.5$.
+
+Proposition 1: unique ridge estimator and identity preservation. For $\rho>0$, the unique minimizer is
+
+$$K^\star=(G_1+\rho I_m)(G_0+\rho I_m)^{-1}.$$
+
+If $G_0v=0$, then $K^\star v=v$. Moreover,
+
+$$\|K^\star-I_m\|_2\leq\frac{\|G_1-G_0\|_2}{\rho}.$$
+
+Proof. Differentiating the objective gives $2K(G_0+\rho I_m)-2(G_1+\rho I_m)$. The matrix $G_0+\rho I_m$ is positive definite, establishing the formula and strict convexity. If $G_0v=0$, then $0=v^\top G_0v=\sum_s\|Z^{(s)}_-v\|_2^2$, so every $Z^{(s)}_-v=0$ and $G_1v=0$. Substitution yields $K^\star v=v$. Finally, $K^\star-I_m=(G_1-G_0)(G_0+\rho I_m)^{-1}$ and the inverse has spectral norm at most $1/\rho$. $\square$
+
+Prediction-validated graph. For a trajectory of length $T$, let $\widehat{x}_i=z_iD^\top$ and $d_{ij}=\|\widehat{x}_i-\widehat{x}_j\|_2^2$. Each row selects its $q=\min(8,T-1)$ nearest other rows by $d_{ij}$. Let $\mathcal{C}$ be these directed candidate pairs. With $p_i=z_iK^\top$, define reciprocal predictive discrepancy
+
+$$e_{ij}=\tfrac12\bigl(\|z_j-p_i\|_2^2+\|z_i-p_j\|_2^2\bigr).$$
+
+The scales are $s_x=\max(\operatorname{median}_{\mathcal{C}}d_{ij},10^{-10})$ and $s_e=\max(\operatorname{median}_{\mathcal{C}}e_{ij},10^{-10})$. Directed weights are
+
+$$V_{ij}=\mathbf{1}_{(i,j)\in\mathcal{C}}\exp(-d_{ij}/s_x-e_{ij}/s_e).$$
+
+We symmetrize $W=(V+V^\top)/2$, compute $d_i^W=\sum_jW_{ij}$, and set
+
+$$A_{ij}=\frac{W_{ij}}{\sqrt{\max(d_i^W,10^{-30})\max(d_j^W,10^{-30})}},\qquad L_A=\operatorname{diag}(A\mathbf{1})-A.$$
+
+Thus the difference penalty uses the combinatorial Laplacian of degree-normalized edge weights. In particular, $L_A\mathbf{1}=0$. For nonadjacent rows, $e_{ij}$ remains a reciprocal one-step compatibility score; it does not propagate $K$ over their temporal separation. Graphs are recomputed before outer rounds 1, 3, and 5 and held fixed between these updates.
+
+Bidirectional temporal inference. Let $H=D^\top D$, $C=XD$, and $\eta=1/\max(\|H\|_2,10^{-12})$. From an extrapolated iterate $Y$, compute
+
+$$U=Y-\eta(YH-C),\qquad V=\mathcal{Q}^{-1}U,$$
+
+$$\mathcal{Q}=I+2\eta\mu_LB^*B+2\eta\mu_K\mathcal{E}_K^*\mathcal{E}_K.$$
+
+The inverse is approximated with at most six preconditioned conjugate-gradient steps. The preconditioner is $I+2\eta\mu_LB^*B$; its inverse is constructed by a Thomas factorization applied to identity right-hand sides, cached, and subsequently applied as a dense matrix. The initial conjugate-gradient iterate is this preconditioner applied to $U$. Iteration terminates early when the preconditioned residual inner product is below $10^{-20}$; scalar denominators are bounded below by $10^{-30}$.
+
+Proposition 2: temporal gradient, conditioning, and filtering. For an interior row, the gradient of $r_K$ is
+
+$$\nabla_{z_t}r_K=2\mu_L(2z_t-z_{t-1}-z_{t+1})+2\mu_K\bigl[(z_t-z_{t-1}K^\top)+(z_tK^\top-z_{t+1})K\bigr].$$
+
+At endpoints, only existing incident transitions contribute. For $a,b\geq0$, $Q=I+aB^*B+b\mathcal{E}_K^*\mathcal{E}_K$ is positive definite and
+
+$$1\leq\lambda_{\min}(Q)\leq\lambda_{\max}(Q)\leq1+4a+b(1+\|K\|_2)^2.$$
+
+Consequently, $Q^{-1}$ is nonexpansive in Frobenius norm. Along an eigenvector of $aB^*B+b\mathcal{E}_K^*\mathcal{E}_K$ with eigenvalue $\xi$, the exact solve multiplies its coefficient by $(1+\xi)^{-1}$.
+
+Proof. Each temporal residual contributes to its later endpoint directly and its earlier endpoint through the adjoint multiplication by $-K$, giving the gradient. For any $Z$, $\langle Z,QZ\rangle=\|Z\|_F^2+a\|BZ\|_F^2+b\|\mathcal{E}_KZ\|_F^2$. Also, $\|B\|_2\leq2$ and $\|\mathcal{E}_KZ\|_F\leq(1+\|K\|_2)\|Z\|_F$. These establish the eigenvalue bounds. Diagonalizing the self-adjoint positive semidefinite penalty operator proves the filtering statement and nonexpansiveness. $\square$
+
+Nonnegative quadratic graph step. Set $U_G=V-\eta\lambda_1\mathbf{1}$ and $\tau=\eta\lambda_G$. We approximately minimize
+
+$$F_G(Z;U_G)=\tfrac12\|Z-U_G\|_F^2+\tfrac{\tau}{2}\sum_{i<j}A_{ij}\|z_i-z_j\|_2^2,\qquad Z\geq0.$$
+
+Starting from $Z=[U_G]_+$, we apply projected-gradient updates
+
+$$Z\leftarrow[Z-\gamma(Z-U_G+\tau L_AZ)]_+,\qquad\gamma=\frac{1}{1+2\tau\max_i\sum_jA_{ij}}.$$
+
+There are at most four blocks of twelve updates. An inner block stops when its iterate change is at most $10^{-5}\max(1,\|Z\|_F)$. After each block, the algorithm checks objective decrease, allowing a numerical tolerance of $10^{-12}\max(1,|F_{\mathrm{old}}|)$, and permits up to twenty midpoint reductions if needed. A nonfinite or unaccepted proposal terminates the graph solve at its previous iterate. Block iteration stops when $\|Z-[Z-\nabla F_G(Z)]_+\|_F\leq10^{-5}\max(1,\|Z\|_F)$.
+
+Proposition 3: graph positivity and projected descent. For symmetric nonnegative $A$, $L_A$ is positive semidefinite and annihilates constant trajectories. The graph subproblem has a unique minimizer. In exact arithmetic, each projected-gradient update above satisfies
+
+$$F_G(Z^+)\leq F_G(Z)-\frac{1}{2\gamma}\|Z^+-Z\|_F^2.$$
+
+Proof. Expanding the quadratic gives $\operatorname{tr}(Z^\top L_AZ)=\sum_{i<j}A_{ij}\|z_i-z_j\|_2^2\geq0$, and the row sums of $L_A$ are zero. The identity contribution makes the Hessian $I+\tau L_A$ positive definite. Gershgorin's theorem yields $\|L_A\|_2\leq2\max_i\sum_jA_{ij}$, so $\nabla F_G$ is $1/\gamma$-Lipschitz or better. The projection optimality condition implies $\langle\nabla F_G(Z),Z^+-Z\rangle\leq-\|Z^+-Z\|_F^2/\gamma$. Combining it with the smoothness inequality proves the descent bound. $\square$
+
+Acceleration, support selection, and refitting. An inference call performs 45 continuous iterations. If $Z^{j+1}$ is the graph-step output, the extrapolation is
+
+$$t_{j+1}=\frac{1+\sqrt{1+4t_j^2}}2,\qquad Y^{j+1}=Z^{j+1}+\frac{t_j-1}{t_{j+1}}(Z^{j+1}-Z^j),\qquad t_0=1.$$
+
+We then retain the largest $k$ nonnegative entries in each row. Let $M$ indicate the positive entries after this projection. Eight additional iterations apply the reconstruction, temporal, and graph operations without momentum, multiplying each resulting code by $M$ to prevent support expansion.
+
+Proposition 4: cardinality and support stability. Rowwise nonnegative Top-k projection yields nonnegative codes with at most $k$ nonzeros. Suppose a nonnegative vector $v$ has a unique set $S$ of $k$ largest entries and separation $\Delta=\min_{i\in S}v_i-\max_{j\notin S}v_j>0$. If $\|\widetilde v-v\|_\infty<\Delta/2$, then Top-k selection on $[\widetilde v]_+$ returns the same set.
+
+Proof. Cardinality follows from retaining only $k$ coordinates. Every selected coordinate exceeds every unselected coordinate by at least $\Delta-2\|\widetilde v-v\|_\infty>0$. Since $v$ is nonnegative, selected coordinates remain positive under this perturbation bound. Nonnegative clipping therefore preserves their strict ordering over the remaining coordinates. $\square$
+
+Dictionary refinement. Stack current codes and observations into $Z$ and $X$. With $R=X-ZD^\top$, define
+
+$$G=R^\top Z,\qquad H_D=G-D\operatorname{diag}(D^\top G),\qquad c=\max(\|Z^\top Z\|_2,10^{-12}).$$
+
+We update $\widetilde D=D+0.8H_D/c$ and normalize each column, dividing by its norm bounded below by $10^{-12}$. The projection removes radial components separately for each atom; it does not impose pairwise orthogonality among atoms.
+
+Proposition 5: dictionary descent direction. For fixed $Z$, let $f(D)=\tfrac12\|X-ZD^\top\|_F^2$ on the product of unit spheres. The tangent direction $H_D$ satisfies
+
+$$\left.\frac{d}{d\alpha}f\bigl(\operatorname{normalize}(D+\alpha H_D)\bigr)\right|_{\alpha=0}=-\|H_D\|_F^2.$$
+
+Thus it is a strict local descent direction whenever $H_D\neq0$.
+
+Proof. The Euclidean gradient is $-G$. Orthogonal projection onto each column's tangent space yields $-H_D$. Column normalization has derivative equal to the tangent projection at a unit column, so its derivative on $H_D$ is $H_D$. Therefore the directional derivative is $-\langle G,H_D\rangle=-\|H_D\|_F^2$. $\square$
+
+Complete procedure. All experiments use $\lambda_1=0.07$, $\mu_L=0.12$, $\mu_K=0.10$, and $\lambda_G=0.06$. The dictionary step multiplier is 0.8, the ridge coefficient is 0.5, and there are six alternating rounds. An initial inference call uses $K=I_m$ and no nonlocal graph. Subsequent calls warm-start from their previous codes and reset the acceleration scalar to one.
+
+```text
+Algorithm 1: Prediction-Validated Graph Temporal Sparse Coding
+Input: training trajectories, unlabeled observed trajectories,
+       initial dictionary D, target cardinality k
+Normalize columns of D; set K = identity
+For every trajectory X:
+    Z[X] = SparseInference(X, D, K, no graph, zero initialization)
+For round r = 1,...,6:
+    Update D by the tangent dictionary step and column normalization
+    Fit K by identity-centered ridge regression from all current codes
+    If r is 1, 3, or 5:
+        For each trajectory, rebuild its prediction-validated adjacency A
+    For every trajectory X:
+        Z[X] = SparseInference(X, D, K, A[X], Z[X])
+Fit K once more from all final codes
+Return D, K, and codes and reconstructions for observed trajectories
+```
+
+```text
+Algorithm 2: SparseInference
+Input: X, D, K, adjacency A or no graph, initial code Z
+Set Y = Z and acceleration scalar t = 1
+Compute H = transpose(D) D, C = X D, eta = 1 / spectral_norm(H)
+Repeat 45 times:
+    U = Y - eta (Y H - C)
+    V = temporal quadratic solve of U, using at most 6 PCG steps
+    Znew = nonnegative quadratic graph solve of V - eta lambda_1
+           (use nonnegative clipping when no graph is present)
+    tnew = (1 + sqrt(1 + 4 t^2)) / 2
+    Y = Znew + ((t - 1) / tnew) (Znew - Z)
+    Z = Znew; t = tnew
+Retain the largest k nonnegative entries of each row of Z
+Set M to the indicator of positive entries of Z
+Repeat 8 times:
+    U = Z - eta (Z H - C)
+    V = temporal quadratic solve of U, using at most 6 PCG steps
+    Z = nonnegative quadratic graph solve of V - eta lambda_1
+    Z = Z multiplied elementwise by M
+Return Z
+```
+
+Computational complexity. Let $S$ count all adaptation trajectories, each of length $T$, $N=ST$, $R=6$, $I=53$, $c_{\mathrm{CG}}=6$, and $h_G\leq48$ denote graph gradient updates per latent iteration. One inference call costs
+
+$$O\left(dm^2+m^3+Tdm+I\left[(1+c_{\mathrm{CG}})(Tm^2+T^2m)+h_GT^2m\right]\right).$$
+
+This includes dense Gram construction and spectral norms, dense transition products, and dense application of the cached temporal inverse. A graph refresh costs $O(Tdm+T^2(d+m)+Tq m)$ per trajectory, with $q\leq8$. Each outer dictionary and dynamics update costs $O(Ndm+Nm^2+m^3)$. The total cost is the sum of $(R+1)S$ inference calls, $R$ shared updates, and three graph refreshes per trajectory, plus the final ridge fit. Storage is $O(N(d+m)+ST^2+dm+m^2)$ for fixed cache capacity, including observations, codes, dense graphs, and working matrices. Although final codes are sparse, these bounds describe dense arithmetic. At $T=48,d=32,m=64,S=16$, float64 code storage alone is 393,216 bytes, the shared dictionary and transition require 49,152 bytes together, and sixteen dense adjacency matrices require 294,912 bytes.
+
+## Experiments
+Experimental design. Our experiments evaluate synthetic trajectories with $d=32$, $m=64$, and target output cardinality $k=5$. The primary validation and held-out test conditions each contain eight training and eight evaluated trajectories of length 48. Independent random draws define the validation and test instances. The observation dictionary has normalized Gaussian columns. Latent evolution uses four 16-dimensional blocks, with within-block operators formed from $0.82I$ and random skew-symmetric perturbations. Potential topic changes occur every sixteen time steps. Observed signals add isotropic Gaussian noise with standard deviation 0.14, and the initial dictionary adds Gaussian perturbations with standard deviation 0.18 before normalization. Ground-truth observed latent rows retain up to six positive coordinates. The proposed method produces at most five active coordinates per row.
+
+We evaluate adaptation to the noisy observations: both the shared dictionary and the transition operator use training trajectories and unlabeled evaluated trajectories. The held-out condition separates generated instances and clean evaluation targets. Baseline implementations share the observation inputs and initial dictionary.
+
+Reference methods. Framewise ISTA uses twenty nonnegative iterations with step 0.18 and shrinkage coefficient 0.20, retaining the initial normalized dictionary. The TopK reference performs four training-only dictionary refinement rounds followed by twenty inference iterations with step 0.18 and six retained coordinates per row. The Laplacian temporal reference uses the same training-only dictionary refinement, twenty inference iterations, step 0.16, shrinkage coefficient 0.16, and temporal gradient coefficient 0.25. These are benchmark implementations motivated by Cunningham et al., Gao et al., and Bhalla et al., respectively. All three use the identity operator for prediction.
+
+Metrics. For each evaluated sequence, reconstruction error $R$ is mean squared error against the clean signal. Support F1, denoted $F$, uses a threshold of 0.08 after aligning each true atom to the estimated atom with largest absolute cosine similarity. This alignment permits multiple true atoms to select the same estimated atom. Prediction error $P$ compares $(Z_{1:T-1}K^\top)D^\top$ with the next clean observations. Mean activity counts entries above $10^{-3}$. If that count is $\ell$, the sparsity excess is $V=\max(0,(\ell-6.5)/6.5)$. The primary composite loss is
+
+$$C=R+0.35(1-F)+0.25P+0.15V.$$
+
+Reported values average sequence-level quantities. Dictionary recovery is the mean, over true atoms, of their maximum absolute cosine similarity with estimated atoms.
+
+Primary comparisons. Table 1 reports all reference methods on validation and held-out test data. Its final column gives the mean paired difference $C_{\mathrm{reference}}-C_{\mathrm{ours}}$ and its 95% interval. For sequence differences $\delta_s$, we use
+
+$$\overline\delta\pm t_{7,0.975}\frac{s_\delta}{\sqrt8},\qquad t_{7,0.975}=2.3646.$$
+
+Table 1: primary comparison. Lower $C,R,P$ and higher $F$ are better; confidence intervals concern paired improvement over PVG-TSC.
+
+| Split | Method | Composite $C$ | Recon. $R$ | Support $F$ | Predict. $P$ | Paired improvement [95% CI] |
+|---|---|---:|---:|---:|---:|---|
+| Validation | Framewise ISTA | 0.263820 | 0.009973 | 0.3133 | 0.010700 | 0.029292 [0.012584, 0.046000] |
+| Validation | TopK | 0.282364 | 0.015424 | 0.2506 | 0.018545 | 0.047836 [0.041947, 0.053725] |
+| Validation | Laplacian temporal | 0.326897 | 0.008386 | 0.3156 | 0.009636 | 0.092369 [0.085633, 0.099105] |
+| Validation | PVG-TSC | 0.234528 | 0.006402 | 0.3536 | 0.007586 | — |
+| Held-out test | Framewise ISTA | 0.266965 | 0.008729 | 0.2789 | 0.009027 | 0.024230 [0.013893, 0.034567] |
+| Held-out test | TopK | 0.273056 | 0.014012 | 0.2715 | 0.016321 | 0.030321 [0.020854, 0.039788] |
+| Held-out test | Laplacian temporal | 0.302188 | 0.007927 | 0.3125 | 0.008343 | 0.059453 [0.035006, 0.083900] |
+| Held-out test | PVG-TSC | 0.242735 | 0.005608 | 0.3269 | 0.006234 | — |
+
+PVG-TSC improves all three component metrics over each reference on both splits. Relative held-out composite reductions are 9.08% against ISTA, 11.10% against TopK, and 19.67% against the temporal reference. Against ISTA, held-out reconstruction error falls by approximately 35.76%, while support F1 increases by 0.0480. Mean activity is exactly 5.0 on both splits and sparsity excess is zero. Dictionary recovery is 0.720175 on validation and 0.742941 on test.
+
+The primary validation loss decomposes as approximately $0.006402+0.226229+0.001896$, with zero sparsity contribution. Thus support error contributes most of the composite value. This decomposition motivates reporting support recovery alongside reconstruction and prediction rather than attributing the entire composite improvement to denoising.
+
+Factorial mechanism isolation. Table 2 varies adjacent-time Laplacian smoothing and the learned dynamics mechanism while holding dictionary refinement off. The nonlocal graph, delayed support projection, acceleration, and amplitude refinement remain active. Disabling learned dynamics retains $K=I$ and removes the adjacent-time dynamics penalty; graph construction consequently uses identity predictions.
+
+Table 2: complete $2\times2$ temporal-mechanism study with a fixed dictionary.
+
+| Split | Laplacian | Dynamics | Composite $C$ | Recon. $R$ | Support $F$ | Predict. $P$ |
+|---|---|---|---:|---:|---:|---:|
+| Validation | Off | Off | 0.272593 | 0.014307 | 0.2732 | 0.015614 |
+| Validation | On | Off | 0.253948 | 0.012305 | 0.3187 | 0.012763 |
+| Validation | Off | On | 0.258306 | 0.012769 | 0.3065 | 0.011259 |
+| Validation | On | On | 0.246229 | 0.011844 | 0.3382 | 0.010971 |
+| Held-out test | Off | Off | 0.280502 | 0.012530 | 0.2440 | 0.013552 |
+| Held-out test | On | Off | 0.262261 | 0.010214 | 0.2874 | 0.010485 |
+| Held-out test | Off | On | 0.270533 | 0.010918 | 0.2648 | 0.009170 |
+| Held-out test | On | On | 0.257194 | 0.009814 | 0.2995 | 0.008776 |
+
+Both mechanisms improve every displayed component metric at either setting of the other mechanism. On validation, Laplacian smoothing reduces composite loss by 0.018645 without dynamics and 0.012077 with dynamics. Dynamics reduces loss by 0.014287 without smoothing and 0.007719 with smoothing. The interaction contrast $C_{11}-C_{10}-C_{01}+C_{00}$ is positive, 0.006568 on validation and 0.004902 on test. The mechanisms therefore exhibit diminishing combined returns on this loss scale while the joint setting remains best. Restoring dictionary refinement reduces the joint setting from 0.246229 to 0.234528 on validation and from 0.257194 to 0.242735 on test.
+
+Single-component subtraction. Each row of Table 3 removes one component from the full proposed method and reruns the complete adaptation procedure. The dynamics subtraction removes transition fitting and its temporal penalty; the dictionary subtraction retains the normalized initial dictionary throughout.
+
+Table 3: five component subtractions on validation. Positive loss differences indicate deterioration relative to the full method.
+
+| Method or removed component | Composite $C$ | Increase in $C$ | Recon. $R$ | Support $F$ | Predict. $P$ | Time (s) |
+|---|---:|---:|---:|---:|---:|---:|
+| Full PVG-TSC | 0.234528 | 0 | 0.006402 | 0.353630 | 0.007586 | 14.952 |
+| Nonlocal graph | 0.236944 | 0.002416 | 0.006535 | 0.347124 | 0.007609 | 8.436 |
+| Temporal Laplacian | 0.252389 | 0.017861 | 0.007908 | 0.307389 | 0.008266 | 13.989 |
+| Learned dynamics | 0.246875 | 0.012347 | 0.006976 | 0.321650 | 0.009906 | 7.731 |
+| Dictionary refinement | 0.246229 | 0.011701 | 0.011844 | 0.338163 | 0.010971 | 14.844 |
+| Support amplitude refinement | 0.234602 | 0.000074 | 0.006427 | 0.353534 | 0.007649 | 12.557 |
+
+Temporal smoothing produces the largest composite contribution, followed by learned dynamics and dictionary refinement. Dictionary adaptation has a particularly clear reconstruction effect: its removal raises reconstruction error from 0.006402 to 0.011844 and reduces dictionary recovery from 0.720175 to 0.689336. Learned dynamics has a pronounced prediction effect, with its removal raising prediction error to 0.009906. The graph contributes a smaller improvement across reconstruction, support, and prediction. Support-restricted amplitude refinement contributes only $7.42\times10^{-5}$ in composite loss, the smallest observed contribution, while adding approximately 2.40 seconds to this measured execution. Every subtraction retains mean activity 5.0 and zero sparsity excess.
+
+Noise robustness. We evaluate a second validation condition with observation-noise standard deviation 0.175, a 25% increase, using a fresh draw of the dictionary, dynamics, and trajectories. Table 4 reports the two noise conditions and all references under higher noise.
+
+Table 4: noise-condition comparison at $T=48$, $d=32$, $m=64$, and output target $k=5$.
+
+| Noise std. | Method | Composite $C$ | Recon. $R$ | Support $F$ | Predict. $P$ | Paired improvement [95% CI] |
+|---|---|---:|---:|---:|---:|---|
+| 0.140 | PVG-TSC | 0.234528 | 0.006402 | 0.3536 | 0.007586 | — |
+| 0.175 | PVG-TSC | 0.264358 | 0.007823 | 0.2722 | 0.007215 | — |
+| 0.175 | Framewise ISTA | 0.315199 | 0.010262 | 0.2496 | 0.010953 | 0.050840 [0.037475, 0.064205] |
+| 0.175 | TopK | 0.304154 | 0.021282 | 0.2085 | 0.023335 | 0.039796 [0.028991, 0.050601] |
+| 0.175 | Laplacian temporal | 0.399379 | 0.008947 | 0.2483 | 0.009637 | 0.135021 [0.119955, 0.150087] |
+
+The method retains lower loss and better component metrics than every reference in the higher-noise condition. Its dictionary recovery is 0.723567, mean activity is 5.0, and sparsity excess remains zero. In the corresponding fixed-dictionary factorial study, the four losses are 0.300050 with neither temporal mechanism, 0.275520 with smoothing only, 0.285534 with dynamics only, and 0.271294 with both. The ordering therefore agrees with the primary conditions.
+
+Runtime, memory, and scaling. Computation uses Python 3.12.3 and NumPy float64 arrays on an aarch64 Linux system, with an ARM Cortex-X925 CPU at 3.90 GHz pinned to one core. Wall-clock measurement surrounds method execution, including adaptation and inference; baseline evaluation and factorial reruns occur outside that interval. Memory figures are traced current and peak allocations for that execution.
+
+Table 5: runtime and memory reproducibility for the same method across conditions.
+
+| Condition | Train/eval sequences | Length | Time (s) | Current bytes | Peak bytes | Mean activity |
+|---|---|---:|---:|---:|---:|---:|
+| Validation | 8 / 8 | 48 | 14.952303 | 1,490,270 | 3,931,876 | 5.0 |
+| Held-out test | 8 / 8 | 48 | 15.187868 | 1,491,488 | 3,944,504 | 5.0 |
+| Higher-noise validation | 8 / 8 | 48 | 15.408684 | 1,491,355 | 3,936,867 | 5.0 |
+
+Table 6 states scaling implications of the implemented dense operations. Multipliers describe isolated leading terms when the indicated dimension doubles with other quantities fixed; these are analytical operation-count comparisons.
+
+| Quantity doubled | Reconstruction products | Transition products | Graph products | Ridge factorization | Stored graphs |
+|---|---|---|---|---|---|
+| Sequence length $T$ | $2\times$ | $2\times$ | $4\times$ | Unchanged | $4\times$ |
+| Trajectory count $S$ | $2\times$ | $2\times$ | $2\times$ | Unchanged | $2\times$ |
+| Dictionary width $m$ | Up to $4\times$ | $4\times$ | $2\times$ | $8\times$ | Unchanged |
+| Observation width $d$ | $2\times$ for $Tdm$ terms | Unchanged | Unchanged after graph construction | Unchanged | Unchanged |
+
+The empirical component analysis and the operation counts identify different cost sources. Removing the graph reduces the measured runtime substantially despite its small loss contribution, whereas removing dictionary refinement changes runtime relatively little while materially affecting reconstruction. The method therefore exposes a measurable accuracy–computation tradeoff through distinct inference components.
+
+## Limitations
+The evidence concerns a small synthetic benchmark with eight evaluated trajectories per primary split, a 32-dimensional observation space, and a 64-atom dictionary. It does not establish human interpretability, causal feature meaning, downstream utility, or performance on language-model, video, or clinical representations. Initialization is a perturbation of the true dictionary, which is more informative than an arbitrary initialization. The data-generating process also has structured linear evolution and sparse observations, favoring the modeling assumptions studied here.
+
+The protocol is transductive: dictionary and transition estimation include unlabeled observations from the evaluated trajectories. Held-out results therefore measure adaptation to newly generated instances rather than inference with a dictionary and transition operator frozen after training. The baseline implementations have different iteration counts, dictionary-adaptation procedures, sparsity levels, and identity prediction operators. Their comparisons establish performance against the specified benchmark references, not superiority over fully trained implementations of the cited papers or a comparison matched for total computation and adaptation access.
+
+The paired confidence intervals use eight sequence differences and a Student-t approximation. Trajectories share an adapted dictionary and transition operator, so the usual independence assumption is imperfect. The intervals are unadjusted for multiple comparisons and do not quantify variation across independently regenerated benchmark collections. Component-subtraction results provide mean differences without paired intervals for those differences. In particular, the very small amplitude-refinement gain does not establish a statistically reliable improvement.
+
+The temporal factorial experiment isolates the two implemented temporal mechanisms conditional on the remaining architecture. Removing learned dynamics also changes the predictions used to weight graph edges and changes the predictor used in evaluation. Consequently, it does not separately identify the effects of transition estimation, temporal dynamics regularization, and predictive edge weighting. Likewise, graph removal measures the whole graph contribution; a direct comparison against similarity-only edges would be needed to identify the incremental benefit of predictive validation.
+
+The higher-noise condition changes the random realization as well as noise magnitude. It demonstrates performance under a second condition but does not estimate a controlled noise-response curve. Empirical sequence-length, dictionary-width, and sparsity sweeps for the complete proposed method are unavailable; the scaling table gives analytical consequences of dense operations rather than measured scaling curves. Runtime observations are individual executions, and traced allocation peaks are not total process resident memory or accelerator memory.
+
+Our proofs concern specified subproblems and local properties. The finite conjugate-gradient solve, sequential composition of proximal operations, accelerated extrapolation, changing graph, dictionary retraction, and hard support projection do not collectively inherit a global convergence guarantee from convex FISTA. The dictionary result establishes a local descent direction rather than monotonicity of every finite update. The ridge estimator is unique but has no imposed spectral-radius constraint, so long-horizon dynamical stability is not guaranteed. Prediction evaluation is one-step observation prediction, not a multistep rollout. The support-stability proposition requires an entry-separation condition that is not verified empirically.
+
+Finally, the graph penalty is quadratic. The experiments do not establish an advantage from robust edge penalties or resistance to adversarial outliers. Its predictive score applies a one-step operator even between distant trajectory positions, and a single shared linear operator may inadequately represent heterogeneous regimes. Dense graph storage and cached dense temporal inverses also create quadratic dependence on sequence length, motivating future sparse graph implementations and direct banded preconditioning.
+
+## References
+- Temporal Sparse Autoencoders: Leveraging the Sequential Nature of Language for Interpretability. DOI: 10.48550/arXiv.2511.05541
+- Interpreting Video Representations with Spatio-Temporal Sparse Autoencoders. DOI: 10.48550/arXiv.2604.03919
+- Temporal Island Sparse Autoencoders for Interpreting Clinical Time-Series Models. DOI: 10.48550/arXiv.2611.03420
+- Sparse Koopman Autoencoders Identify Local Dynamical Regimes in Multibasin Systems. DOI: 10.48550/arXiv.2608.29057
+- Sparse Autoencoders Find Highly Interpretable Features in Language Models. DOI: 10.48550/arXiv.2309.08600
+- Scaling and evaluating sparse autoencoders. DOI: 10.48550/arXiv.2406.04093
+- Gemma Scope: Open Sparse Autoencoders Everywhere All At Once on Gemma 2. DOI: 10.48550/arXiv.2408.05147
+- Deep learning for universal linear embeddings of nonlinear dynamics. DOI: 10.48550/arXiv.1712.09707
+- Deep Residual Autoencoders for Expectation Maximization-inspired Dictionary Learning. DOI: 10.48550/arXiv.1904.08827
+- Sparse Coding for Alpha Matting. DOI: 10.48550/arXiv.1604.02898
+- Multi-Dictionary Learning for Low Rank Sparse Coding. DOI: 10.48550/arXiv.2509.10033
+
+## Appendix A: Complete Experimental Trajectory Manifest
+
+| Experiment | mse |
+|---|---|
+| baseline_source | 0.255520396 |
+| baseline_subset | 0.255737511 |
+| baseline_full | 0.255520396 |
+| initial_subset | 0.244590553 |
+| initial_full | 0.246773375 |
+| seed0_subset | 0.240042746 |
+| seed0_full | 0.234550798 |
+| evolved0_subset | 0.241177083 |
+| evolved0_full | 0.234528008 |
+| ablation0 | 0.236943569 |
+| ablation1 | 0.252388535 |
+| ablation2 | 0.246875297 |
+| ablation3 | 0.246229500 |
+| ablation4 | 0.234602175 |
+| pruned | 0.234528008 |
+| rebuttal0 | 0.264358184 |
+| final_test | 0.242735012 |

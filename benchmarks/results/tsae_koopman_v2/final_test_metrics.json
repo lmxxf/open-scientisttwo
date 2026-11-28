@@ -1,0 +1,87 @@
+{
+  "mse": 0.24273501244770118,
+  "clean_recon_mse": 0.005607650932579219,
+  "feature_support_f1": 0.3269461796775074,
+  "koopman_rollout_mse": 0.006234097608998294,
+  "dictionary_mean_max_cosine": 0.7429407041969914,
+  "mean_active_l0": 5.0,
+  "sparsity_violation": 0.0,
+  "baselines": {
+    "framewise_ista_2309_08600": {
+      "mse": 0.266965,
+      "clean_recon_mse": 0.008729,
+      "feature_support_f1": 0.2789,
+      "koopman_rollout_mse": 0.009027,
+      "paired_improvement_mean": 0.02423,
+      "paired_improvement_t95_ci": 0.010337
+    },
+    "topk_sae_2406_04093": {
+      "mse": 0.273056,
+      "clean_recon_mse": 0.014012,
+      "feature_support_f1": 0.2715,
+      "koopman_rollout_mse": 0.016321,
+      "paired_improvement_mean": 0.030321,
+      "paired_improvement_t95_ci": 0.009467
+    },
+    "laplacian_tsae_2511_05541": {
+      "mse": 0.302188,
+      "clean_recon_mse": 0.007927,
+      "feature_support_f1": 0.3125,
+      "koopman_rollout_mse": 0.008343,
+      "paired_improvement_mean": 0.059453,
+      "paired_improvement_t95_ci": 0.024447
+    }
+  },
+  "runtime_ms": 15187.868,
+  "traced_memory_bytes": {
+    "current_bytes": 1491488,
+    "peak_bytes": 3944504
+  },
+  "environment_metadata": {
+    "python": "3.12.3",
+    "platform": "Linux-6.17.0-1014-nvidia-aarch64-with-glibc2.39",
+    "machine": "aarch64",
+    "cpu": "ARM Cortex-X925 (3.90 GHz, pinned single core)"
+  },
+  "num_sequences": 8,
+  "d_in": 32,
+  "m_dict": 64,
+  "k_active": 5,
+  "mode": "full",
+  "split": "test",
+  "extra": false,
+  "factorial_and_scaling": {
+    "factorial_2x2_study": {
+      "full_selected": {
+        "composite_mse": 0.242735,
+        "clean_recon_mse": 0.005608,
+        "feature_support_f1": 0.3269,
+        "koopman_rollout_mse": 0.006234
+      },
+      "laplacian_on_koopman_on_dict_off": {
+        "composite_mse": 0.257194,
+        "clean_recon_mse": 0.009814,
+        "feature_support_f1": 0.2995,
+        "koopman_rollout_mse": 0.008776
+      },
+      "laplacian_on_koopman_off_dict_off": {
+        "composite_mse": 0.262261,
+        "clean_recon_mse": 0.010214,
+        "feature_support_f1": 0.2874,
+        "koopman_rollout_mse": 0.010485
+      },
+      "laplacian_off_koopman_on_dict_off": {
+        "composite_mse": 0.270533,
+        "clean_recon_mse": 0.010918,
+        "feature_support_f1": 0.2648,
+        "koopman_rollout_mse": 0.00917
+      },
+      "laplacian_off_koopman_off_dict_off": {
+        "composite_mse": 0.280502,
+        "clean_recon_mse": 0.01253,
+        "feature_support_f1": 0.244,
+        "koopman_rollout_mse": 0.013552
+      }
+    }
+  }
+}

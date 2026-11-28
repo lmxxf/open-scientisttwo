@@ -1,0 +1,46 @@
+{
+  "success": true,
+  "best": {
+    "config": {
+      "reachability_gate": false,
+      "archive_threshold_annealing": false,
+      "dimension_adaptive_smoothing": false,
+      "frontier_boundary_guidance": true,
+      "local_surrogate_refinement": true,
+      "cma_covariance_adaptation": true,
+      "transition_ridge": 0.1
+    },
+    "value": 0.24412226720948527,
+    "label": "pruned",
+    "snapshot": "pruned"
+  },
+  "baseline_full": 0.22073795319730402,
+  "final_test": 0.25624841773389334,
+  "local_score": 5.285714285714286,
+  "local_decision": "Accept",
+  "claims": 17,
+  "roles": 26,
+  "protected_hashes": {
+    "eval.py": "02ddf46a4861b8169ce4b9804f5b38ced0c7d64f91119afce5e92f3754953e72",
+    "data.py": "d14aeb519b860e140dc6677adb66fd97eff55748a3551c537aa75d10e411cd82",
+    "task_spec.json": "b3285e18cb3f916aa1fca7f68adbb3fce0d0ce142b55fe090995d3cc52cb249c"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/dmsqd_cma",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-dmsqd-v1"
+  ],
+  "seconds": 1768.0097452991176
+}

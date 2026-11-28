@@ -1,0 +1,46 @@
+{
+  "success": true,
+  "best": {
+    "config": {
+      "name": "quadratic_prediction_validated_graph",
+      "candidate_neighbors": 8,
+      "graph_mode": "prediction_validated",
+      "robust_graph_penalty": false,
+      "nonlocal_graph": true,
+      "temporal_laplacian_smoothing": true,
+      "attribution": "The best snapshot omits robust_graph_penalty, which defaults to false. Its MSE exactly matches the quadratic control; this does not establish robustness as beneficial. Retain the explicit quadratic configuration and remove robustness claims. An explicit prediction-validated robust reference remains unmeasured."
+    },
+    "value": 0.23452800763635281,
+    "label": "pruned",
+    "snapshot": "pruned"
+  },
+  "baseline_full": 0.2555203956955264,
+  "final_test": 0.24273501244770118,
+  "local_score": 4.7142857142857135,
+  "local_decision": "Reject",
+  "claims": 17,
+  "roles": 26,
+  "protected_hashes": {
+    "eval.py": "8f2c757b33da56282dbdc0b8d6bf5935c09a28c3c401361e3fb0ccf5a43218f7",
+    "data.py": "3e6e31ed68e579fb9e502622c6953d09955d74abb4912843d96b1e817a4a4627",
+    "task_spec.json": "1600e1291c70b3c84d765ff4dbe3be0b63b04d1b069b11f4999508262f8ffc14"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/tsae_koopman",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-tsae-v1"
+  ],
+  "seconds": 3275.0587800180074
+}
