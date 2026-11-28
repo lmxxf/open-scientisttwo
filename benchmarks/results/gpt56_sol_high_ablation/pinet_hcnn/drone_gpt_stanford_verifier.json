@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56high-pinet_hcnn/manuscript.pdf",
+  "seconds": 67.44,
+  "numerical_score": 3.2,
+  "fine_weighted_score": 5.12,
+  "positive_count": 2,
+  "neutral_count": 3,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Conditional theoretical results are credible, but central timing and confidence claims conflict with the reported means and stated statistical construction; component-level attribution is incomplete.",
+    "Experimental_Soundness": "Held-out instances, randomized passes, factorial controls, and stress tests are present, but inconsistent statistics, unequal output-cache advantages, unspecified nonlinear baselines, and statistically unresolved subtraction effects are substantial methodological problems.",
+    "Writing_Clarity": "The manuscript is a coherent standalone article with explicit theorems, proofs, pseudocode, tables, and limitations, without internal-log or audit-report clutter.",
+    "Prior_Work_Context": "The bibliography covers major optimization-layer and active-set approaches, but differentiation from the closest methods is mostly qualitative and retrieved first-order differentiation work is omitted.",
+    "Question_Importance": "Efficient, accurate differentiable optimization with hard equality and inequality constraints is an important problem for constrained learning.",
+    "Originality": "The combination is a useful specialization, but nullspace elimination, active-face Newton, QR geometry updates, and retained-factor implicit differentiation are established ingredients without a demonstrated fundamentally new synthesis.",
+    "Value_to_Community": "The clear derivations and specialized implementation could support a useful technical note, but small synthetic workloads and unresolved empirical validity constrain broader value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.5,
+    "Experimental_Soundness": 3.0,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.0,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "The paper proposes a specialized differentiable solver for strongly convex sinusoidally perturbed quadratic objectives with affine equalities and box constraints. It combines nullspace elimination, active-face Newton solves, neighboring-face geometry reuse, and a retained-factor implicit adjoint. The conditional derivative and geometry arguments are sound, but inconsistent timing statistics, dominant exact-output memoization, incomplete subtraction evidence, and underspecified baselines prevent the empirical claims from being established.",
+    "strengths": "The strong-convexity argument, face-tangent characterization, factor-update identity, and stable-face derivative are mathematically coherent under their stated assumptions. The backward formula correctly yields O(dk+k^2) work once the terminal factor is available. The paper includes a useful cache-free factorial comparison, finite-difference gradient checks, randomized timing passes, and explicit limitations concerning stable faces, small dense problems, and object-identity caching. Its presentation is organized as a standalone research article rather than an internal audit log.",
+    "weaknesses": "The timing tables and confidence intervals are internally inconsistent. Headline speedups predominantly measure retrieval of identical solved problems rather than optimization on new inputs. Neighboring-face lookup and rank updates have effects explicitly described as within timing uncertainty, so their necessity is unproven. Only six main synthetic instances and dimensions through 128 are studied. Baseline adaptation to the nonquadratic objective, training configuration, cache correctness, measured memory, and several statistical details are missing. Novelty over established active-set Newton methods and forward-factor reuse remains limited.",
+    "detailed_comments": "1. Mathematical scope: Theorem 1 follows from the Hessian bound on the stated box, Lemma 1 and Proposition 2 follow from nullspace geometry and QR identities, and Theorem 3 is the standard implicit-function calculation on a fixed face. Theorem 2 establishes a conditional local recurrence; it does not establish global convergence of the implemented solver. The manuscript generally states this distinction correctly, but the implementation still labels the output of eight unrestricted Newton steps a face minimizer without a specified failure path. The initialization and active-set iteration caps likewise do not guarantee a feasible initialization or a terminal KKT certificate. Specify how unsuccessful termination is detected and propagated. When active rows are dependent, a least-squares multiplier solution need not expose the existence of a sign-feasible multiplier; the degeneracy handling needs a precise specification.\n2. Timing arithmetic: For identical paired observations and weights, the mean paired difference equals the difference of means. The main table implies savings of 0.82952-0.00660=0.82292 ms and 1.14341-0.00660=1.13681 ms, whereas the paired table reports 0.6821 and 0.9846 ms. Interleaving cannot explain this identity failing. If these are different datasets or estimators, that must be stated and the corresponding means supplied.\n3. Confidence-interval consistency: The reported marginal 95% half-width of 0.4519 ms is incompatible with a 0.00660 ms mean over seven nonnegative pass-level timing observations using the stated Student-t construction. For seven nonnegative observations, the standard error cannot exceed the sample mean, giving a maximum half-width of approximately 2.447*0.00660=0.0162 ms. Different aggregation could change the interpretation, but it is currently undocumented. These discrepancies require correction before interpreting significance claims.\n4. Mechanism attribution: Removing solved-output reuse raises runtime from 0.006179 to 0.879218 ms, while the cache-free exact-nullspace solve takes 1.20796 ms. Thus the headline 125.74x/173.31x comparisons largely evaluate exact-answer lookup. Provide separate cold, changing-q/fixed-geometry, changing-face, and exact-repeat workloads, with equivalent permissible caching for competitors. The cache-free method is not shown to outperform external baselines under a matched protocol.\n5. Subtraction controls: The factorial design usefully separates equality treatment and curvature, but uncertainty and iteration counts are absent. The 8.6% lookup and 4.2% rank-update effects are explicitly within timing uncertainty. Their contribution is therefore unresolved, rather than established by clean subtraction. The removed-cache variants overlap, and removing nullspace reduction while preserving solved-output hits largely masks its computational effect.\n6. Baselines and reproducibility: OSQP directly solves quadratic programs, whereas the proposed objective can be nonquadratic. Specify the nonlinear wrapper, stopping criteria, tuning budget, factorization reuse, and matched accuracy targets. Explain the relationship between the implemented Douglas-Rachford baseline and PiNet rather than implying an implementation-level comparison from a conceptual relationship. Define the objective-reference solver, relative-error denominator, normalized feasibility measure, KKT norm, instance generation, and held-out selection procedure. Training needs architecture, task, data split, optimizer, seeds, and comparison methods.\n7. Resources and complexity: Reporting the pinned ARM core is helpful, but precision, software/BLAS versions, thread settings, measured peak memory, and actual cache occupancy are absent. The stated Newton-step complexity needs to explain how the dense Q contribution to the gradient is precomputed or avoided; otherwise a generic Qy evaluation adds O(d^2). The conservative capped-loop complexity is a runtime bound, not a guarantee of reaching the optimum.\n8. Novelty and presentation: Retrieved OptNet already describes backward computation with virtually no additional cost beyond the forward solve; retrieved Lewis-Wylie establishes the active-manifold/Newton framework, and OSQP already uses factorization caching. The manuscript's own dQP discussion further narrows the novelty boundary. A retained-factor implementation is useful, but no theorem establishes a novel differentiation principle. The retrieved first-order differentiable-layer work is omitted and would contextualize the compute-memory tradeoff. The article has clear theorem/proof and algorithm organization, no internal log filenames, and no duplicate appendix headings. Dense tables and an unusually numerical abstract are minor presentation weaknesses; extraction artifacts alone are not evidence of poor manuscript writing.",
+    "questions": "Can the authors reconcile the paired mean differences and the impossible-looking marginal timing half-width using the exact observations and aggregation definitions? What are matched external-baseline results when q changes every call and solved-output hits are impossible? How is OSQP adapted to the sinusoidal objective? What happens when initialization, Newton, or face-iteration caps are exhausted? How are sign-feasible multipliers handled on dependent active sets? Do paired confidence intervals establish benefits from rank updates and neighboring-face lookup independently? What are measured memory usage, cache hit rates, mutation invalidation rules, training configuration, and multi-seed results? What precise algorithmic advance remains beyond classical reduced-space active-set Newton and forward-factor reuse?",
+    "assessment": "Reject in its current form. The conditional mathematics supports a potentially useful specialized solver, and the manuscript is readable, but central empirical evidence contains unresolved arithmetic and statistical contradictions. Strong performance claims require corrected measurements, fair changing-input comparisons, and independently supported component effects. The present contribution is best characterized as a promising small-scale specialization within established optimization-layer methods."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

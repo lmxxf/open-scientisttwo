@@ -15,7 +15,9 @@ _UNICODE_MATH = {
     '≤':r'\le ','≥':r'\ge ','≠':r'\ne ','≈':r'\approx ','≡':r'\equiv ','∈':r'\in ','∉':r'\notin ',
     '⊂':r'\subset ','⊆':r'\subseteq ','∪':r'\cup ','∩':r'\cap ','→':r'\to ','←':r'\leftarrow ',
     '↔':r'\leftrightarrow ','↦':r'\mapsto ','∞':r'\infty ','∇':r'\nabla ','∂':r'\partial ',
-    '∑':r'\sum ','∏':r'\prod ','√':r'\sqrt ','×':r'\times ','±':r'\pm ','·':r'\cdot ',
+    '∑':r'\sum ','∏':r'\prod ','√':r'\surd ','×':r'\times ','±':r'\pm ','·':r'\cdot ',
+    '‖':r'\| ','∥':r'\| ','⟨':r'\langle ','⟩':r'\rangle ','ℝ':r'\mathbb{R} ','ℤ':r'\mathbb{Z} ','ℕ':r'\mathbb{N} ','𝔼':r'\mathbb{E} ',
+    '□':r'\square ','■':r'\blacksquare ','∎':r'\square ',
     '−':'-','–':'--','—':'---','⁺':'^{+}','⁻':'^{-}','⁎':'^{*}','⋆':r'\star ',
 }
 _UNICODE_ASCII = {k: v.strip().lstrip('\\') for k, v in _UNICODE_MATH.items()}

@@ -1,0 +1,135 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 22
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "2d2336f77f4fde478df5aaba023ff04ec98b476b6640aad62033aa318f82f735",
+      "data.py": "ad854e00e7da8a1e72505d0ab25de62b346374326734914c2187cb0211454064",
+      "task_spec.json": "0ae737dc14372a1691402b3986f5348d1acf48d6e41aef2c6aaa833ca7c9c256"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2503.07649",
+        "title": "TS-RAG: Retrieval-Augmented Generation based Time Series Foundation Models are Stronger Zero-Shot Forecaster",
+        "url": "https://arxiv.org/abs/2503.07649",
+        "authors": "Kanghui Ning, Zijie Pan, Yu Liu, Yushan Jiang et al.",
+        "year": "2025",
+        "abstract": "Large Language Models (LLMs) and Foundation Models (FMs) have recently become prevalent for time series forecasting tasks. While fine-tuning LLMs enables domain adaptation, they often struggle to generalize across diverse and unseen datasets. Moreover, existing Time Series Foundation Models (TSFMs) still face challenges in handling non-stationary dynamics and distribution shifts, largely due to the lack of effective mechanisms for adaptation. To this end, we present TS-RAG, a retrieval-augmented generation framework for time series forecasting that enhances the generalization and interpretability of TSFMs. Specifically, TS-RAG leverages pre-trained time series encoders to retrieve semantically relevant segments from a dedicated knowledge base, enriching the contextual representation of the input query. Furthermore, we propose an Adaptive Retrieval Mixer (ARM) module that dynamically fuse"
+      },
+      {
+        "doi": "10.48550/arXiv.2608.06223",
+        "title": "TS-RAG: Retrieval Augmented Generation for Time Series Forecasting",
+        "url": "https://arxiv.org/abs/2608.06223",
+        "authors": "Yixiong Xiao, Congxi Xiao, Jingbo Zhou",
+        "year": "2026",
+        "abstract": "While deep learning models, particularly transformer-based architectures, have shown impressive performance in time series forecasting, the application of retrieval-augmented generation (RAG) in this domain remains limited. Since RAG has proven effective in enhancing the capabilities of large language models by incorporating relevant external information, retrieving similar time series sequences as references might also improve accuracy in time series forecasting tasks. However, most time series models are constrained by limited training data, smaller parameter scales, and a lack of the extensive generative capabilities found in large language models. Simply concatenating reference sequences into the prompt, as done in language models, may not yield the expected results. To address these challenges, we propose a novel approach, TS-RAG, which leverages RAG to enhance forecasting performan"
+      },
+      {
+        "doi": "10.48550/arXiv.2606.14941",
+        "title": "Semantics-Enhanced Retrieval-Augmented Time Series Forecasting",
+        "url": "https://arxiv.org/abs/2606.14941",
+        "authors": "Shiqiao Zhou, Zipeng Wu, Holger Sch\u00f6ner, Edouard Fouch\u00e9 et al.",
+        "year": "2026",
+        "abstract": "Time series forecasting models often benefit from historical patterns. Inspired by Retrieval-Augmented Generation (RAG), recent research explored retrieving relevant historical time series segments to enhance forecasting. However, relying solely on time series similarity is often insufficient for retrieval under non-stationarity. To address this, we propose a multimodal approach: a \\textbf{S}emantics-\\textbf{E}nhanced \\textbf{R}etrieval-\\textbf{A}ugmented Time Series \\textbf{F}orecasting framework, SERAF. Unlike mainstream approaches that depend only on time series similarity, SERAF conducts dual retrieval over the time series and their self-generated textual descriptions. It retrieves two complementary sets of historical patterns and corresponding futures, which are selectively and jointly used to guide future predictions. Experiments across seven real-world datasets demonstrate the eff"
+      },
+      {
+        "doi": "10.48550/arXiv.2207.10517",
+        "title": "MQRetNN: Multi-Horizon Time Series Forecasting with Retrieval Augmentation",
+        "url": "https://arxiv.org/abs/2207.10517",
+        "authors": "Sitan Yang, Carson Eisenach, Dhruv Madeka",
+        "year": "2022",
+        "abstract": "Multi-horizon probabilistic time series forecasting has wide applicability to real-world tasks such as demand forecasting. Recent work in neural time-series forecasting mainly focus on the use of Seq2Seq architectures. For example, MQTransformer - an improvement of MQCNN - has shown the state-of-the-art performance in probabilistic demand forecasting. In this paper, we consider incorporating cross-entity information to enhance model performance by adding a cross-entity attention mechanism along with a retrieval mechanism to select which entities to attend over. We demonstrate how our new neural architecture, MQRetNN, leverages the encoded contexts from a pretrained baseline model on the entire population to improve forecasting accuracy. Using MQCNN as the baseline model (due to computational constraints, we do not use MQTransformer), we first show on a small demand forecasting dataset th"
+      },
+      {
+        "doi": "10.48550/arXiv.2211.14730",
+        "title": "A Time Series is Worth 64 Words: Long-term Forecasting with Transformers",
+        "url": "https://arxiv.org/abs/2211.14730",
+        "authors": "Yuqi Nie, Nam H. Nguyen, Phanwadee Sinthong, Jayant Kalagnanam",
+        "year": "2022",
+        "abstract": "We propose an efficient design of Transformer-based models for multivariate time series forecasting and self-supervised representation learning. It is based on two key components: (i) segmentation of time series into subseries-level patches which are served as input tokens to Transformer; (ii) channel-independence where each channel contains a single univariate time series that shares the same embedding and Transformer weights across all the series. Patching design naturally has three-fold benefit: local semantic information is retained in the embedding; computation and memory usage of the attention maps are quadratically reduced given the same look-back window; and the model can attend longer history. Our channel-independent patch time series Transformer (PatchTST) can improve the long-term forecasting accuracy significantly when compared with that of SOTA Transformer-based models. We a"
+      },
+      {
+        "doi": "10.48550/arXiv.2210.02186",
+        "title": "TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis",
+        "url": "https://arxiv.org/abs/2210.02186",
+        "authors": "Haixu Wu, Tengge Hu, Yong Liu, Hang Zhou et al.",
+        "year": "2022",
+        "abstract": "Time series analysis is of immense importance in extensive applications, such as weather forecasting, anomaly detection, and action recognition. This paper focuses on temporal variation modeling, which is the common key problem of extensive analysis tasks. Previous methods attempt to accomplish this directly from the 1D time series, which is extremely challenging due to the intricate temporal patterns. Based on the observation of multi-periodicity in time series, we ravel out the complex temporal variations into the multiple intraperiod- and interperiod-variations. To tackle the limitations of 1D time series in representation capability, we extend the analysis of temporal variations into the 2D space by transforming the 1D time series into a set of 2D tensors based on multiple periods. This transformation can embed the intraperiod- and interperiod-variations into the columns and rows of "
+      },
+      {
+        "doi": "10.48550/arXiv.2310.06625",
+        "title": "iTransformer: Inverted Transformers Are Effective for Time Series Forecasting",
+        "url": "https://arxiv.org/abs/2310.06625",
+        "authors": "Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu et al.",
+        "year": "2023",
+        "abstract": "The recent boom of linear forecasting models questions the ongoing passion for architectural modifications of Transformer-based forecasters. These forecasters leverage Transformers to model the global dependencies over temporal tokens of time series, with each token formed by multiple variates of the same timestamp. However, Transformers are challenged in forecasting series with larger lookback windows due to performance degradation and computation explosion. Besides, the embedding for each temporal token fuses multiple variates that represent potential delayed events and distinct physical measurements, which may fail in learning variate-centric representations and result in meaningless attention maps. In this work, we reflect on the competent duties of Transformer components and repurpose the Transformer architecture without any modification to the basic components. We propose iTransfor"
+      },
+      {
+        "doi": "10.48550/arXiv.2205.13504",
+        "title": "Are Transformers Effective for Time Series Forecasting?",
+        "url": "https://arxiv.org/abs/2205.13504",
+        "authors": "Ailing Zeng, Muxi Chen, Lei Zhang, Qiang Xu",
+        "year": "2022",
+        "abstract": "Recently, there has been a surge of Transformer-based solutions for the long-term time series forecasting (LTSF) task. Despite the growing performance over the past few years, we question the validity of this line of research in this work. Specifically, Transformers is arguably the most successful solution to extract the semantic correlations among the elements in a long sequence. However, in time series modeling, we are to extract the temporal relations in an ordered set of continuous points. While employing positional encoding and using tokens to embed sub-series in Transformers facilitate preserving some ordering information, the nature of the \\emph{permutation-invariant} self-attention mechanism inevitably results in temporal information loss. To validate our claim, we introduce a set of embarrassingly simple one-layer linear models named LTSF-Linear for comparison. Experimental resu"
+      },
+      {
+        "doi": "10.48550/arXiv.2103.14200",
+        "title": "Applying k-nearest neighbors to time series forecasting : two new approaches",
+        "url": "https://arxiv.org/abs/2103.14200",
+        "authors": "Samya Tajmouati, Bouazza El Wahbi, Adel Bedoui, Abdallah Abarda et al.",
+        "year": "2021",
+        "abstract": "K-nearest neighbors algorithm is one of the prominent techniques used in classification and regression. Despite its simplicity, the k-nearest neighbors has been successfully applied in time series forecasting. However, the selection of the number of neighbors and feature selection is a daunting task. In this paper, we introduce two methodologies to forecasting time series that we refer to as Classical Parameters Tuning in Weighted Nearest Neighbors and Fast Parameters Tuning in Weighted Nearest Neighbors. The first approach uses classical parameters tuning that compares the most recent subsequence with every possible subsequence from the past of the same length. The second approach reduces the neighbors' search set, which leads to significantly reduced grid size and hence a lower computational time. To tune the models' parameters, both methods implement an approach inspired by cross-vali"
+      },
+      {
+        "doi": "10.48550/arXiv.2502.15900",
+        "title": "Explaining the Success of Nearest Neighbor Methods in Prediction",
+        "url": "https://arxiv.org/abs/2502.15900",
+        "authors": "George H. Chen, Devavrat Shah",
+        "year": "2025",
+        "abstract": "Many modern methods for prediction leverage nearest neighbor search to find past training examples most similar to a test example, an idea that dates back in text to at least the 11th century and has stood the test of time. This monograph aims to explain the success of these methods, both in theory, for which we cover foundational nonasymptotic statistical guarantees on nearest-neighbor-based regression and classification, and in practice, for which we gather prominent methods for approximate nearest neighbor search that have been essential to scaling prediction systems reliant on nearest neighbor analysis to handle massive datasets. Furthermore, we discuss connections to learning distances for use with nearest neighbor methods, including how random decision trees and ensemble methods learn nearest neighbor structure, as well as recent developments in crowdsourcing and graphons. In terms"
+      },
+      {
+        "doi": "10.48550/arXiv.2609.03937",
+        "title": "RATL: Learning from Retrieved Residuals for Robust Multivariate Time-Series Forecasting",
+        "url": "https://arxiv.org/abs/2609.03937",
+        "authors": "Yuchen He, Yueyang Cang, Zhiyuan Ning, Ningyu Wang et al.",
+        "year": "2026",
+        "abstract": "Retrieval-augmented generation (RAG) complements parametric models with retrieved external evidence. The same idea is attractive for continuous-output regression, but directly reusing retrieved target values is often not robust when samples differ in output level, numerical scale, or local dynamics. Moreover, conventional forecasting pipelines generally use residuals for model optimization and error diagnosis, but do not retain individual historical residual examples as memory that can be accessed at inference time.For multivariate time-series forecasting, we propose RATL, a plug-in residual-retrieval and feedback-correction method. RATL freezes a base forecaster to construct retrieval keys and turns its historical forecast residuals into a train-only memory specific to that base model. At inference time, RATL retrieves residual trajectories from similar historical contexts subject to ca"
+      },
+      {
+        "doi": "10.48550/arXiv.2608.06748",
+        "title": "KReF: Training-Free Retrieval for Long-Term Time-Series Forecasting and Predictive Uncertainty",
+        "url": "https://arxiv.org/abs/2608.06748",
+        "authors": "Yang Zhang, Rui Su",
+        "year": "2026",
+        "abstract": "Probabilistic long-term time-series forecasting commonly relies on trained models. Training-free conformal methods typically construct intervals around a pre-existing point forecaster and do not natively represent a complete predictive distribution; sequential variants additionally suffer from increasingly delayed feedback at long horizons. We propose KReF, a training-free retrieval framework that treats retrieved historical futures as a querylocal empirical predictive distribution. After robust preprocessing, KReF embeds each lookback using handcrafted statistics or frozen random Fourier features and retrieves similar historical lookback-future pairs. Their similarity weights directly define predictive masses, quantiles, CRPS, and a weighted-mean point forecast. KReF further uses the observed query lookback to construct a probability-integral-transform map and applies validation-selecte"
+      },
+      {
+        "doi": "10.48550/arXiv.2410.11674",
+        "title": "LLM-Mixer: Multiscale Mixing in LLMs for Time Series Forecasting",
+        "url": "https://arxiv.org/abs/2410.11674",
+        "authors": "Md Kowsher, Md. Shohanur Islam Sobuj, Nusrat Jahan Prottasha, E. Alejandro Alanis et al.",
+        "year": "2024",
+        "abstract": "Time series forecasting remains a challenging task, particularly in the context of complex multiscale temporal patterns. This study presents LLM-Mixer, a framework that improves forecasting accuracy through the combination of multiscale time-series decomposition with pre-trained LLMs (Large Language Models). LLM-Mixer captures both short-term fluctuations and long-term trends by decomposing the data into multiple temporal resolutions and processing them with a frozen LLM, guided by a textual prompt specifically designed for time-series data. Extensive experiments conducted on multivariate and univariate datasets demonstrate that LLM-Mixer achieves competitive performance, outperforming recent state-of-the-art models across various forecasting horizons. This work highlights the potential of combining multiscale analysis and LLMs for effective and scalable time-series forecasting."
+      },
+      {
+        "doi": "10.48550/arXiv.2502.19086",
+        "title": "Forecasting intermittent time series with Gaussian Processes and Tweedie likelihood",
+        "url": "https://arxiv.org/abs/2502.19086",
+        "authors": "Stefano Damato, Dario Azzimonti, Giorgio Corani",
+        "year": "2025",
+        "abstract": "We adopt Gaussian Processes (GPs) as latent functions for probabilistic forecasting of intermittent time series. The model is trained in a Bayesian framework that accounts for the uncertainty about the latent function. We couple the latent GP variable with two types of forecast distributions: the negative binomial (NegBinGP) and the Tweedie distribution (TweedieGP). While the negative binomial has already been used in forecasting intermittent time series, this is the first time in which a fully parameterized Tweedie density is used for intermittent time series. We properly evaluate the Tweedie density, which has both a point mass at zero and heavy tails, avoiding simplifying assumptions made in existing models. We test our models on thousands of intermittent count time series. Results show that our models provide consistently better probabilistic forecasts than the competitors. In partic"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The manuscript matches the executed path under snapshots/pruned/config.json: stability-aware SVD ridge is active; GCV uses base lambda 0.008 plus 17 factors from 0.05 to 0.6; the stated ridge objective, SVD solution, GCV score, retrieval residual, reconstruction error, and confidence gate match model.py. Default-active mechanisms are also accurately described: threshold-8 four-neighbor despiking; blocked prequential selection among linear, quadratic, and one-knot trends; width-5 causal selection smoothing; four Huber-IRLS updates with epsilon 1e-10; slope/curvature damping 0.85/0.5; RMS residual normalization; 0.7/0.3 temporal-spectral retrieval; shortlist 32; shifts -12 through 12 with strength 0.2; top 12 prototypes; five-mode Fourier continuation; and finite-output fallback. influence_pruning=false bypasses condition-number/collinearity pruning, and weight_constraint=false bypasses affine/negative-weight constraints; the manuscript makes no claim that either inactive mechanism is used. The remaining related config keys are therefore inactive metadata and create no alignment failure."
+  }
+}

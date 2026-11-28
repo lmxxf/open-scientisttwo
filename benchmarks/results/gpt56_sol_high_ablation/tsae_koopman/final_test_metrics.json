@@ -1,0 +1,87 @@
+{
+  "mse": 0.23792883524278574,
+  "clean_recon_mse": 0.005913479279615494,
+  "feature_support_f1": 0.34144657490237273,
+  "koopman_rollout_mse": 0.0060866287160028145,
+  "dictionary_mean_max_cosine": 0.7317225019724294,
+  "mean_active_l0": 5.0,
+  "sparsity_violation": 0.0,
+  "baselines": {
+    "framewise_ista_2309_08600": {
+      "mse": 0.266965,
+      "clean_recon_mse": 0.008729,
+      "feature_support_f1": 0.2789,
+      "koopman_rollout_mse": 0.009027,
+      "paired_improvement_mean": 0.029036,
+      "paired_improvement_t95_ci": 0.014179
+    },
+    "topk_sae_2406_04093": {
+      "mse": 0.273056,
+      "clean_recon_mse": 0.014012,
+      "feature_support_f1": 0.2715,
+      "koopman_rollout_mse": 0.016321,
+      "paired_improvement_mean": 0.035128,
+      "paired_improvement_t95_ci": 0.012871
+    },
+    "laplacian_tsae_2511_05541": {
+      "mse": 0.302188,
+      "clean_recon_mse": 0.007927,
+      "feature_support_f1": 0.3125,
+      "koopman_rollout_mse": 0.008343,
+      "paired_improvement_mean": 0.06426,
+      "paired_improvement_t95_ci": 0.026372
+    }
+  },
+  "runtime_ms": 1372.3413,
+  "traced_memory_bytes": {
+    "current_bytes": 1349705,
+    "peak_bytes": 2665477
+  },
+  "environment_metadata": {
+    "python": "3.12.3",
+    "platform": "Linux-6.17.0-1014-nvidia-aarch64-with-glibc2.39",
+    "machine": "aarch64",
+    "cpu": "ARM Cortex-X925 (3.90 GHz, pinned single core)"
+  },
+  "num_sequences": 8,
+  "d_in": 32,
+  "m_dict": 64,
+  "k_active": 5,
+  "mode": "full",
+  "split": "test",
+  "extra": false,
+  "factorial_and_scaling": {
+    "factorial_2x2_study": {
+      "full_selected": {
+        "composite_mse": 0.237929,
+        "clean_recon_mse": 0.005913,
+        "feature_support_f1": 0.3414,
+        "koopman_rollout_mse": 0.006087
+      },
+      "laplacian_on_koopman_on_dict_off": {
+        "composite_mse": 0.255928,
+        "clean_recon_mse": 0.010977,
+        "feature_support_f1": 0.3069,
+        "koopman_rollout_mse": 0.009487
+      },
+      "laplacian_on_koopman_off_dict_off": {
+        "composite_mse": 0.255789,
+        "clean_recon_mse": 0.010923,
+        "feature_support_f1": 0.3072,
+        "koopman_rollout_mse": 0.009504
+      },
+      "laplacian_off_koopman_on_dict_off": {
+        "composite_mse": 0.270896,
+        "clean_recon_mse": 0.011708,
+        "feature_support_f1": 0.2668,
+        "koopman_rollout_mse": 0.010266
+      },
+      "laplacian_off_koopman_off_dict_off": {
+        "composite_mse": 0.274162,
+        "clean_recon_mse": 0.012747,
+        "feature_support_f1": 0.2627,
+        "koopman_rollout_mse": 0.013382
+      }
+    }
+  }
+}

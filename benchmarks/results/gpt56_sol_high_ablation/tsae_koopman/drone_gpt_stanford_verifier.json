@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56high-tsae_koopman/manuscript.pdf",
+  "seconds": 73.31,
+  "numerical_score": 5.5,
+  "fine_weighted_score": 5.71,
+  "positive_count": 2,
+  "neutral_count": 5,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The main subproblem results hold, but exact-Lipschitz wording is too strong and central mechanism claims exceed the resolution of the subtraction evidence.",
+    "Experimental_Soundness": "A careful local prototype includes paired comparisons, independent data generation, factorial controls, and subtractions, but lacks independent full-pipeline replications, resolved component effects, strong matched baselines, and meaningful width scaling.",
+    "Writing_Clarity": "The paper is organized as a standalone academic article with explicit theorems, pseudocode, tables, and limitations, without audit-log clutter.",
+    "Prior_Work_Context": "The bibliography and comparison table provide adequate context, but formal differentiation from the closest temporal and sparse-Koopman methods remains incomplete.",
+    "Question_Importance": "Stable sparse representations that preserve genuine temporal transitions address an important problem for representation learning and interpretability.",
+    "Originality": "Using innovations to coordinate dynamics fitting and support persistence is a plausible synthesis, but its ingredients and proved properties largely specialize established techniques.",
+    "Value_to_Community": "The formulation and controlled findings could support a useful technical note, but small scale, computational cost, and unresolved mechanism attribution limit broader value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 5.0,
+    "Experimental_Soundness": 4.5,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.0,
+    "Question_Importance": 7.5,
+    "Originality": 5.5,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "The paper combines nonnegative Top-k sparse coding, predictive graph regularization, temporal Laplacian smoothing, learned linear latent dynamics, innovation-gated support consensus, and dictionary refinement. Several subproblem guarantees are correct, and small synthetic experiments report consistent aggregate improvements. However, the evidence does not establish that the distinctive innovation-gating mechanism provides a meaningful, reproducible advantage beyond dictionary refinement and conventional smoothing.",
+    "strengths": "The manuscript provides explicit objectives, hyperparameters, pseudocode, complexity bounds, paired comparator intervals, and candid limitations. The graph-Laplacian PSD argument, temporal spectral attenuation theorem, ridge-estimator uniqueness result, support-coordinate minimization argument, and fixed-support reconstruction descent result are substantially sound. An independently generated evaluation suite and a temporal factorial study improve on a single benchmark comparison. The paper explicitly acknowledges transductive fitting, limited scale, and substantial computational overhead.",
+    "weaknesses": "The experiments remain extremely small: eight trajectories per suite, 32 observation dimensions, and 64 atoms. The headline components contribute only 0.000041\u20130.000262 composite-loss improvements in subtraction experiments, without uncertainty intervals. The larger integrated improvement bundles dictionary, graph, support, and amplitude changes. Evaluation is transductive, comparator tuning and compute matching are insufficiently specified, hardware and numerical precision are absent, and no real representation-learning application is demonstrated. Most mathematical guarantees are standard properties of constituent operations rather than a new guarantee for their coupling.",
+    "detailed_comments": "1. Mathematical scope: Theorem 1 and Theorem 2 correctly establish their respective convex subproblem solutions. Proposition 2 correctly establishes coordinatewise support-energy descent with fixed gates and unary scores. These results do not establish descent of the complete alternating algorithm or recovery of the generating supports; the limitations appropriately acknowledge this distinction.\n2. Smooth-step claim: Section 1 calls the stated Lipschitz quantity exact. Proposition 1 proves a valid upper bound. The exact constant is the largest eigenvalue of D^T D + 2 mu_g L, which need not equal the sum of the two individual spectral norms. The introductory claim should be weakened.\n3. Nonnegative Koopman updates: The displayed unconstrained block solution is consistent with the quadratic objective, but clipping that solution is generally not the constrained quadratic minimizer when its Hessian is non-diagonal. Consequently, the clipped sweeps should be described as a heuristic approximation unless a suitable metric projection or constrained solver is supplied. No monotonicity guarantee for these sweeps follows from the presented derivation.\n4. Splitting interpretation: Applying a finite accelerated sparse stage, separate temporal proximal operations, projection, consensus, and reconstruction-only debiasing does not by itself solve the displayed joint objective J. Explain the relationship between J and the implemented composition, including which stages optimize separate objectives.\n5. Exact cardinality: The proof guarantees exactly k selected mask coordinates and at most k nonzero amplitudes. It does not guarantee exactly k positive activations after clipping or debiasing. Statements about exact observed activity can be empirical findings, but must remain distinct from the theorem.\n6. Mechanism attribution: Removing innovation gating changes loss by only 0.000042; removing transition weighting changes it by about 0.000041. Both removals slightly improve reconstruction and rollout in the reported table. Their tiny composite advantages therefore do not establish the claimed transition-prediction benefit. Report paired intervals, transition-boundary metrics, and independent-dictionary replications. Also clarify whether disabling the gate changes consensus weights alone or simultaneously changes dynamics fitting; otherwise the gate and weighting subtractions overlap.\n7. Factorial evidence: On the independent suite, combining Koopman inference with Laplacian smoothing slightly worsens loss relative to Laplacian smoothing alone: 0.255928 versus 0.255789. This does not invalidate the complete method, but it does not support a robust positive interaction between these temporal mechanisms. The integrated gain bundles several changes and leaves its dominant cause unresolved.\n8. Statistical design: The paired t-interval formula and reported interval arithmetic are consistent. Nevertheless, eight trajectories jointly processed through shared dictionary and dynamics fitting are not automatically independent experimental replications. The paper needs independent full-pipeline runs over generating dictionaries, initialization seeds, and trajectory sets. Comparator intervals cannot establish significance of component subtractions, and no randomized comparison protocol is documented.\n9. Evaluation fairness: Independently generated data unused for selection provide useful replication, but target observations participate in fitting, so this is not frozen-model held-out generalization. Compare all methods under identical transductive access, dictionary initialization, tuning budgets, cardinality constraints, and iteration or runtime budgets. Report each composite-score component, including sparsity violation, for every baseline: unequal cardinality penalties can materially affect headline composite improvements.\n10. Scale and resources: Length 24\u201396 and sparsity 3\u20137 are local sensitivity checks, not evidence of scaling to contemporary SAEs. The approximately 275-fold slowdown is material. CPU/GPU model, thread count, software stack, floating-point precision, timing repetitions, and the coverage of peak traced memory are needed. Traced memory alone does not establish total process or accelerator memory usage.\n11. Prior work: The supplied literature supports the relevance of framewise SAEs, dictionary learning, and learned Koopman embeddings. The manuscript discusses additional temporal and sparse-Koopman papers whose contents are not included in the supplied retrieval, so their claimed distinctions cannot be independently verified here. The retrieved SPIKE work also combines learned Koopman dynamics with sparsity in another setting; it warrants positioning, although its abstract does not establish anticipation of gated support consensus. The comparison table provides useful categorical distinctions but not a formal novelty separation from the closest temporal sparse-coding approaches.\n12. Presentation: The manuscript is a coherent standalone article with theorems, algorithms, tables, and limitations. It does not contain internal log filenames, duplicate appendix headings, or audit-report clutter. Extracted mathematical and table formatting is imperfect, but the supplied text alone does not establish a corresponding defect in the PDF.",
+    "questions": "Can the innovation gate and transition weighting show significant benefits across independently generated dictionaries, particularly at regime boundaries? What changes when the dictionary is fixed and each graph, consensus, gate, and dynamics component is independently removed? Does the method outperform an equally tuned Laplacian-plus-dictionary-refinement baseline under equal compute and cardinality? Can the authors provide frozen-model evaluation, exact latent-alignment and rollout definitions, baseline sparsity violations, random-seed details, and complete hardware/precision reporting? Can they replace clipped Koopman block updates with correct constrained updates or explicitly delimit their heuristic status?",
+    "assessment": "I lean reject. The paper is technically organized and contains useful local derivations, but the distinctive coupling lacks convincing isolated empirical support. The current evidence supports a small synthetic, transductive sparse-coding prototype rather than a broadly validated advance in temporal SAE learning. Stronger independent replications, matched baselines, statistically resolved subtraction studies, and clearer novelty boundaries would materially change this assessment."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

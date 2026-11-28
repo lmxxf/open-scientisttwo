@@ -1,0 +1,66 @@
+{
+  "success": true,
+  "best": {
+    "config": {
+      "name": "tangent_normal_frontier_emitters",
+      "frontier_estimator": "kNN local PCA plus one-sidedness test",
+      "k": 32,
+      "intrinsic_dimension_energy": 0.95,
+      "normal_emitter_fraction": 0.6,
+      "tangent_emitter_fraction": 0.0,
+      "normal_step_scale": 1.5,
+      "tangent_step_scale": 0.5,
+      "novelty": "density-normalized outward displacement",
+      "quality_constraint": "candidate quality above local soft threshold",
+      "ablation": [
+        "ordinary kNN novelty",
+        "normal-only emitter",
+        "tangent-only emitter",
+        "no density normalization"
+      ],
+      "frontier_density_normalization": false,
+      "frontier_local_pca": false,
+      "frontier_boundary_guidance": true,
+      "cma_covariance_adaptation": true,
+      "archive_threshold_annealing": true,
+      "local_surrogate_refinement": false,
+      "dimension_adaptive_smoothing": true
+    },
+    "value": 0.22570207937832712,
+    "label": "pruned_r2",
+    "snapshot": "pruned_r2"
+  },
+  "baseline_full": 0.7121110138086076,
+  "final_test": 0.21532067948978492,
+  "local_score": 4.857142857142857,
+  "local_decision": "Reject",
+  "claims": 29,
+  "roles": 30,
+  "protected_hashes": {
+    "eval.py": "02ddf46a4861b8169ce4b9804f5b38ced0c7d64f91119afce5e92f3754953e72",
+    "data.py": "d14aeb519b860e140dc6677adb66fd97eff55748a3551c537aa75d10e411cd82",
+    "task_spec.json": "957080d474b3ea03adb0fc22e9ff18a216f8e974456bca6f14c9d2be674d790f"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/dmsqd_cma",
+    "--model",
+    "gpt-5.6-sol",
+    "--reasoning-effort",
+    "high",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "900",
+    "--output",
+    "/tmp/st-gpt56high-dmsqd_cma"
+  ],
+  "seconds": 4930.373429190135
+}

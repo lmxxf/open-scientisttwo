@@ -1,0 +1,80 @@
+{
+  "success": true,
+  "best": {
+    "label": "evolved0",
+    "snapshot": "evolved0_full",
+    "config": {
+      "name": "innovation_gated_support_consensus",
+      "base": "adaptive_predictive_feature_graph",
+      "dictionary_refinement": true,
+      "adaptive_feature_graph": true,
+      "koopman_dynamical_prior": true,
+      "temporal_laplacian_smoothing": true,
+      "topk_support_projection": true,
+      "fista_momentum": true,
+      "support_consensus": true,
+      "support_state": "binary indicator of the framewise nonnegative Top-K code",
+      "support_objective": "sum_t unary_t(s_t)+lambda_switch*sum_t g_t*||s_t-s_{t-1}||_1 subject to ||s_t||_0=k",
+      "unary_score": "negative standardized pre-projection FISTA amplitudes plus graph-neighbor activation evidence",
+      "solver": "three alternating forward/backward Top-K sweeps followed by amplitude-only projected-gradient debiasing on the selected supports",
+      "consensus_sweeps": 3,
+      "support_switch_weight": 0.12,
+      "innovation_gate": "g_t=clip(exp(-0.5*(r_t/tau)^2),g_min,1), with r_t=||z_t-z_{t-1}K_est^T||_2 divided by the median nonzero code norm",
+      "innovation_tau": 1.5,
+      "innovation_gate_min": 0.05,
+      "stop_gradient_through_innovation_gate": true,
+      "weighted_koopman_fit": true,
+      "koopman_transition_weight": "same g_t used in ridge cross-covariance",
+      "amplitude_debias_iterations": 6,
+      "amplitude_debias_l1": 0.0,
+      "losses": {
+        "reconstruction": 1.0,
+        "sparsity": 0.01,
+        "weighted_temporal_support_switching": 0.12,
+        "koopman_prediction": 0.2,
+        "graph_code_smoothness": 0.035,
+        "graph_dictionary_smoothness": 0.002
+      },
+      "ablation_toggles": {
+        "support_consensus": true,
+        "innovation_gating": true,
+        "weighted_koopman_fit": true,
+        "amplitude_debias": true
+      }
+    },
+    "value": 0.21905073467253727
+  },
+  "baseline_full": 0.2555203956955264,
+  "final_test": 0.23792883524278574,
+  "local_score": 4.571428571428571,
+  "local_decision": "Reject",
+  "claims": 16,
+  "roles": 27,
+  "protected_hashes": {
+    "eval.py": "8f2c757b33da56282dbdc0b8d6bf5935c09a28c3c401361e3fb0ccf5a43218f7",
+    "data.py": "3e6e31ed68e579fb9e502622c6953d09955d74abb4912843d96b1e817a4a4627",
+    "task_spec.json": "4a9adc541227be43896bf58915a2436c749a6adcd23fb4cacc1855ee6a0ac69d"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/tsae_koopman",
+    "--model",
+    "gpt-5.6-sol",
+    "--reasoning-effort",
+    "high",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "900",
+    "--output",
+    "/tmp/st-gpt56high-tsae_koopman"
+  ],
+  "seconds": 3664.0352357290685
+}

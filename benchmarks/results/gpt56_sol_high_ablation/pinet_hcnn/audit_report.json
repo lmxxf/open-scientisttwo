@@ -1,0 +1,111 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 16
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "26ff903857778b3c726b9de2de175a86826cb790fe18068bf43ad6c1442802bc",
+      "data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+      "task_spec.json": "36b47c9e507bf856a39c746ae5da8f3b042c0550f53620597a0d0700eee32090"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2508.10480",
+        "title": "Pinet: Optimizing hard-constrained neural networks with orthogonal projection layers",
+        "url": "https://arxiv.org/abs/2508.10480",
+        "authors": "Panagiotis D. Grontas, Antonio Terpin, Efe C. Balta, Raffaello D'Andrea et al.",
+        "year": "2025",
+        "abstract": "We introduce an output layer for neural networks that ensures satisfaction of convex constraints. Our approach, $Π$net, leverages operator splitting for rapid and reliable projections in the forward pass, and the implicit function theorem for backpropagation. We deploy $Π$net as a feasible-by-design optimization proxy for parametric constrained optimization problems and obtain modest-accuracy solutions faster than traditional solvers when solving a single problem, and significantly faster for a batch of problems. We surpass state-of-the-art learning approaches by orders of magnitude in terms of training time, solution quality, and robustness to hyperparameter tuning, while maintaining similar inference times. Finally, we tackle multi-vehicle motion planning with non-convex trajectory preferences and provide $Π$net as a GPU-ready package implemented in JAX."
+      },
+      {
+        "doi": "10.48550/arXiv.2410.06324",
+        "title": "Differentiation Through Black-Box Quadratic Programming Solvers",
+        "url": "https://arxiv.org/abs/2410.06324",
+        "authors": "Connor W. Magoon, Fengyu Yang, Noam Aigerman, Shahar Z. Kovalsky",
+        "year": "2024",
+        "abstract": "Differentiable optimization has attracted significant research interest, particularly for quadratic programming (QP). Existing approaches for differentiating the solution of a QP with respect to its defining parameters often rely on specific integrated solvers. This integration limits their applicability, including their use in neural network architectures and bi-level optimization tasks, restricting users to a narrow selection of solver choices. To address this limitation, we introduce dQP, a modular and solver-agnostic framework for plug-and-play differentiation of virtually any QP solver. A key insight we leverage to achieve modularity is that, once the active set of inequality constraints is known, both the solution and its derivative can be expressed using simplified linear systems that share the same matrix. This formulation fully decouples the computation of the QP solution from i"
+      },
+      {
+        "doi": "10.48550/arXiv.1902.00724",
+        "title": "Active-set Newton methods and partial smoothness",
+        "url": "https://arxiv.org/abs/1902.00724",
+        "authors": "Adrian S. Lewis, Calvin Wylie",
+        "year": "2019",
+        "abstract": "Diverse optimization algorithms correctly identify, in finite time, intrinsic constraints that must be active at optimality. Analogous behavior extends beyond optimization to systems involving partly smooth operators, and in particular to variational inequalities over partly smooth sets. As in classical nonlinear programming, such active-set structure underlies the design of accelerated local algorithms of Newton type. We formalize this idea in broad generality as a simple linearization scheme for two intersecting manifolds."
+      },
+      {
+        "doi": "10.48550/arXiv.2212.02748",
+        "title": "An Online Newton's Method for Time-varying Linear Equality Constraints",
+        "url": "https://arxiv.org/abs/2212.02748",
+        "authors": "Jean-Luc Lupien, Antoine Lesage-Landry",
+        "year": "2022",
+        "abstract": "We consider online optimization problems with time-varying linear equality constraints. In this framework, an agent makes sequential decisions using only prior information. At every round, the agent suffers an environment-determined loss and must satisfy time-varying constraints. Both the loss functions and the constraints can be chosen adversarially. We propose the Online Projected Equality-constrained Newton Method (OPEN-M) to tackle this family of problems. We obtain sublinear dynamic regret and constraint violation bounds for OPEN-M under mild conditions. Namely, smoothness of the loss function and boundedness of the inverse Hessian at the optimum are required, but not convexity. Finally, we show OPEN-M outperforms state-of-the-art online constrained optimization algorithms in a numerical network flow application."
+      },
+      {
+        "doi": "10.48550/arXiv.2104.12225",
+        "title": "DC3: A learning method for optimization with hard constraints",
+        "url": "https://arxiv.org/abs/2104.12225",
+        "authors": "Priya L. Donti, David Rolnick, J. Zico Kolter",
+        "year": "2021",
+        "abstract": "Large optimization problems with hard constraints arise in many settings, yet classical solvers are often prohibitively slow, motivating the use of deep networks as cheap \"approximate solvers.\" Unfortunately, naive deep learning approaches typically cannot enforce the hard constraints of such problems, leading to infeasible solutions. In this work, we present Deep Constraint Completion and Correction (DC3), an algorithm to address this challenge. Specifically, this method enforces feasibility via a differentiable procedure, which implicitly completes partial solutions to satisfy equality constraints and unrolls gradient-based corrections to satisfy inequality constraints. We demonstrate the effectiveness of DC3 in both synthetic optimization tasks and the real-world setting of AC optimal power flow, where hard constraints encode the physics of the electrical grid. In both cases, DC3 achi"
+      },
+      {
+        "doi": "10.48550/arXiv.1703.00443",
+        "title": "OptNet: Differentiable Optimization as a Layer in Neural Networks",
+        "url": "https://arxiv.org/abs/1703.00443",
+        "authors": "Brandon Amos, J. Zico Kolter",
+        "year": "2017",
+        "abstract": "This paper presents OptNet, a network architecture that integrates optimization problems (here, specifically in the form of quadratic programs) as individual layers in larger end-to-end trainable deep networks. These layers encode constraints and complex dependencies between the hidden states that traditional convolutional and fully-connected layers often cannot capture. We explore the foundations for such an architecture: we show how techniques from sensitivity analysis, bilevel optimization, and implicit differentiation can be used to exactly differentiate through these layers and with respect to layer parameters; we develop a highly efficient solver for these layers that exploits fast GPU-based batch solves within a primal-dual interior point method, and which provides backpropagation gradients with virtually no additional cost on top of the solve; and we highlight the application of "
+      },
+      {
+        "doi": "10.48550/arXiv.1910.12430",
+        "title": "Differentiable Convex Optimization Layers",
+        "url": "https://arxiv.org/abs/1910.12430",
+        "authors": "Akshay Agrawal, Brandon Amos, Shane Barratt, Stephen Boyd et al.",
+        "year": "2019",
+        "abstract": "Recent work has shown how to embed differentiable optimization problems (that is, problems whose solutions can be backpropagated through) as layers within deep learning architectures. This method provides a useful inductive bias for certain problems, but existing software for differentiable optimization layers is rigid and difficult to apply to new settings. In this paper, we propose an approach to differentiating through disciplined convex programs, a subclass of convex optimization problems used by domain-specific languages (DSLs) for convex optimization. We introduce disciplined parametrized programming, a subset of disciplined convex programming, and we show that every disciplined parametrized program can be represented as the composition of an affine map from parameters to problem data, a solver, and an affine map from the solver's solution to a solution of the original problem (a n"
+      },
+      {
+        "doi": "10.48550/arXiv.1711.08013",
+        "title": "OSQP: An Operator Splitting Solver for Quadratic Programs",
+        "url": "https://arxiv.org/abs/1711.08013",
+        "authors": "Bartolomeo Stellato, Goran Banjac, Paul Goulart, Alberto Bemporad et al.",
+        "year": "2017",
+        "abstract": "We present a general-purpose solver for convex quadratic programs based on the alternating direction method of multipliers, employing a novel operator splitting technique that requires the solution of a quasi-definite linear system with the same coefficient matrix at almost every iteration. Our algorithm is very robust, placing no requirements on the problem data such as positive definiteness of the objective function or linear independence of the constraint functions. It can be configured to be division-free once an initial matrix factorization is carried out, making it suitable for real-time applications in embedded systems. In addition, our technique is the first operator splitting method for quadratic programs able to reliably detect primal and dual infeasible problems from the algorithm iterates. The method also supports factorization caching and warm starting, making it particularl"
+      },
+      {
+        "doi": "10.48550/arXiv.2102.04626",
+        "title": "Physics-informed neural networks with hard constraints for inverse design",
+        "url": "https://arxiv.org/abs/2102.04626",
+        "authors": "Lu Lu, Raphael Pestourie, Wenjie Yao, Zhicheng Wang et al.",
+        "year": "2021",
+        "abstract": "Inverse design arises in a variety of areas in engineering such as acoustic, mechanics, thermal/electronic transport, electromagnetism, and optics. Topology optimization is a major form of inverse design, where we optimize a designed geometry to achieve targeted properties and the geometry is parameterized by a density function. This optimization is challenging, because it has a very high dimensionality and is usually constrained by partial differential equations (PDEs) and additional inequalities. Here, we propose a new deep learning method -- physics-informed neural networks with hard constraints (hPINNs) -- for solving topology optimization. hPINN leverages the recent development of PINNs for solving PDEs, and thus does not rely on any numerical PDE solver. However, all the constraints in PINNs are soft constraints, and hence we impose hard constraints by using the penalty method and "
+      },
+      {
+        "doi": "10.48550/arXiv.2601.06244",
+        "title": "Hard Constraint Projection in a Physics Informed Neural Network",
+        "url": "https://arxiv.org/abs/2601.06244",
+        "authors": "Miranda J. S. Horne, Peter K. Jimack, Amirul Khan, He Wang",
+        "year": "2026",
+        "abstract": "In this work, we embed hard constraints in a physics informed neural network (PINN) which predicts solutions to the 2D incompressible Navier Stokes equations. We extend the hard constraint method introduced by Chen et al. (arXiv:2012.06148) from a linear PDE to a strongly non-linear PDE. The PINN is used to estimate the stream function and pressure of the fluid, and by differentiating the stream function we can recover an incompressible velocity field. An unlearnable hard constraint projection (HCP) layer projects the predicted velocity and pressure to a hyperplane that admits only exact solutions to a discretised form of the governing equations."
+      },
+      {
+        "doi": "10.48550/arXiv.2211.13765",
+        "title": "Implicit differentiation of variational quantum algorithms",
+        "url": "https://arxiv.org/abs/2211.13765",
+        "authors": "Shahnawaz Ahmed, Nathan Killoran, Juan Felipe Carrasquilla Álvarez",
+        "year": "2022",
+        "abstract": "Several quantities important in condensed matter physics, quantum information, and quantum chemistry, as well as quantities required in meta-optimization of machine learning algorithms, can be expressed as gradients of implicitly defined functions of the parameters characterizing the system. Here, we show how to leverage implicit differentiation for gradient computation through variational quantum algorithms and explore applications in condensed matter physics, quantum machine learning, and quantum information. A function defined implicitly as the solution of a quantum algorithm, e.g., a variationally obtained ground- or steady-state, can be automatically differentiated using implicit differentiation while being agnostic to how the solution is computed. We apply this notion to the evaluation of physical quantities in condensed matter physics such as generalized susceptibilities studied t"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "manuscript.md matches the selected execution path: original-row complete-QR/SVD nullspace elimination; clipping/projection feasibility initialization; exact reduced-Hessian Newton with full steps, 8-step and 2d+16 limits; signed sorted active-face identification; simultaneous blocker activation and largest sign-violating multiplier release; sequential cached subset lookup with at most four QR-based constraint additions; 1e8 factor-refactor threshold; three independently 128-entry caches; and solved-output/adjoint-state reuse. Its Hessian, face-update, multiplier, and stable-face VJP formulas agree with model.py. The stated VJP triangular operations are algebraically implemented by retaining L_inverse and applying L_inverse and its transpose, so no refactorization occurs. The manuscript also correctly states that batch_grouping performs sequential lookup rather than explicit batching and that row equilibration and Armijo search are inactive."
+  }
+}

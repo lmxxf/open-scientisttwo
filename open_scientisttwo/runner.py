@@ -34,9 +34,10 @@ def extract(text):
 
 
 class CodexRunner:
-    def __init__(self, workdir, guard, backend='codex', model='gpt-6.1-sol', timeout=240, custom=None):
+    def __init__(self, workdir, guard, backend='codex', model='gpt-6.1-sol', timeout=240, custom=None, reasoning_effort='low'):
         self.root, self.guard = Path(workdir), guard
         self.backend, self.model, self.timeout, self.custom = backend, model, timeout, custom
+        self.reasoning_effort = reasoning_effort
         self.count = 0
 
     def role(self, role, instruction):
@@ -49,7 +50,7 @@ class CodexRunner:
         if self.backend == 'codex':
             cmd = ['codex', 'exec', '--dangerously-bypass-approvals-and-sandbox',
                    '--skip-git-repo-check', '-C', str(self.root), '-m', self.model,
-                   '-c', 'model_reasoning_effort="low"', '-o', str(output), prompt]
+                   '-c', f'model_reasoning_effort="{self.reasoning_effort}"', '-o', str(output), prompt]
         elif self.backend == 'claude':
             cmd = ['claude', '-p', prompt]
         else:

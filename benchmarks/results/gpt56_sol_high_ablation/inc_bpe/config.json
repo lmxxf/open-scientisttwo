@@ -1,0 +1,7 @@
+{
+  "acceptance_mode": "intervals",
+  "flat_transitions": true,
+  "atomic_fastpath": true,
+  "certified_regions": true,
+  "certificate_mode": "accept_and_reject"
+}

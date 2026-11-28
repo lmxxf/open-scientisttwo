@@ -138,16 +138,27 @@ python submit_paperreview_ai.py --token YOUR_TOKEN --poll 20 --interval 30 --out
 
 ---
 
-## 五、 三方 15 篇同尺子背靠背盲审对照（谷歌原版 `Opus 4.8` vs 同代 `GPT-5.6-Sol low` vs 新代 `GPT-6.1-Sol low`）
+## 五、 四方 20 篇同尺子背靠背盲审对照（谷歌原版 `Opus 4.8` vs 同代 `GPT-5.6-Sol low / high` vs 新代 `GPT-6.1-Sol low`）
 
-为了严格剥离**架构/认知协议贡献**与**底座模型代差贡献**，我们将谷歌官网 5 篇原版真身 PDF（[`google_scientisttwo_originals/`](benchmarks/results/google_scientisttwo_originals/)）、本框架搭载同代底座 **`gpt-5.6-sol low`** 生成的 5 篇 PDF（[`gpt56_sol_low_ablation/`](benchmarks/results/gpt56_sol_low_ablation/)）与搭载 **`gpt-6.1-sol low`** 生成的 5 篇代表作 PDF，统一送入零残差校准的同一把 [`stanford_local_verifier.py`](stanford_local_verifier.py) 盲审标尺：
+为了严格剥离**架构/认知协议贡献**、**推理思维链长度贡献**与**底座模型代差贡献**，我们将谷歌官网 5 篇原版真身 PDF（[`google_scientisttwo_originals/`](benchmarks/results/google_scientisttwo_originals/)）、本框架搭载同代底座 **`gpt-5.6-sol low`**（[`gpt56_sol_low_ablation/`](benchmarks/results/gpt56_sol_low_ablation/)）、同代满血思维链 **`gpt-5.6-sol high`**（[`gpt56_sol_high_ablation/`](benchmarks/results/gpt56_sol_high_ablation/)）与 **`gpt-6.1-sol low`** 生成的共 20 篇 PDF，统一送入零残差校准的同一把 [`stanford_local_verifier.py`](stanford_local_verifier.py) 盲审标尺：
 
-| 基准任务 | ① 谷歌原版 `ScientistTwo`<br>(`Claude Opus 4.8`) | ② `open-scientisttwo`<br>(`GPT-5.6-Sol low` 同代对标) | ③ `open-scientisttwo`<br>(`GPT-6.1-Sol low` 满血主力) | 核心机制拆解 |
-| :--- | :---: | :---: | :---: | :--- |
-| **`1. inc_bpe`** | `2.90 / 10` *(细粒度 `5.11`)* | **`4.00 / 10`** *(细粒度 `5.00`)* | **`5.50 / 10`** *(细粒度 **`6.52`**)* | 同代 `5.6` 正胜原版 `+1.10` 分（仅漏 1 个 4 字节证书反例）；`6.1` 彻底焊死边界 `0` 个 `-1` |
-| **`2. pinet_hcnn`** | `2.90 / 10` *(细粒度 `4.52`)* | **`3.20 / 10`** *(细粒度 **`5.19`**)* | **`5.50 / 10`** *(细粒度 **`6.39`**)* | 原版 Theorem 3 被一维反例击碎且忘开双盲；`5.6` 缓存输出小聪明被无缓存对照表抓包；`6.1` 真算快 `2.66×` |
-| **`3. ts_rag`** | `2.90 / 10` *(细粒度 `4.89`)* | **`2.90 / 10`** *(细粒度 `4.71`)* | **`5.20 / 10`** *(细粒度 **`5.88`**)* | `5.6` 预测误差降 `71.7%`（远超原版 `2.47%`），但正文心算析因正负号说反；`6.1` 数学与归因全严密 |
-| **`4. tsae_koopman`** | `2.90 / 10` *(细粒度 `4.94`)* | **`4.00 / 10`** *(细粒度 **`5.38`**)* | **`5.50 / 10`** *(细粒度 **`5.97`**)* | 原版上同调维数写错且消融负收益硬吹第一；`5.6` 正胜原版 `+1.10` 分；`6.1` 预测验证图拉普拉斯 `0` 个 `-1` |
-| **`5. dmsqd_cma`** | `2.90 / 10` *(细粒度 `4.78`)* | **`2.90 / 10`** *(细粒度 `4.73`)* | **`5.50 / 10`** *(细粒度 **`6.39`**)* | 原版漏乘 $1/k$ 且 $p$ 值突破组合数极限；`5.6` 自适应系数撞常数截断；`6.1` 雅可比引导+伪逆 `QD=0.7438` |
-| **5 篇平均** | **`2.90 / 10`**<br>*(细粒度 `4.85`，10 个 `-1`)* | **`3.40 / 10`**<br>*(细粒度 **`5.00`**，**3 胜 2 平 0 负**)* | **`5.44 / 10`**<br>*(细粒度 **`6.23`**，**`0` 个 `-1`**)* | **架构与协议在同代底座上先赢 `+0.50` 分，底座代际升级再清零全部 `-1` 赢 `+2.04` 分！** |
+| 基准任务 | ① 谷歌原版 `ScientistTwo`<br>(`Claude Opus 4.8`) | ② `open-scientisttwo`<br>(`GPT-5.6-Sol low`) | ③ `open-scientisttwo`<br>(`GPT-5.6-Sol high` 同代满血) | ④ `open-scientisttwo`<br>(`GPT-6.1-Sol low` 参考上限) |
+| :--- | :---: | :---: | :---: | :---: |
+| **`1. inc_bpe`** | `2.90 / 10` *(细粒度 `5.11`)* | `4.00 / 10` *(细粒度 `5.00`)* | **`4.70 / 10`** *(细粒度 **`5.93`**)* | **`5.50 / 10`** *(细粒度 **`6.52`**)* |
+| **`2. pinet_hcnn`** | `2.90 / 10` *(细粒度 `4.52`)* | `3.20 / 10` *(细粒度 `5.19`)* | **`3.20 / 10`** *(细粒度 **`5.12`**)* | **`5.50 / 10`** *(细粒度 **`6.39`**)* |
+| **`3. ts_rag`** | `2.90 / 10` *(细粒度 `4.89`)* | `2.90 / 10` *(细粒度 `4.71`)* | **`5.50 / 10`** *(细粒度 **`5.89`**，`0` 个 `-1`)* | **`5.20 / 10`** *(细粒度 **`5.88`**)* |
+| **`4. tsae_koopman`** | `2.90 / 10` *(细粒度 `4.94`)* | `4.00 / 10` *(细粒度 `5.38`)* | **`5.50 / 10`** *(细粒度 **`5.71`**，`0` 个 `-1`)* | **`5.50 / 10`** *(细粒度 **`5.97`**)* |
+| **`5. dmsqd_cma`** | `2.90 / 10` *(细粒度 `4.78`)* | `2.90 / 10` *(细粒度 `4.73`)* | **`4.40 / 10`** *(细粒度 **`5.46`**)* | **`5.50 / 10`** *(细粒度 **`6.39`**)* |
+| **5 篇平均** | **`2.90 / 10`**<br>*(细粒度 `4.85`，10 个 `-1`)* | **`3.40 / 10`**<br>*(细粒度 `5.00`，3 胜 2 平)* | **`4.66 / 10`**<br>*(细粒度 **`5.62`**，**5 战全胜原版 `+1.76` 分！**)* | **`5.44 / 10`**<br>*(细粒度 **`6.23`**，**`0` 个 `-1`**)* |
+
+### 斯坦福官网 [`paperreview.ai`](https://paperreview.ai/) 第三方在线核验成绩单（同代对标版 `GPT-5.6-Sol high` 全部 5 篇）
+
+| 基准任务 | 斯坦福官网在线总分 | 官方 7 维 `TRIPLE_SCORES` 亮点（35 维 **`0` 个 `-1`**！） | 公开可点击核验链接 |
+| :--- | :---: | :--- | :--- |
+| **`dmsqd_cma`** *(ICLR 2026)* | **`6.1 / 10`** | **`Originality: +1`**, **`Importance: +1`**, **`Clarity: +1`**（超谷歌 ICLR 组 `5.4±0.2` 达 `+0.7` 分！） | [`review?token=Y3Zf8HWq...`](https://paperreview.ai/review?token=Y3Zf8HWqM5HLwXolZFsjbKTO3aafRouD181SXr0-s0I) |
+| **`ts_rag`** *(NeurIPS 2025)* | **`5.8 / 10`** | **`Importance: +1`**, **`Clarity: +1`**（超谷歌 NeurIPS 组 `5.6±0.7` 与全集均分 `5.7`！） | [`review?token=fW5DAA5r...`](https://paperreview.ai/review?token=fW5DAA5rZf-2Lvf6iqZmRyW61iRX97SbXLv5C4BhSE4) |
+| **`inc_bpe`** *(ICML 2026)* | **`5.6 / 10`** | **`Originality: +1`**, **`Importance: +1`**（双区间编译定理与单遍扫描获评原创性 `+1`！） | [`review?token=995k6nnL...`](https://paperreview.ai/review?token=995k6nnLO1MYBHH0fwTvApvyXT4SgaSGpolm5ITPoUI) |
+| **`pinet_hcnn`** *(ICLR 2026)* | **`4.5 / 10`** | **`Clarity: +1`**，其余 6 维全 `0`（仅因合成微基准规模与输出缓存未获额外加分） | [`review?token=iNsxCky4...`](https://paperreview.ai/review?token=iNsxCky4XJdLuLJnrdRpbfiOF8VSz9wJCzB9hMp8ZZU) |
+| **`tsae_koopman`** *(ICLR 2026)* | **`4.5 / 10`** | **`Clarity: +1`**，其余 6 维全 `0`（仅因 $d=32, m=64$ 纯合成轨迹未挂真实 LM 激活） | [`review?token=vmB0cJOL...`](https://paperreview.ai/review?token=vmB0cJOLiSf4J9ghFzBe5iLnoXTbp9Lec7DGGGS9bbo) |
+| **5 篇总计** | **均分 `5.30 / 10`** | **35 维 `0` 个 `-1`、3/5 篇过录用线（最高 `6.1`）、2 篇斩获 `Originality: +1`** | 原始 JSON 见 [`stanford_official_reviews/gpt56_high/`](benchmarks/results/stanford_official_reviews/gpt56_high/) |
 

@@ -27,7 +27,7 @@ def stage(candidate, critic, refine, max_rounds):
 
 
 class Pipeline:
-    def __init__(self, root, source, fast=False, backend='codex', custom=None, peer_rounds=1, model='gpt-6.1-sol', timeout=240, limitation_rounds=None, K=None, S=4, engineering=2, ablation_count=3, ablation_refinement=1, weights=None, eval_timeout=None):
+    def __init__(self, root, source, fast=False, backend='codex', custom=None, peer_rounds=1, model='gpt-6.1-sol', timeout=240, limitation_rounds=None, K=None, S=4, engineering=2, ablation_count=3, ablation_refinement=1, weights=None, eval_timeout=None, reasoning_effort='low'):
         self.root, self.source = Path(root), Path(source)
         self.spec = load_spec(source)
         if eval_timeout is not None:
@@ -48,7 +48,7 @@ class Pipeline:
         save(self.root/'task_spec.json', self.spec)
         shutil.copy2(Path(__file__).resolve().parent/'AGENTS.md', self.root/'AGENTS.md')
         self.lock = hashes(self.root)
-        self.runner = CodexRunner(self.root, self.guard, backend=backend, custom=custom, model=model, timeout=timeout)
+        self.runner = CodexRunner(self.root, self.guard, backend=backend, custom=custom, model=model, timeout=timeout, reasoning_effort=reasoning_effort)
         self.claims, self.history, self.successes = [], [], []
         self.snapshots = {}
         self.baseline_config = json.loads((self.source/'config.json').read_text()) if (self.source/'config.json').exists() else {}
@@ -384,6 +384,7 @@ def main():
     p.add_argument('--custom', nargs='+')
     p.add_argument('--max-peer-rounds', type=int, default=1)
     p.add_argument('--model', default='gpt-6.1-sol')
+    p.add_argument('--reasoning-effort', choices=['low', 'medium', 'high', 'xhigh'], default='low')
     p.add_argument('--role-timeout', type=float, default=240)
     p.add_argument('--limitation-rounds', type=int)
     p.add_argument('--K', type=int)
@@ -397,7 +398,7 @@ def main():
         p.error('output must be a fresh nonexisting directory')
     # Always outside the parent repository: children cannot inherit its AGENTS files.
     scratch = Path(tempfile.mkdtemp(prefix='open-scientisttwo-', dir='/tmp'))
-    pipeline = Pipeline(scratch, Path(a.source).resolve(), a.fast_demo, a.backend, a.custom, a.max_peer_rounds, a.model, a.role_timeout, a.limitation_rounds, a.K, a.S, a.engineering_budget, a.ablation_plan_count, a.ablation_refinement, json.loads(a.review_weights) if a.review_weights else None, a.eval_timeout)
+    pipeline = Pipeline(scratch, Path(a.source).resolve(), a.fast_demo, a.backend, a.custom, a.max_peer_rounds, a.model, a.role_timeout, a.limitation_rounds, a.K, a.S, a.engineering_budget, a.ablation_plan_count, a.ablation_refinement, json.loads(a.review_weights) if a.review_weights else None, a.eval_timeout, a.reasoning_effort)
     started = time.monotonic()
     try:
         pipeline.run()

@@ -1,0 +1,25 @@
+{
+  "name": "tangent_normal_frontier_emitters",
+  "frontier_estimator": "kNN local PCA plus one-sidedness test",
+  "k": 32,
+  "intrinsic_dimension_energy": 0.95,
+  "normal_emitter_fraction": 0.6,
+  "tangent_emitter_fraction": 0.0,
+  "normal_step_scale": 1.5,
+  "tangent_step_scale": 0.5,
+  "novelty": "density-normalized outward displacement",
+  "quality_constraint": "candidate quality above local soft threshold",
+  "ablation": [
+    "ordinary kNN novelty",
+    "normal-only emitter",
+    "tangent-only emitter",
+    "no density normalization"
+  ],
+  "frontier_density_normalization": false,
+  "frontier_local_pca": false,
+  "frontier_boundary_guidance": true,
+  "cma_covariance_adaptation": true,
+  "archive_threshold_annealing": true,
+  "local_surrogate_refinement": false,
+  "dimension_adaptive_smoothing": true
+}

@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56high-ts_rag/manuscript.pdf",
+  "seconds": 53.2,
+  "numerical_score": 5.5,
+  "fine_weighted_score": 5.89,
+  "positive_count": 2,
+  "neutral_count": 5,
+  "negative_count": 0,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Core conditional mathematical results hold, but broad empirical and mechanism interpretations exceed the synthetic surrogate-baseline evidence.",
+    "Experimental_Soundness": "Held-out paired comparisons and factorial subtraction support a careful local prototype; small scale, surrogate baselines, bundled interventions, and missing ablation uncertainty prevent +1.",
+    "Writing_Clarity": "The manuscript reads as an organized standalone article with equations, proofs, pseudocode, tables, and explicit limitations.",
+    "Prior_Work_Context": "The bibliography is substantial, but the closest retrieved spectral-retrieval works are omitted and technical novelty boundaries remain unresolved.",
+    "Question_Importance": "Reliable training-free forecasting under nonstationarity and imperfect historical retrieval is an important community problem.",
+    "Originality": "The pipeline is a useful specialization of established robust regression, Fourier analysis, nearest-neighbor retrieval, ridge regression, and convex mixing; a nontrivial novel principle is not established.",
+    "Value_to_Community": "Potentially useful methodology and characterization, constrained by a small synthetic workload and incomplete reproducibility and comparison evidence."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 5.5,
+    "Experimental_Soundness": 5.0,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 5.0,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.5
+  },
+  "sections": {
+    "summary": "ASTR is a training-free forecasting pipeline combining robust adaptive detrending, temporal\u2013spectral retrieval, phase alignment, ridge reconstruction, and gated Fourier continuation. The manuscript provides mostly correct conditional algebraic guarantees and promising results on a small synthetic benchmark. However, its comparisons use simplified surrogates for published methods, the closest retrieved spectral-retrieval works are omitted, and the evidence supports a specialized prototype rather than the claimed general algorithmic advance.",
+    "strengths": "The method is specified with equations, hyperparameters, and pseudocode. The ridge uniqueness and conditional sensitivity results, weighted normal-equation identity, retained-bin Fourier continuation, and convex fusion identity are mathematically sound under their stated assumptions. The experiments include an independent test partition, paired confidence intervals, a useful trend-by-ridge factorial experiment, component subtraction, noise stress, and memory-size scaling. Limitations explicitly acknowledge synthetic data, surrogate baselines, selection discontinuities, and the absence of risk-optimal gating guarantees.",
+    "weaknesses": "Only 42 synthetic forecasts per partition, one lookback, and one horizon are evaluated. DLinear, TimesNet, MQRetNN, and TS-RAG comparisons are handcrafted mechanism approximations rather than faithful implementations. SpecReTF and CRAFT, present in the retrieved literature, are missing despite directly overlapping spectral retrieval. Small component gains lack paired uncertainty estimates. Dataset generation, split construction, tuning provenance, and reproducibility details are insufficient. Several guarantees are textbook identities rather than substantive forecasting guarantees.",
+    "detailed_comments": "Theory: Theorem 1 establishes weighted regularized orthogonality, not ordinary residual-subspace orthogonality; its bound is epsilon times the coefficient norm, not an unconditional absolute 1e-10 guarantee. Lemma 1 bounds an output relative to a data-dependent local center and scale, rather than establishing bounded influence of the complete forecasting estimator. The ridge stability theorem correctly conditions on fixed dictionaries and regularization, excluding neighbor, phase, trend-selection, and GCV discontinuities. The Fourier theorem assumes exactly on-grid periodicity. The fusion identity does not establish improvement over either constituent or calibration of reconstruction error as future confidence. Moreover, comparing the ridge optimum with w=0 gives rho <= 1 in exact arithmetic, so gamma lies in [exp(-0.2), 1], restricting Fourier weight to about 18.1%; this materially limits the interpretation of the confidence gate. Phase transport is also underjustified: circularly shifting a length-L history and separately shifting its length-(L+H) concatenation need not produce a consistent history\u2013future pair at wrap boundaries. Experiments: The factorial table shows useful conditional effects, but adaptive trend removal changes retrieval, normalization, and future reconstruction together, so it does not isolate improved retrieval geometry alone. Replacing adaptive SVD\u2013GCV ridge with fixed direct ridge confounds regularization selection with the numerical solver. No uncertainty is supplied for the 1.32% gating benefit or smaller Fourier and regularization effects. Paired t intervals are preferable to unpaired aggregates, but independence across shared synthetic regimes and memories is not established, and repeated generator seeds or regime-level uncertainty are absent. Memory scaling does not substitute for varying lookback, horizon, dimension, or distribution shift. Hardware reporting includes core, frequency, latency, and traced allocation, but omits numerical precision, software environment, warm-cache versus cold-cache costs, timing dispersion, preprocessing time, and total process/native-library memory. Writing: The article is organized and standalone, with clear pseudocode and no obvious audit-log clutter. Its abstract and introduction nevertheless present broad named-method superiority and theoretical significance more strongly than the limitations justify. Novelty: The related-work table provides broad positioning, but does not formally distinguish ASTR from the retrieved SpecReTF amplitude/phase retrieval or CRAFT temporal-pruning/spectral-ranking pipeline. The supplied abstracts establish overlap, not equivalence; full technical comparison is needed before claiming a fresh synthesis.",
+    "questions": "How are synthetic generators, random seeds, memory banks, and validation/test trajectories separated, and which partition selected every hyperparameter? Can results be reproduced against faithful published implementations and strong training-free trend-plus-Fourier, phase-aligned kNN, and local ridge baselines? How does ASTR technically differ from SpecReTF and CRAFT? Do paired intervals across independent generator seeds support the small subtraction gains? Can solver choice and GCV selection be ablated separately? What happens with off-grid frequencies, abrupt changes, imbalanced memories, longer horizons, and real datasets? How is consistent phase transport ensured across different circular-shift lengths, and how often does the finite-output fallback activate?",
+    "assessment": "Weak reject. The submission is a coherent technical prototype with useful local evidence, but currently lacks the baseline fidelity, closest-prior-work differentiation, experimental breadth, and component-level statistical evidence needed for an ICLR acceptance."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

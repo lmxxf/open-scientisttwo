@@ -1,0 +1,10 @@
+{
+  "stability_aware_ridge": true,
+  "lambda_selection": "gcv",
+  "ridge_whitening": "svd",
+  "weight_constraint": false,
+  "negative_weight_cap": 0.25,
+  "influence_pruning": false,
+  "max_condition_number": 10000.0,
+  "min_effective_neighbors": 3
+}

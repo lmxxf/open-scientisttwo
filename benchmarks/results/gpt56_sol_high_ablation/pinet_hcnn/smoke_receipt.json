@@ -1,0 +1,51 @@
+{
+  "success": true,
+  "best": {
+    "label": "seed0",
+    "snapshot": "seed0_full",
+    "config": {
+      "name": "face_signature_batching_with_factor_updates",
+      "face_signature": "sorted_active_constraint_ids",
+      "batch_grouping": true,
+      "max_rank_update": 4,
+      "update_method": "qr_update_downdate",
+      "refactor_condition_threshold": 100000000.0,
+      "cache_size": 128,
+      "cache_forward_and_adjoint": true
+    },
+    "value": 0.00030893133984315663
+  },
+  "baseline_full": 0.21649480394757287,
+  "final_test": 0.000329866695484937,
+  "local_score": 4.7142857142857135,
+  "local_decision": "Reject",
+  "claims": 16,
+  "roles": 27,
+  "protected_hashes": {
+    "eval.py": "26ff903857778b3c726b9de2de175a86826cb790fe18068bf43ad6c1442802bc",
+    "data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+    "task_spec.json": "36b47c9e507bf856a39c746ae5da8f3b042c0550f53620597a0d0700eee32090"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/pinet_hcnn",
+    "--model",
+    "gpt-5.6-sol",
+    "--reasoning-effort",
+    "high",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "900",
+    "--output",
+    "/tmp/st-gpt56high-pinet_hcnn"
+  ],
+  "seconds": 3611.2241444259416
+}

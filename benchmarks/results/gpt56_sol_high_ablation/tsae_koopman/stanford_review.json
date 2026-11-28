@@ -1,0 +1,24 @@
+{
+  "scores": {
+    "Originality": 5,
+    "Importance": 5,
+    "Claims_Supported": 5,
+    "Soundness_of_Experiments": 3,
+    "Clarity_of_Writing": 7,
+    "Value_to_Community": 4,
+    "Contextualization": 3
+  },
+  "comments": "The central combination—hard-cardinality temporal sparse coding with Koopman prediction, innovation-gated support persistence, graph evidence, and fixed-support debiasing—is plausibly original as an integrated algorithm. However, most individual ingredients are standard, and the retrieved evidence does not substantiate a strong novelty claim: related_work.xml contains only the Bhalla et al. temporal-SAE record, while review_retrieval.json returns two irrelevant papers and fails to retrieve the nearest Koopman, temporal sparse-coding, support-tracking, graph-regularized sparse-coding, or switching-dynamics literature. The manuscript’s manually assembled references therefore cannot establish that the claimed three-role use of dynamics is unprecedented. The problem is potentially important, but demonstrated impact is limited to small synthetic systems with d=32, m=64 and eight trajectories; there is no language-model, video, clinical, or other real-representation experiment, and the method is about 275 times slower than the lightweight reference. The local mathematical results are mostly valid but modest: PSD of a normalized graph Laplacian, uniqueness of ridge regression and a tridiagonal proximal solve, Top-k coordinate minimization, and projected-gradient descent are standard consequences. The abstract’s phrase 'positive semidefiniteness of the predictive graph' overstates what is proved—the Laplacian is PSD, not necessarily the constructed affinity itself. Exact mask cardinality establishes k admissible coordinates, not necessarily k nonzero amplitudes after clipping or debiasing. No convergence or recovery guarantee is supplied for the coupled nonconvex algorithm, and clipping the unconstrained Koopman block solution is not generally the exact constrained block minimizer when its Hessian is nondiagonal. Experimental soundness is the main weakness. Statistical intervals use only eight trajectories, apparently sharing a generator, rather than independent dictionaries/dynamical systems; raw paired observations, seed variability, normality checks, and multiplicity handling are absent. The alleged independent test is transductive because target trajectories participate in unsupervised fitting, so it is not a frozen out-of-sample evaluation. Baselines are under-specified and computationally unmatched, with no direct implementation of the cited temporal SAE or sparse Koopman autoencoder. The composite loss is dominated by the weighted support-F1 term, while alignment procedures for support and dictionary recovery are insufficiently specified and may permit optimistic matching. The factorial study shows Koopman adds almost nothing beyond Laplacian smoothing on the test suite and is slightly worse than Laplacian alone; the large 'integration' gain bundles several mechanisms and cannot attribute causality. Component-subtraction effects are only 4.1e-5 to 2.62e-4, lack uncertainty estimates, and some removals improve reconstruction or rollout, so claims that every component materially contributes are unsupported. Writing and organization are comparatively strong: equations, hyperparameters, algorithms, limitations, runtime, and local proofs are presented clearly. Reproducibility nevertheless lacks exact generator equations, seeds, baseline configurations, standardization/alignment details, and code. Community value is presently moderate-to-low: the work offers an interesting hypothesis and a detailed synthetic prototype, but neither broad empirical utility nor scalable practicality is established. Contextualization is inadequate because the literature search demonstrably missed central neighboring fields, the reference list is narrow, and novelty is argued largely by contrast with recent application-specific SAE papers rather than the broader history of dynamic sparse coding, structured sparsity, temporal support recovery, graph dictionary learning, state-space sparse inference, robust Koopman fitting, and switching Koopman models.",
+  "total": 4.571428571428571,
+  "decision": "Reject",
+  "weights": {
+    "Originality": 0.14285714285714285,
+    "Importance": 0.14285714285714285,
+    "Claims_Supported": 0.14285714285714285,
+    "Soundness_of_Experiments": 0.14285714285714285,
+    "Clarity_of_Writing": 0.14285714285714285,
+    "Value_to_Community": 0.14285714285714285,
+    "Contextualization": 0.14285714285714285
+  },
+  "calibration": "unknown official coefficients; equal-average proxy by default; uncalibrated local approximation; NOT official Stanford score"
+}

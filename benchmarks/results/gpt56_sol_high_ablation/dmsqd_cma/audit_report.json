@@ -1,0 +1,119 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 29
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "02ddf46a4861b8169ce4b9804f5b38ced0c7d64f91119afce5e92f3754953e72",
+      "data.py": "d14aeb519b860e140dc6677adb66fd97eff55748a3551c537aa75d10e411cd82",
+      "task_spec.json": "957080d474b3ea03adb0fc22e9ff18a216f8e974456bca6f14c9d2be674d790f"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2601.01082",
+        "title": "Discount Model Search for Quality Diversity Optimization in High-Dimensional Measure Spaces",
+        "url": "https://arxiv.org/abs/2601.01082",
+        "authors": "Bryon Tjanaka, Henry Chen, Matthew C. Fontaine, Stefanos Nikolaidis",
+        "year": "2026",
+        "abstract": "Quality diversity (QD) optimization searches for a collection of solutions that optimize an objective while attaining diverse outputs of a user-specified, vector-valued measure function. Contemporary QD algorithms are typically limited to low-dimensional measures because high-dimensional measures are prone to distortion, where many solutions found by the QD algorithm map to similar measures. For example, the state-of-the-art CMA-MAE algorithm guides measure space exploration with a histogram in measure space that records so-called discount values. However, CMA-MAE stagnates in domains with high-dimensional measure spaces because solutions with similar measures fall into the same histogram cell and hence receive the same discount value. To address these limitations, we propose Discount Model Search (DMS), which guides exploration with a model that provides a smooth, continuous representat"
+      },
+      {
+        "doi": "10.48550/arXiv.2205.10752",
+        "title": "Covariance Matrix Adaptation MAP-Annealing",
+        "url": "https://arxiv.org/abs/2205.10752",
+        "authors": "Matthew C. Fontaine, Stefanos Nikolaidis",
+        "year": "2022",
+        "abstract": "Single-objective optimization algorithms search for the single highest-quality solution with respect to an objective. Quality diversity (QD) optimization algorithms, such as Covariance Matrix Adaptation MAP-Elites (CMA-ME), search for a collection of solutions that are both high-quality with respect to an objective and diverse with respect to specified measure functions. However, CMA-ME suffers from three major limitations highlighted by the QD community: prematurely abandoning the objective in favor of exploration, struggling to explore flat objectives, and having poor performance for low-resolution archives. We propose a new quality diversity algorithm, Covariance Matrix Adaptation MAP-Annealing (CMA-MAE), that addresses all three limitations. We provide theoretical justifications for the new algorithm with respect to each limitation. Our theory informs our experiments, which support t"
+      },
+      {
+        "doi": "10.48550/arXiv.1912.02400",
+        "title": "Covariance Matrix Adaptation for the Rapid Illumination of Behavior Space",
+        "url": "https://arxiv.org/abs/1912.02400",
+        "authors": "Matthew C. Fontaine, Julian Togelius, Stefanos Nikolaidis, Amy K. Hoover",
+        "year": "2019",
+        "abstract": "We focus on the challenge of finding a diverse collection of quality solutions on complex continuous domains. While quality diver-sity (QD) algorithms like Novelty Search with Local Competition (NSLC) and MAP-Elites are designed to generate a diverse range of solutions, these algorithms require a large number of evaluations for exploration of continuous spaces. Meanwhile, variants of the Covariance Matrix Adaptation Evolution Strategy (CMA-ES) are among the best-performing derivative-free optimizers in single-objective continuous domains. This paper proposes a new QD algorithm called Covariance Matrix Adaptation MAP-Elites (CMA-ME). Our new algorithm combines the self-adaptation techniques of CMA-ES with archiving and mapping techniques for maintaining diversity in QD. Results from experiments based on standard continuous optimization benchmarks show that CMA-ME finds better-quality solu"
+      },
+      {
+        "doi": "10.48550/arXiv.2106.03894",
+        "title": "Differentiable Quality Diversity",
+        "url": "https://arxiv.org/abs/2106.03894",
+        "authors": "Matthew C. Fontaine, Stefanos Nikolaidis",
+        "year": "2021",
+        "abstract": "Quality diversity (QD) is a growing branch of stochastic optimization research that studies the problem of generating an archive of solutions that maximize a given objective function but are also diverse with respect to a set of specified measure functions. However, even when these functions are differentiable, QD algorithms treat them as \"black boxes\", ignoring gradient information. We present the differentiable quality diversity (DQD) problem, a special case of QD, where both the objective and measure functions are first order differentiable. We then present MAP-Elites via a Gradient Arborescence (MEGA), a DQD algorithm that leverages gradient information to efficiently explore the joint range of the objective and measure functions. Results in two QD benchmark domains and in searching the latent space of a StyleGAN show that MEGA significantly outperforms state-of-the-art QD algorithms"
+      },
+      {
+        "doi": "10.48550/arXiv.2007.05352",
+        "title": "Multi-Emitter MAP-Elites: Improving quality, diversity and convergence speed with heterogeneous sets of emitters",
+        "url": "https://arxiv.org/abs/2007.05352",
+        "authors": "Antoine Cully",
+        "year": "2020",
+        "abstract": "Quality-Diversity (QD) optimisation is a new family of learning algorithms that aims at generating collections of diverse and high-performing solutions. Among those algorithms, the recently introduced Covariance Matrix Adaptation MAP-Elites (CMA-ME) algorithm proposes the concept of emitters, which uses a predefined heuristic to drive the algorithm's exploration. This algorithm was shown to outperform MAP-Elites, a popular QD algorithm that has demonstrated promising results in numerous applications. In this paper, we introduce Multi-Emitter MAP-Elites (ME-MAP-Elites), an algorithm that directly extends CMA-ME and improves its quality, diversity and data efficiency. It leverages the diversity of a heterogeneous set of emitters, in which each emitter type improves the optimisation process in different ways. A bandit algorithm dynamically finds the best selection of emitters depending on t"
+      },
+      {
+        "doi": "10.48550/arXiv.2305.01264",
+        "title": "Multi-Task Multi-Behavior MAP-Elites",
+        "url": "https://arxiv.org/abs/2305.01264",
+        "authors": "Anne, Mouret",
+        "year": "2023",
+        "abstract": "We propose Multi-Task Multi-Behavior MAP-Elites, a variant of MAP-Elites that finds a large number of high-quality solutions for a large set of tasks (optimization problems from a given family). It combines the original MAP-Elites for the search for diversity and Multi-Task MAP-Elites for leveraging similarity between tasks. It performs better than three baselines on a humanoid fault-recovery set of tasks, solving more tasks and finding twice as many solutions per solved task."
+      },
+      {
+        "doi": "10.48550/arXiv.2504.02177",
+        "title": "A Quality Diversity Approach to Evolving Model Rockets",
+        "url": "https://arxiv.org/abs/2504.02177",
+        "authors": "Jacob Schrum, Cody Crosby",
+        "year": "2025",
+        "abstract": "Model rocketry presents a design task accessible to undergraduates while remaining an interesting challenge. Allowing for variation in fins, nose cones, and body tubes presents a rich design space containing numerous ways to achieve various altitudes. Therefore, when exploring possible designs computationally, it makes sense to apply a method that produces various possibilities for decision-makers to choose from: Quality Diversity (QD). The QD methods MAP-Elites, CMA-ME, and CMA-MAE are applied to model rocket design using the open-source OpenRocket software to characterize the behavior and determine the fitness of evolved designs. Selected rockets were manufactured and launched to evaluate them in the real world. Simulation results demonstrate that CMA-ME produces the widest variety of rocket designs, which is surprising given that CMA-MAE is a more recent method designed to overcome sh"
+      },
+      {
+        "doi": "10.48550/arXiv.2009.08438",
+        "title": "Competitiveness of MAP-Elites against Proximal Policy Optimization on locomotion tasks in deterministic simulations",
+        "url": "https://arxiv.org/abs/2009.08438",
+        "authors": "Szymon Brych, Antoine Cully",
+        "year": "2020",
+        "abstract": "The increasing importance of robots and automation creates a demand for learnable controllers which can be obtained through various approaches such as Evolutionary Algorithms (EAs) or Reinforcement Learning (RL). Unfortunately, these two families of algorithms have mainly developed independently and there are only a few works comparing modern EAs with deep RL algorithms. We show that Multidimensional Archive of Phenotypic Elites (MAP-Elites), which is a modern EA, can deliver better-performing solutions than one of the state-of-the-art RL methods, Proximal Policy Optimization (PPO) in the generation of locomotion controllers for a simulated hexapod robot. Additionally, extensive hyper-parameter tuning shows that MAP-Elites displays greater robustness across seeds and hyper-parameter sets. Generally, this paper demonstrates that EAs combined with modern computational resources display pro"
+      },
+      {
+        "doi": "10.48550/arXiv.2112.03534",
+        "title": "Deep Surrogate Assisted MAP-Elites for Automated Hearthstone Deckbuilding",
+        "url": "https://arxiv.org/abs/2112.03534",
+        "authors": "Yulun Zhang, Matthew C. Fontaine, Amy K. Hoover, Stefanos Nikolaidis",
+        "year": "2021",
+        "abstract": "We study the problem of efficiently generating high-quality and diverse content in games. Previous work on automated deckbuilding in Hearthstone shows that the quality diversity algorithm MAP-Elites can generate a collection of high-performing decks with diverse strategic gameplay. However, MAP-Elites requires a large number of expensive evaluations to discover a diverse collection of decks. We propose assisting MAP-Elites with a deep surrogate model trained online to predict game outcomes with respect to candidate decks. MAP-Elites discovers a diverse dataset to improve the surrogate model accuracy, while the surrogate model helps guide MAP-Elites towards promising new content. In a Hearthstone deckbuilding case study, we show that our approach improves the sample efficiency of MAP-Elites and outperforms a model trained offline with random decks, as well as a linear surrogate model base"
+      },
+      {
+        "doi": "10.48550/arXiv.2211.12610",
+        "title": "Efficient Exploration using Model-Based Quality-Diversity with Gradients",
+        "url": "https://arxiv.org/abs/2211.12610",
+        "authors": "Bryan Lim, Manon Flageat, Antoine Cully",
+        "year": "2022",
+        "abstract": "Exploration is a key challenge in Reinforcement Learning, especially in long-horizon, deceptive and sparse-reward environments. For such applications, population-based approaches have proven effective. Methods such as Quality-Diversity deals with this by encouraging novel solutions and producing a diversity of behaviours. However, these methods are driven by either undirected sampling (i.e. mutations) or use approximated gradients (i.e. Evolution Strategies) in the parameter space, which makes them highly sample-inefficient. In this paper, we propose a model-based Quality-Diversity approach. It extends existing QD methods to use gradients for efficient exploitation and leverage perturbations in imagination for efficient exploration. Our approach optimizes all members of a population simultaneously to maintain both performance and diversity efficiently by leveraging the effectiveness of Q"
+      },
+      {
+        "doi": "10.48550/arXiv.2204.14061",
+        "title": "A Collection of Quality Diversity Optimization Problems Derived from Hyperparameter Optimization of Machine Learning Models",
+        "url": "https://arxiv.org/abs/2204.14061",
+        "authors": "Lennart Schneider, Florian Pfisterer, Janek Thomas, Bernd Bischl",
+        "year": "2022",
+        "abstract": "The goal of Quality Diversity Optimization is to generate a collection of diverse yet high-performing solutions to a given problem at hand. Typical benchmark problems are, for example, finding a repertoire of robot arm configurations or a collection of game playing strategies. In this paper, we propose a set of Quality Diversity Optimization problems that tackle hyperparameter optimization of machine learning models - a so far underexplored application of Quality Diversity Optimization. Our benchmark problems involve novel feature functions, such as interpretability or resource usage of models. To allow for fast and efficient benchmarking, we build upon YAHPO Gym, a recently proposed open source benchmarking suite for hyperparameter optimization that makes use of high performing surrogate models and returns these surrogate model predictions instead of evaluating the true expensive black "
+      },
+      {
+        "doi": "10.48550/arXiv.2412.06830",
+        "title": "A New Strategy for the Exploration of Venus",
+        "url": "https://arxiv.org/abs/2412.06830",
+        "authors": "The VEXAG Exploration Strategy Study Analysis Workgroup",
+        "year": "2024",
+        "abstract": "The 2023-2032 Planetary Science and Astrobiology Decadal Survey Origins, Worlds, and Life recommended that \"NASA develop scientific exploration strategies, as it has for Mars, in areas of broad scientific importance, e.g., Venus... that have an increasing number of U.S. missions and international collaboration opportunities\" (OWL, p.22-10). In NASA's initial responses to that Decadal Survey, the agency asserted that \"...specific scientific exploration strategies should be community generated by bodies such as the Analysis Groups,\" thus placing the onus on the planetary community to generate and support these exploration strategies. In late 2022, the Venus Exploration Analysis Group began a project to develop a new exploration strategy for Venus, reflecting the 2021 selections of the VERITAS, DAVINCI, and EnVision missions and the sweeping comparative planetology recommendations relevant "
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The manuscript matches the active pruned_r2 execution: generation-0 uniform sampling; sigma=0.23*sqrt(32/d); F=round(0.20B); rank-weighted mean, evolution-path, and clipped diagonal-covariance updates with rho=0.16; alpha=0.03 threshold annealing; elite replacement by strict quality improvement; and ridge-Jacobian frontier transport using k=32, lambda=0.002, the stated edge scores, displacement cap, and full-archive better-to-weaker refinement. Under config.json, surrogate refinement, density normalization, and local PCA are disabled and the manuscript does not claim them. tangent_emitter_fraction=0 makes every frontier proposal take the normal branch, whose implemented residual perturbation is exactly 0.20*0.5*sqrt(32/d)=0.10*sqrt(32/d), matching the displayed frontier formula. Unused descriptive metadata and inactive code paths are not presented as active mechanisms."
+  }
+}

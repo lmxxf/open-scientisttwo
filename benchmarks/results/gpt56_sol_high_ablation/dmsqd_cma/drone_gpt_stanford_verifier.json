@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56high-dmsqd_cma/manuscript.pdf",
+  "seconds": 62.67,
+  "numerical_score": 4.4,
+  "fine_weighted_score": 5.46,
+  "positive_count": 1,
+  "neutral_count": 5,
+  "negative_count": 1,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Core recurrence and ridge identities hold, and local gains are reported, but covariance scaling, implemented-proposal guarantees, and mechanism attribution require qualification.",
+    "Experimental_Soundness": "The strict criterion is not met: randomization and held-out tuning are undocumented, baseline settings are confounded, and covariance subtraction fails to establish a clear effect.",
+    "Writing_Clarity": "The paper has a coherent academic structure and pseudocode, but dense presentation and mathematical ambiguities prevent the highest rating.",
+    "Prior_Work_Context": "Relevant frameworks are cited and distinguished conceptually, but formal differentiation and matched evaluation against the closest alternatives remain incomplete.",
+    "Question_Importance": "Sample-efficient construction of diverse, high-quality repertoires in large decision spaces is important to optimization and learning.",
+    "Originality": "Learned frontier transport is a plausible useful specialization, but the overall method combines established QD, ridge regression, and regularized inverse techniques without a demonstrated major conceptual advance.",
+    "Value_to_Community": "Potentially useful as a technical note, with broader value constrained by synthetic scale, unresolved covariance necessity, and missing reproducibility details."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 5.0,
+    "Experimental_Soundness": 3.5,
+    "Writing_Clarity": 6.5,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "FAC-MAE combines annealed archive thresholds, diagonal covariance adaptation, and ridge-estimated descriptor transport for quality-diversity optimization. Reported gains are substantial on twelve small synthetic tasks, but the evidence does not establish robust superiority or the necessity of the covariance component. Most theoretical results are standard identities or regularization properties, with an important qualification needed for the sampling-covariance guarantee.",
+    "strengths": "The method is described with equations and pseudocode, including initialization and exceptional cases. The threshold-persistence identity, ridge-estimator uniqueness, unnormalized transport alignment, and pre-normalization leakage bound are mathematically sound. Results include coverage, mean quality, tail quality, paired confidence intervals, component subtraction, and a covariance-by-annealing factorial experiment. The limitations candidly acknowledge restricted scope and statistically unresolved covariance benefits.",
+    "weaknesses": "Evaluation uses only three instances per dimension, one archive size, one evaluation budget, and a single synthetic problem family. No held-out tuning protocol, repeated optimizer seeds, or randomized execution protocol is documented. Baselines are restricted diagonal variants with different annealing rates and insufficient implementation detail. Covariance removal has no statistically resolved score penalty. Hardware, measured runtime, peak memory, precision, exact benchmark equations, and reproducibility artifacts are absent. The claimed covariance eigenvalue bound requires correction for global scaling and clipping.",
+    "detailed_comments": "1. Mathematical scope: Theorems 1 and Lemma 2 follow directly from a geometric recurrence and strictly convex ridge regression. Proposition 3 correctly establishes alignment of the unnormalized regularized step under the estimated Jacobian; it does not establish target-cell entry, objective improvement, or alignment of the complete noisy, clipped proposal. Positive scalar norm capping preserves nonnegative alignment but generally loses the stated unconstrained minimizer property. Proposition 4 correctly bounds JR_lambda z before normalization; the implemented normalized direction instead introduces division by ||R_lambda z||, so the displayed bound is not an equivalent guarantee for the emitted perturbation. The limitations acknowledge this distinction.\n2. Covariance theorem: For the latent normalized Gaussian displacement, D + rho pp^T/||p||^2 has minimum eigenvalue at least 0.08. For the decision proposal x = m + sigma y, the corresponding bound is 0.08 sigma^2 before clipping. Coordinate clipping produces a non-Gaussian distribution for which the stated bound does not follow. Theorem 5 calls the unscaled matrix the actual sampling covariance and should distinguish these objects. The natural-gradient identity is standard and valid for fixed utilities in the stated Gaussian model; its relationship to sample-dependent ranks, sequential within-batch threshold changes, the path-augmented distribution, and clipping needs explicit qualification.\n3. Experimental isolation: The strongest baseline uses alpha = 0.15 while FAC-MAE uses 0.03, and baseline initialization, restart behavior, emitter details, and tuning budgets are unspecified. Thus the 0.2118 score advantage cannot be assigned specifically to frontier transport. The within-method frontier subtraction supports a narrower 0.0332 +/- 0.0142 effect, provided proposal replacement and randomness are controlled; these details are not reported.\n4. Subtraction and interaction: Removing covariance changes score by only 0.0078 +/- 0.0106. In the frontier-free factorial, covariance contributes approximately 0.002 with annealing, and the interaction contrast is negative, approximately -0.0056, without an uncertainty estimate. These results do not establish a beneficial covariance-annealing interaction. The reported 0.0800 improvement compares the complete method against a frontier-free condition lacking covariance and annealing, so it combines three changes. The evolution-path term, edge weighting, residual perturbation, and full-archive refinement also lack individual subtraction controls.\n5. Statistical support: The paired Student-t formula is appropriate for twelve independent taskwise differences under its assumptions, but the manuscript supplies neither taskwise observations nor repeated optimizer runs. Three instances at each fixed dimension provide limited evidence about stochastic reliability, and task-level intervals mix instance variation with search randomness. Multiple component comparisons are unadjusted; the dimension-scaling interval barely excludes zero and should be treated cautiously.\n6. Scale and reproducibility: Dimensions 24-64, 144 cells, and 672 evaluations establish a local prototype result, not broad high-dimensional scalability. No budget, archive-resolution, noise, descriptor-dimension, or hardware stress study is provided. Asymptotic memory and runtime bounds are useful but do not replace measured overhead. With k = 32 and d up to 64, local decision-space regression is underdetermined before regularization; ridge uniqueness does not establish Jacobian accuracy. Descriptor prediction error and actual target-cell success should be measured.\n7. Prior work and presentation: The supplied literature establishes covariance-based QD, heterogeneous emitters, gradient-guided descriptor exploration, and learned-model assistance as existing frameworks. The plausible distinctive contribution is their specific black-box frontier-transport integration, not the individual algebraic guarantees. The related-work section recognizes these connections but lacks matched comparisons against multi-emitter and model-based alternatives. The Venus strategy citation is tangential. The manuscript is organized as a standalone paper without internal log filenames or duplicate appendix headings, although dense contribution lists, an oversized comparison table, and extracted mathematical/pseudocode corruption reduce clarity. Extraction artifacts alone do not establish poor PDF typography.",
+    "questions": "What are the exact objective and descriptor equations, task-generation seeds, optimizer seeds, and held-out tuning protocol? Are comparisons repeated with paired random streams and randomized execution order? How do results change with matched annealing rates, tuned standard CMA-ME/CMA-MAE implementations, and a covariance-free frontier method? What are the uncertainty intervals for factorial main effects and interaction? Does removing the path term or normalized residual perturbation change performance? What are measured Jacobian errors, target-cell hit rates, runtime, peak memory, numerical precision, and hardware? Can Theorem 5 distinguish normalized latent covariance, scaled proposals, and clipped samples?",
+    "assessment": "I lean toward rejection in the present form. The submission offers a potentially useful QD specialization with encouraging local results and mostly correct elementary analysis, but insufficient baseline matching, unresolved component necessity, limited reproducibility, and narrow experimental scope prevent a strong research claim. My assessment relies on the supplied manuscript and literature records; the reported experiments were not independently reproduced."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

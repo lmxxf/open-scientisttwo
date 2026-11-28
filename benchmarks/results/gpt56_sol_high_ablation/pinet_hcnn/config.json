@@ -1,0 +1,10 @@
+{
+  "name": "face_signature_batching_with_factor_updates",
+  "face_signature": "sorted_active_constraint_ids",
+  "batch_grouping": true,
+  "max_rank_update": 4,
+  "update_method": "qr_update_downdate",
+  "refactor_condition_threshold": 100000000.0,
+  "cache_size": 128,
+  "cache_forward_and_adjoint": true
+}

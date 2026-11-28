@@ -1,0 +1,8 @@
+{
+  "native_math": true,
+  "returncodes": [
+    0,
+    0
+  ],
+  "fallback": false
+}

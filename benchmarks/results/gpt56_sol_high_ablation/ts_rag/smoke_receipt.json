@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "best": {
+    "config": {
+      "stability_aware_ridge": true,
+      "lambda_selection": "gcv",
+      "ridge_whitening": "svd",
+      "weight_constraint": false,
+      "negative_weight_cap": 0.25,
+      "influence_pruning": false,
+      "max_condition_number": 10000.0,
+      "min_effective_neighbors": 3
+    },
+    "value": 0.07634169658774356,
+    "label": "pruned",
+    "snapshot": "pruned"
+  },
+  "baseline_full": 0.523565919000025,
+  "final_test": 0.16109898518969767,
+  "local_score": 4.7142857142857135,
+  "local_decision": "Reject",
+  "claims": 22,
+  "roles": 30,
+  "protected_hashes": {
+    "eval.py": "2d2336f77f4fde478df5aaba023ff04ec98b476b6640aad62033aa318f82f735",
+    "data.py": "ad854e00e7da8a1e72505d0ab25de62b346374326734914c2187cb0211454064",
+    "task_spec.json": "0ae737dc14372a1691402b3986f5348d1acf48d6e41aef2c6aaa833ca7c9c256"
+  },
+  "seconds": 3960.0
+}

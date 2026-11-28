@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56high-inc_bpe/manuscript.pdf",
+  "seconds": 71.03,
+  "numerical_score": 4.7,
+  "fine_weighted_score": 5.93,
+  "positive_count": 2,
+  "neutral_count": 4,
+  "negative_count": 1,
+  "triple_scores": {
+    "Claims_Support": 0,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The interval theorem and rank sweep are convincing conditional on the semantic criterion, and local measurements support integrated gains over the reference. Semantic proof gaps and unresolved mechanism attribution prevent full support.",
+    "Experimental_Soundness": "Randomized paired measurements are useful, but subtraction does not establish effects for intervals or certificates, displayed paired means are inconsistent, and baseline parity and realistic-scale evaluation are insufficiently documented.",
+    "Writing_Clarity": "A coherent standalone article with explicit theorems, pseudocode, tables, and limitations; no internal log filenames, duplicate appendix headings, or audit-report clutter.",
+    "Prior_Work_Context": "Broad bibliography and useful positioning, but the directly relevant retrieved finite-state-transduction work is missing and closest-method differentiation remains incomplete.",
+    "Question_Importance": "Exact streaming tokenization and predictable per-byte processing are important infrastructure problems for language-model systems.",
+    "Originality": "Rank-ordered subtree intervals and conservative context certificates form a neat specialization, but the current evidence does not establish a substantial conceptual departure from established tree-interval and finite-state compilation techniques.",
+    "Value_to_Community": "The characterization and transparent prototype results could make a useful technical note; unresolved semantic details, attribution, and small workloads constrain broader value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 5.5,
+    "Experimental_Soundness": 4.0,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 8.0,
+    "Originality": 6.0,
+    "Value_to_Community": 5.5
+  },
+  "sections": {
+    "summary": "The paper proposes exact incremental ranked-BPE tokenization using rank-ordered DFS intervals and static context certificates. The interval characterization and update-before-read compiler are plausible, useful contributions. However, the experiments do not establish that these central components improve integrated latency: their subtraction intervals include zero, and replacing intervals with pointer traversal is slightly faster in the primary ablation. The evidence supports a small tokenizer prototype with promising predicate microbenchmarks, rather than a convincingly isolated systems advance.",
+    "strengths": "The paper distinguishes constant-time predecessor decisions from O(Cq) append complexity and explicitly reports construction overhead, duplicated endpoint storage, hardware, runtime, and memory. Theorem 1 follows cleanly from rank-ordered contiguous child subtrees, conditional on Lemma 1; Theorem 2 correctly handles equal-rank exclusion through update-before-read ordering. Randomized interleaving, paired confidence intervals, fixed-size depth sweeps, explicit-set comparisons, and disclosed negative ablations are valuable. The manuscript reads as a standalone academic article with algorithms, proofs, tables, and substantive limitations.",
+    "weaknesses": "The primary vocabulary has only 72 merges, and the largest sweep has 512 merges. Corpus provenance, stream generation, seeds, split construction, baseline implementation details, and memory measurement methodology are insufficiently specified. The core interval and certificate components have no statistically resolved integrated benefit, whereas dense transitions and the atomic bypass do. No rejection certificates occur in the benchmark. A depth-sweep table contains paired-mean inconsistencies. The closest retrieved finite-state-transduction work is omitted, and the supplied literature does not substantiate the component-weighted-centroid citation.",
+    "detailed_comments": "Mathematical assessment: The two-interval geometry and linear rank sweep are convincing conditional results. The semantic foundation needs a more rigorous argument. Lemma 1 states that a token ending in w(p) is precisely a successor-forest descendant of p; byte-suffix containment alone does not imply ancestry along designated right operands. The proof must explain why canonicality and the particular exposed boundary imply the stronger structural property needed here. Theorem 3 also compresses two substantive steps: why the longest accepted candidate is uniquely the batch-final token, and why cutting at that boundary preserves the batch tokenization of the preceding prefix. These are proof obligations, not established counterexamples. Certificate soundness is reasonable conditional on the conservative boundary sets and preceding semantic results, but certificate construction deserves executable pseudocode rather than only a named subroutine and prose.\n\nExperimental attribution: Removing certificates changes latency by +0.262 \u00b1 0.459 ms/10 KB; replacing intervals with pointers changes it by -0.073 \u00b1 0.189; removing both costs +0.504 \u00b1 0.522. All three intervals include zero. Dense transitions and atomic bypasses have positive isolated effects, but the central mechanisms do not satisfy the requested subtraction criterion. Forced-query depth results support cheaper predicates, not an integrated latency benefit. The approximately twofold centroid comparisons need identical transition, atomic-bypass, certificate, candidate-order, and output policies to establish representation-specific attribution.\n\nNumerical consistency: At depth 4, displayed pointer and proposed means imply 2.373 - 2.327 = 0.046 ms, but the paired mean is reported as 0.095 ms. At depth 24, 1.870 - 1.850 = 0.020, versus a reported paired mean of 0.035. For the same paired observations and weighting, mean differences must agree; these discrepancies exceed displayed rounding. If different aggregation rules were used, disclose them and avoid presenting the columns as the same contrast.\n\nStatistical scope: Seven timing passes quantify execution variability on fixed streams, not variation across independently generated vocabularies, corpora, or machines. The paper labels a test stream held out, but does not describe a sufficiently reproducible split or selection protocol. Static certificate coverage is vocabulary-dependent, so unchanged 82.3% coverage across streams is not evidence of distributional generalization. Report uncertainty for predicate speedups and certificate effects across independent workloads. Peak-memory figures need allocator/process scope, units, measurement procedure, and scale-dependent construction measurements.\n\nPrior work and presentation: The retrieved Tokenization as Finite-State Transduction paper directly concerns constructive canonical-BPE compilation and should be compared formally. Explain differences in state growth, preprocessing, update/output semantics, and retained history. The retrieved Jiang\u2013Gong abstract states O(log^2 L), whereas the extracted manuscript repeatedly displays O(log L); verify whether this is a manuscript error or lost PDF superscripting. The component-weighted-centroid work is cited but absent from the supplied retrieval, so its guarantees and differentiation cannot be independently established from this evidence. Presentation is otherwise clean; extraction artifacts alone do not justify a writing penalty.",
+    "questions": "1. Can you provide a complete boundary-exposure proof of Lemma 1 and explicitly establish the prefix-cut property used in Theorem 3? 2. Why do the fixed-depth paired means disagree with differences of the displayed method means? 3. Do all centroid and set baselines share the same transitions, bypasses, certificates, and output semantics? 4. What independent vocabulary and stream sampling protocol supports the held-out designation? 5. Can production-size vocabularies and adversarial candidate-heavy streams demonstrate an integrated interval/certificate benefit with confidence intervals excluding zero? 6. How does this compilation differ formally from the retrieved finite-state-transduction construction, and what are the measured preprocessing and memory costs at realistic vocabulary sizes?",
+    "assessment": "Below the acceptance threshold in its current form. The paper offers a potentially useful interval-compilation specialization and presents limitations honestly, but central semantic proof steps need strengthening, experimental attribution fails the stipulated subtraction standard, numerical inconsistencies need correction, and realistic-scale validation is missing."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

@@ -34,6 +34,6 @@ test_trial_runtime_error_recovers_or_marks_bad (test_regressions.IntegrityTests.
 test_zero_success_terminal_receipt (test_regressions.IntegrityTests.test_zero_success_terminal_receipt) ... ok
 
 ----------------------------------------------------------------------
-Ran 34 tests in 5.520s
+Ran 34 tests in 6.544s
 
 OK
