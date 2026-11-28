@@ -201,12 +201,17 @@ class Pipeline:
         for i, plan in enumerate(plans):
             self.restore(self.best['snapshot'])
             ablations.append(dict(config=plan['config'], value=self.snapshot(f'ablation{i}', plan['config'])))
-        critique = self.agent('Ablation Critic', f'Metric={self.spec["primary_metric"]}, higher_is_better={self.spec["higher_is_better"]}. Best {self.best}; ablations {ablations}. Return {{"refine":true|false,"config":{{...}}}}.')
+        critique = self.agent('Ablation Critic', f'Metric={self.spec["primary_metric"]}, higher_is_better={self.spec["higher_is_better"]}. Best {self.best}; ablations {ablations}. Return {{"refine":true|false,"config":{{...}}}} using ONLY concrete boolean/numeric parameter values (never write descriptive placeholder strings like "retain setting" inside numeric config fields).')
         if critique['refine'] and self.ablation_refinement:
             self.restore(self.best['snapshot'])
-            score = self.snapshot('pruned', critique['config'])
+            base_cfg = dict(self.best.get('config', {}))
+            for k_cfg, v_cfg in critique.get('config', {}).items():
+                if k_cfg in base_cfg and isinstance(base_cfg[k_cfg], (int, float)) and not isinstance(base_cfg[k_cfg], bool) and isinstance(v_cfg, str):
+                    continue
+                base_cfg[k_cfg] = v_cfg
+            score = self.snapshot('pruned', base_cfg)
             if better(score, self.best['value'], self.spec, equal=True):
-                self.best = dict(config=critique['config'], value=score, label='pruned', snapshot='pruned')
+                self.best = dict(config=base_cfg, value=score, label='pruned', snapshot='pruned')
         self.event(4, best=self.best, ablations=ablations)
         self.draft()
         for i in range(self.peer_rounds):
