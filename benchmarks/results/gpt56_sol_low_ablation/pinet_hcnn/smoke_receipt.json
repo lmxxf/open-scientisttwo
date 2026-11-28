@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "best": {
+    "label": "initial",
+    "snapshot": "initial_eng4",
+    "config": {
+      "name": "curvature_metric_projection",
+      "projection_metric": "D + U*U^T, D positive diagonal",
+      "metric_parameterization": "softplus diagonal with bounded low-rank correction",
+      "newton_hessian": "metric plus active constraint curvature",
+      "nullspace_system": "Z^T H Z",
+      "adjoint": "reuse factorization of Z^T H Z",
+      "safeguard": "eigenvalue floor 1e-6 and condition cap 1e6"
+    },
+    "value": 0.00010639972403890398
+  },
+  "baseline_full": 0.21581560591594873,
+  "final_test": 0.00011080216369801548,
+  "local_score": 4.285714285714286,
+  "local_decision": "Reject",
+  "claims": 16,
+  "roles": 30,
+  "protected_hashes": {
+    "eval.py": "26ff903857778b3c726b9de2de175a86826cb790fe18068bf43ad6c1442802bc",
+    "data.py": "a8a82931b54f7fabd1525268b7344534de22e8bd4eff455677668671426062e2",
+    "task_spec.json": "36b47c9e507bf856a39c746ae5da8f3b042c0550f53620597a0d0700eee32090"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/pinet_hcnn",
+    "--model",
+    "gpt-5.6-sol",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-gpt56-pinet_hcnn"
+  ],
+  "seconds": 2000.7528050239198
+}

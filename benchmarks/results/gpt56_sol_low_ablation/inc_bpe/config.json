@@ -1,0 +1,20 @@
+{
+  "name": "fused_state_acceptance_partition",
+  "acceptance_mode": "intervals",
+  "flat_transitions": true,
+  "atomic_fastpath": true,
+  "certified_regions": true,
+  "state_partition": "priority_winner_segments",
+  "segment_domain": "predecessor_dfs_rank",
+  "lookup": "two_level_rank_directory",
+  "compile": "endpoint_sweep",
+  "fallback": null,
+  "proof_objects": [
+    "interval_partition",
+    "rank_monotonicity",
+    "certificate_soundness",
+    "winner_partition_completeness"
+  ],
+  "checker": "independent_linear_scan",
+  "runtime_assertions": false
+}

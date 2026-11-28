@@ -106,23 +106,59 @@ class Pipeline:
         if (self.root/'model.py').read_bytes() == (self.root/'snapshots'/parent/'model.py').read_bytes():
             raise ValueError('coder made no source change')
 
+    def _check_integrity_if_initialized(self):
+        if hasattr(self, 'lock') and hasattr(self, 'snapshots'):
+            self.guard()
+
+    def _safe_trial_snapshot(self, snap_label, config, mode):
+        try:
+            return config, self.snapshot(snap_label, config, mode), None
+        except Exception as exc:
+            self._check_integrity_if_initialized()
+            return config, None, f'{type(exc).__name__}: {exc}'
+
     def trial(self, label, idea):
-        self.code(label, idea, idea.get('parent', 'baseline_source'))
+        try:
+            self.code(label, idea, idea.get('parent', 'baseline_source'))
+        except Exception as exc:
+            self._check_integrity_if_initialized()
+            self.event(2, label=label, mode='code', decision='Bad', value=None, feedback=f'{type(exc).__name__}: {exc}')
+            return
         config = idea.get('config', {})
         current = None
         for mode, baseline in [('subset', self.base_subset), ('full', self.base_full)]:
+            attempts = [0]
             def candidate():
-                return config, self.snapshot(label+'_'+mode, config, mode)
+                attempts[0] += 1
+                snap_name = label+'_'+mode if attempts[0] == 1 else f'{label}_{mode}_try{attempts[0]}'
+                cfg, val, err = self._safe_trial_snapshot(snap_name, config, mode)
+                if err is not None:
+                    self.execution_error = err
+                    return cfg, None
+                self.execution_error = None
+                return cfg, val
             def critic(value):
+                if value[1] is None:
+                    self.feedback = 'Runtime execution failed; fix the bug in model.py/config: ' + (getattr(self, 'execution_error', '') or 'unknown error')
+                    return 'Engineer'
                 result = self.agent(mode+' Critic', f'Result {value}, baseline {baseline}. Return {{"decision":"Good|Bad|Engineer","feedback":"..."}}. Good requires a strict improvement in {getattr(self, "spec", {}).get("primary_metric", "mse")}; higher_is_better={getattr(self, "spec", {}).get("higher_is_better", False)}.')
                 self.feedback = result.get('feedback', '')
                 decision = result['decision']
                 if decision == 'Good' and not better(value[1], baseline, getattr(self, 'spec', {'higher_is_better': False})):
                     return 'Bad'
                 return decision
-            current, verdict = stage(candidate, critic, lambda v:self.refine(label, v, mode), self.engineering)
-            self.event(2, label=label, mode=mode, decision=verdict, value=current[1], feedback=self.feedback)
-            if verdict != 'Good':
+            def refine_step(v):
+                try:
+                    res = self.refine(label, v, mode)
+                    self.execution_error = None
+                    return res
+                except Exception as exc:
+                    self._check_integrity_if_initialized()
+                    self.execution_error = f'{type(exc).__name__}: {exc}'
+                    return v[0], None
+            current, verdict = stage(candidate, critic, refine_step, self.engineering)
+            self.event(2, label=label, mode=mode, decision=verdict, value=current[1], feedback=getattr(self, 'feedback', ''))
+            if verdict != 'Good' or current[1] is None:
                 return
             config = current[0]
         snapshot = self.claims[-1]['label']
@@ -177,7 +213,14 @@ class Pipeline:
                             dois.append(cand_doi)
             except Exception:
                 pass
-        self.refs = [reference(doi) for doi in dois]
+        seed_set = {d.casefold() for d in self.spec['seed_dois']}
+        self.refs = []
+        for doi in dois:
+            try:
+                self.refs.append(reference(doi))
+            except Exception:
+                if doi.casefold() in seed_set:
+                    raise
         save(self.root/'references.json', self.refs)
         ideas = self.agent('Seed Generator and Novelty Checker', 'Read related_work.xml and references.json. '
             f'For {self.spec["title"]}, propose {self.K+2} distinct evidence-grounded algorithmic improvements. '
@@ -208,15 +251,28 @@ class Pipeline:
         self.best = next(x for x in self.successes if x['label'] == selected['label'])
         if any(better(x['value'], self.best['value'], self.spec) for x in self.successes):
             raise ValueError('selector did not choose best')
-        self.restore(self.best['snapshot'])
-        plans = self.agent('Ablation Planner', f'Read model.py and snapshots/{self.best["snapshot"]}/config.json. Best {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one proposed component"}},...]}}. '
-                           f'Plan exactly {self.ablation_count} subtraction/control configurations using ONLY config keys and values actually supported by model.py without raising exceptions; identify which mechanism each disables.')['ablations']
-        ablations = []
-        if len(plans) != self.ablation_count:
-            raise ValueError('ablation plan count')
-        for i, plan in enumerate(plans):
+        for _ab_try in range(2):
             self.restore(self.best['snapshot'])
-            ablations.append(dict(config=plan['config'], value=self.snapshot(f'ablation{i}', plan['config'])))
+            ab_err_note = '' if _ab_try == 0 else f' Previous ablation config crashed with: {_last_ab_err}. Use ONLY scalar boolean/numeric config keys supported by model.py.'
+            plans = self.agent('Ablation Planner', f'Read model.py and snapshots/{self.best["snapshot"]}/config.json. Best {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one proposed component"}},...]}}. '
+                               f'Plan exactly {self.ablation_count} subtraction/control configurations using ONLY config keys and values actually supported by model.py without raising exceptions; identify which mechanism each disables.' + ab_err_note)['ablations']
+            ablations = []
+            if len(plans) != self.ablation_count:
+                raise ValueError('ablation plan count')
+            _last_ab_err = None
+            for i, plan in enumerate(plans):
+                self.restore(self.best['snapshot'])
+                lbl_ab = f'ablation{i}' if _ab_try == 0 else f'ablation_retry_{i}'
+                try:
+                    ablations.append(dict(config=plan['config'], value=self.snapshot(lbl_ab, plan['config'])))
+                except Exception as exc:
+                    self._check_integrity_if_initialized()
+                    _last_ab_err = f'{type(exc).__name__}: {exc}'
+                    break
+            if _last_ab_err is None:
+                break
+        if _last_ab_err is not None:
+            raise RuntimeError(f'ablation execution failed: {_last_ab_err}')
         critique = self.agent('Ablation Critic', f'Metric={self.spec["primary_metric"]}, higher_is_better={self.spec["higher_is_better"]}. Best {self.best}; ablations {ablations}. Return {{"refine":true|false,"config":{{...}}}} using ONLY concrete boolean/numeric parameter values (never write descriptive placeholder strings like "retain setting" inside numeric config fields).')
         if critique['refine'] and self.ablation_refinement:
             self.restore(self.best['snapshot'])
@@ -225,32 +281,48 @@ class Pipeline:
                 if k_cfg in base_cfg and isinstance(base_cfg[k_cfg], (int, float)) and not isinstance(base_cfg[k_cfg], bool) and isinstance(v_cfg, str):
                     continue
                 base_cfg[k_cfg] = v_cfg
-            score = self.snapshot('pruned', base_cfg)
-            if better(score, self.best['value'], self.spec, equal=True):
+            try:
+                score = self.snapshot('pruned', base_cfg)
+            except Exception:
+                self._check_integrity_if_initialized()
+                score = None
+            if score is not None and better(score, self.best['value'], self.spec, equal=True):
                 self.best = dict(config=base_cfg, value=score, label='pruned', snapshot='pruned')
                 # Iterative Pareto Pruning: re-plan and re-run subtraction ablations around pruned;
                 # if removing any single remaining component improves or matches validation score,
                 # automatically promote that cleaner subtraction config as the new pruned!
                 for _prune_round in range(2):
                     self.restore(self.best['snapshot'])
-                    re_plans = self.agent('Ablation Planner', f'Read model.py and snapshots/pruned/config.json. Final selected pruned method is {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one active component from pruned"}},...]}}. Plan exactly {self.ablation_count} single-component subtraction configurations around snapshots/pruned/config.json using ONLY supported boolean/numeric keys.')['ablations']
+                    cur_snap = self.best['snapshot']
+                    re_plans = self.agent('Ablation Planner', f'Read model.py and snapshots/{cur_snap}/config.json. Final selected pruned method is {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one active component from pruned"}},...]}}. Plan exactly {self.ablation_count} single-component subtraction configurations around snapshots/{cur_snap}/config.json using ONLY supported boolean/numeric keys.')['ablations']
                     if len(re_plans) != self.ablation_count:
                         break
-                    ablations = []
+                    new_ablations = []
+                    ab_ok = True
                     for i, plan in enumerate(re_plans):
                         self.restore(self.best['snapshot'])
-                        p_lbl = f'pruned_ablation{i}'
+                        p_lbl = f'pruned_ablation{i}' if _prune_round == 0 else f'pruned_r{_prune_round}_ablation{i}'
                         p_cfg = dict(base_cfg)
                         for k_p, v_p in plan.get('config', {}).items():
                             if k_p in p_cfg and isinstance(p_cfg[k_p], (int, float)) and not isinstance(p_cfg[k_p], bool) and isinstance(v_p, str):
                                 continue
                             p_cfg[k_p] = v_p
-                        ablations.append(dict(config=p_cfg, value=self.snapshot(p_lbl, p_cfg)))
-                    best_ab = min(ablations, key=lambda x: x['value'] if self.direction == 'min' else -x['value'])
-                    if better(best_ab['value'], self.best['value'], self.direction):
+                        try:
+                            new_ablations.append(dict(config=p_cfg, value=self.snapshot(p_lbl, p_cfg)))
+                        except Exception:
+                            self._check_integrity_if_initialized()
+                            ab_ok = False
+                            break
+                    if not ab_ok or not new_ablations:
+                        break
+                    ablations = new_ablations
+                    higher = self.spec.get('higher_is_better', False)
+                    best_ab = max(ablations, key=lambda x: x['value']) if higher else min(ablations, key=lambda x: x['value'])
+                    if better(best_ab['value'], self.best['value'], self.spec):
                         base_cfg = dict(best_ab['config'])
-                        score = self.snapshot('pruned', base_cfg)
-                        self.best = dict(config=base_cfg, value=score, label='pruned', snapshot='pruned')
+                        next_lbl = f'pruned_r{_prune_round + 1}'
+                        score = self.snapshot(next_lbl, base_cfg)
+                        self.best = dict(config=base_cfg, value=score, label=next_lbl, snapshot=next_lbl)
                     else:
                         break
         self.event(4, best=self.best, ablations=ablations)
@@ -278,15 +350,17 @@ class Pipeline:
         count = verify_claims(self.root, self.root/'claims.json', self.root/'manuscript.md')
         from .audits import verify_references
         verified = verify_references(self.root/'manuscript.md')
-        alignment = self.agent('Method-Code Auditor', f'Read manuscript.md and ONLY snapshots/{self.best["snapshot"]}/model.py and its config.json as selected source. '
-            f'Selected configuration {self.best}. Check actual executed method/formula. Return {{"aligned":true|false,"evidence":"..."}}.')
-        if not alignment['aligned']:
-            self.draft('CRITICAL I4 METHOD-CODE ALIGNMENT FIX: Ensure the manuscript describes ONLY the exact executed configuration in snapshots/' + str(self.best["snapshot"]) + '/config.json and model.py without any discrepancy: ' + str(alignment.get('evidence', '')))
+        i4_prompt = (f'Read manuscript.md and ONLY snapshots/{self.best["snapshot"]}/model.py and its config.json as selected source. '
+                     f'Selected configuration {self.best}. Check whether manuscript.md faithfully describes ONLY the algorithm, formulas, and active mechanisms actually executed by model.py under config.json (do NOT fail alignment over unused metadata/dead keys in config.json as long as manuscript.md itself makes no unimplemented claims). Return {{"aligned":true|false,"evidence":"..."}}.')
+        alignment = self.agent('Method-Code Auditor', i4_prompt)
+        for _i4_try in range(2):
+            if alignment['aligned']:
+                break
+            self.draft('CRITICAL I4 METHOD-CODE ALIGNMENT FIX: Ensure manuscript.md describes ONLY the exact executed code path (including any numerical regularization/fallback branches) in snapshots/' + str(self.best["snapshot"]) + '/model.py (under its config.json) without claiming any unimplemented mechanism: ' + str(alignment.get('evidence', '')))
             self.guard()
             count = verify_claims(self.root, self.root/'claims.json', self.root/'manuscript.md')
             verified = verify_references(self.root/'manuscript.md')
-            alignment = self.agent('Method-Code Auditor', f'Read manuscript.md and ONLY snapshots/{self.best["snapshot"]}/model.py and its config.json as selected source. '
-                f'Selected configuration {self.best}. Check actual executed method/formula. Return {{"aligned":true|false,"evidence":"..."}}.')
+            alignment = self.agent('Method-Code Auditor', i4_prompt)
         report = dict(I1=dict(pass_=True, claims=count), I2=dict(pass_=True, hashes=self.lock),
                       I3=dict(pass_=True, references=verified), I4=alignment)
         save(self.root/'audit_report.json', report)

@@ -1,0 +1,32 @@
+{
+  "adaptive_emitter_allocation": true,
+  "allocation_signal": "ema_realized_normalized_qd_gain_per_evaluation",
+  "reward_ema_decay": 0.9,
+  "emitters": [
+    "frontier_secant",
+    "local_surrogate",
+    "archive_elite_mutation"
+  ],
+  "initial_shares": {
+    "frontier_secant": 0.25,
+    "local_surrogate": 0.2,
+    "archive_elite_mutation": 0.55
+  },
+  "minimum_share": 0.05,
+  "coverage_saturation_window": 3,
+  "coverage_gain_threshold": 0.005,
+  "post_saturation_shares": {
+    "frontier_secant": 0.05,
+    "local_surrogate": 0.15,
+    "archive_elite_mutation": 0.8
+  },
+  "surrogate_target": "cellwise_quality_improvement",
+  "surrogate_acceptance": "positive_uncertainty_penalized_improvement_over_target_cell_elite",
+  "duplicate_cell_filter": true,
+  "parent_sampling": "quality_cvar_mixture",
+  "cvar_parent_fraction": 0.25,
+  "frontier_boundary_guidance": false,
+  "local_surrogate_refinement": false,
+  "cma_covariance_adaptation": true,
+  "archive_threshold_annealing": true
+}

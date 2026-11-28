@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56-pinet_hcnn/manuscript.pdf",
+  "seconds": 68.54,
+  "numerical_score": 3.2,
+  "fine_weighted_score": 5.19,
+  "positive_count": 2,
+  "neutral_count": 3,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The conditional derivative and curvature calculation hold, but the complete solver lacks verified convergence, admits stale cached outputs, and overstates isolated geometry and forward acceleration benefits.",
+    "Experimental_Soundness": "Randomized paired timing and backward controls are positives, but the geometry subtraction is confounded, headline comparisons lack equivalent output caching, and held-out selection and baseline accuracy protocols are undocumented.",
+    "Writing_Clarity": "The manuscript has a coherent academic structure, explicit theorems, proofs, pseudocode, tables, and candid limitations, without internal log filenames or audit-report clutter.",
+    "Prior_Work_Context": "The bibliography and comparison table provide adequate context, but formal differentiation from the closest methods is limited and retrieved modular implicit differentiation work is omitted.",
+    "Question_Importance": "Efficient differentiable layers that enforce hard constraints are important for learning, control, and scientific optimization.",
+    "Originality": "The retained face-factor implementation is a useful specialization of established nullspace, active-set Newton, and implicit differentiation techniques; a genuinely new synthesis is not demonstrated.",
+    "Value_to_Community": "The stable-face formulation and backward comparison could support a useful technical note, but correctness gaps and small cached workloads limit the present contribution."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.5,
+    "Experimental_Soundness": 3.5,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.0,
+    "Question_Importance": 8.0,
+    "Originality": 5.0,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "The paper presents a dense nullspace active-face Newton solver for a strongly convex sinusoidally perturbed quadratic objective with affine and box constraints, together with a retained-Cholesky implicit derivative. The stable-face derivative is correct under its stated assumptions, but the implemented solver's guarantees are incomplete, memoization can return incorrect outputs, and the principal speedups compare cached answers against numerical solves. The evidence supports a small specialized prototype rather than the claimed unified algorithmic advance.",
+    "strengths": "The Hessian lower bound is correct on the specified box. The face-tangent parameterization and stable-face derivative with respect to q are mathematically sound, and the O(dk+k^2) retained-factor VJP bound follows directly. The paper provides pseudocode, randomized interleaved timing, paired confidence intervals, finite-difference gradient checks, a same-output backward refactorization control, and explicit limitations. Its cache-free factorial experiment and disclosure that fresh solves lose to the splitting baselines are useful evidence.",
+    "weaknesses": "The paper does not establish convergence or correctness of its capped active-face implementation. Strong convexity is guaranteed only inside the box, while unconstrained face Newton iterates need not remain there. The identity cache omits objective and constraint parameters and is unsafe under mutation. Headline forward speedups primarily measure solution lookup, without equivalent caching controls for competitors. Equality-nullspace geometry has no isolated performance benefit in the factorial results, and the purported non-nullspace subtraction also changes refinement. Experiments cover six small principal instances, lack a documented held-out development protocol, and omit important baseline, memory, software, and learning-task details.",
+    "detailed_comments": "1. Theorem 1 correctly establishes curvature on the box, but existence additionally requires a nonempty feasible set. Full row rank of M does not imply that My=b intersects the box. Closedness and boundedness alone do not establish existence on an empty set. This assumption should be explicit.\n2. Lemma 2 is a standard valid local Newton estimate when both iterates lie in the same affine face space and the required curvature and Lipschitz bounds hold along the connecting segment. It does not justify the actual undamped trajectory. Algorithm 1 solves intermediate face problems without preserving inactive bounds; outside the box, Q-alpha*diag(sin(y)) need not be positive definite under the stated parameter range. The spectral safeguard changes the Newton system rather than establishing convergence of the original iteration.\n3. Theorem 2 does not establish finite identification for the implemented algorithm. Its sign-stability neighborhood is assumed rather than shown reachable or invariant, and the proof refers to adding a 'violated inactive bound' although truly inactive bounds have positive slack near the optimum. The effect of resetting to a face base point is not analyzed. No anti-cycling argument, consistency guarantee for accumulated active equations, or justification for d+2 face updates and ten Newton steps is supplied. Exhaustion of either cap has no certified failure outcome. These gaps matter independently of successful local tests.\n4. Theorem 3 correctly differentiates the exact solution with respect to q on a fixed regular face. It does not establish derivatives at degenerate faces or with respect to all problem parameters. An implementation must also establish that its retained factor corresponds to the final returned point after the last Newton update and face projection. A floored factor instead differentiates a modified linear system. The final NaN/infinity conversion can return a finite but infeasible or nonoptimal point and should not constitute successful solver termination.\n5. Memoization is a correctness issue, not merely a performance limitation. Changing alpha or bounds can reuse an incompatible solution, and geometry caching can reuse an origin for an obsolete b. In-place changes to identity-keyed arrays create further stale-state risks. The limitations acknowledge these issues, but the public algorithm has no enforced immutable-input contract or automatic invalidation.\n6. The 396x/540x forward results and 381x\u2013529x scaling results compare an O(d) stored-answer copy with numerical optimization. They establish repeated-object lookup throughput, not solver acceleration or fresh-solve scaling. The paper itself reports that removing reuse makes the method slower than Douglas\u2013Rachford by 0.795\u00b10.100 ms and ADMM by 0.495\u00b10.048 ms. Both competitors need equivalent solved-output caching controls, with separate cold, geometry-reuse, and genuinely changed-input workloads.\n7. The cache-free factorial table does not support an independent nullspace advantage: exact-curvature direct equality handling scores 0.082314 versus 0.082719 for nullspace handling; quadratic-only direct handling scores 0.074259 versus 0.125699. Exact curvature improves stationarity but increases direct-handling latency from 1.485 to 1.646 ms. The 'shortened non-nullspace refinement' subtraction changes two factors, so it cannot isolate geometry. Timing changes between memoized variants also cannot, without a precise measurement protocol, attribute a cache-hit difference to Newton computation skipped on those hits.\n8. The retained-factor backward comparison is the strongest empirical component: the same-output refactorization control directly tests reuse of the terminal factor, and the directional checks support local derivative correctness. However, ten directions and one reported training trajectory do not establish robustness across active-set transitions. The 40-step unrolled baseline needs matched accuracy and forward/backward accounting.\n9. Seven randomized timing passes and Student-t intervals provide useful local timing evidence, but repeated measurements are not independent problem diversity. The independent benchmark is insufficiently specified to establish a held-out split. Missing details include seeds, instance generation, reference-optimum and KKT-certificate construction, baseline stopping criteria and nonlinear-objective handling, training architecture/task/splits, software and BLAS versions, and measured peak memory. CPU model, clock, and core pinning are reported; actual memory usage and backward memory comparisons are not.\n10. Against the supplied literature, nullspace reduction, active-set identification, Newton acceleration, and implicit differentiation are established ingredients. OptNet already emphasizes low-overhead backward computation using solver structure; OSQP explicitly uses factorization caching; Lewis and Wylie cover identification and Newton acceleration; dQP is discussed as an active-set differentiation comparator. The retrieved Efficient and Modular Implicit Differentiation paper is absent from the bibliography. A comparison table is helpful, but the manuscript does not formally establish what new result exceeds specialization of these principles. The paper otherwise reads as a coherent standalone article, without audit-log clutter; extraction artifacts should not be mistaken for authorial disorganization.",
+    "questions": "Can the authors prove convergence for the actual capped, undamped algorithm, including inconsistent candidate faces and iterates outside the box, or explicitly restrict the guarantee to a certified local phase? What immutable-input contract or complete cache invalidation mechanism prevents stale solutions and stale feasible origins? What are cold-solve and changed-q results with equally cached baselines and matched solution tolerances? Can geometry be subtracted without changing iteration budgets, stopping rules, or other solver components? What are the held-out instance protocol, learning-task specification, baseline configurations, measured memory, and uncertainty across independently generated problems? What formal result is new relative to active-set Newton identification and existing factor-reusing implicit differentiation?",
+    "assessment": "Reject in its present form. The stable-face algebra and backward reuse experiment are useful, but the forward correctness contract, convergence argument, mechanism attribution, and practical performance evidence require substantial revision. I distinguish the valid conditional derivative theorem from unsupported guarantees for the complete implementation. This assessment is based on the supplied manuscript and retrieved literature; no files were modified."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

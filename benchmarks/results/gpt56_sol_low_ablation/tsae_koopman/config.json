@@ -1,0 +1,14 @@
+{
+  "name": "support_gated_bidirectional_koopman_mixture",
+  "latent_width": 8192,
+  "active_features": 64,
+  "num_koopman_regimes": 8,
+  "gate_source": "stop_gradient_binary_topk_support",
+  "forward_loss_weight": 0.2,
+  "backward_loss_weight": 0.2,
+  "cycle_loss_weight": 0.1,
+  "gate_entropy_weight": 0.002,
+  "regime_balance_weight": 0.01,
+  "minimum_regime_usage": 0.03,
+  "fista_momentum": false
+}

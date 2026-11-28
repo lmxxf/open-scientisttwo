@@ -1,0 +1,102 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 16
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2605.30813",
+        "title": "Incremental BPE Tokenization",
+        "url": "https://arxiv.org/abs/2605.30813",
+        "authors": "Shenghu Jiang, Ruihao Gong",
+        "year": "2026",
+        "abstract": "We propose a novel algorithm for incremental Byte Pair Encoding (BPE) tokenization. The algorithm processes each input byte in worst-case $\\mathcal{O}(\\log^2 t)$ time, leading to an overall complexity of $\\mathcal{O}(n \\log^2 t)$, where $n$ is the input length and $t$ is the maximum token length. The algorithm incrementally maintains BPE tokenization results for every prefix of the input text, implementing the standard BPE merge procedure defined by a fixed set of merge rules. This enables efficient partial tokenization in streaming settings. Functioning as a drop-in replacement for standard BPE, our approach achieves a speedup of up to ${\\sim}3\\times$ over Hugging Face's tokenizers, and demonstrates significant latency reductions over OpenAI's tiktoken on pathological inputs. We further introduce an eager output algorithm that enables streaming output, emitting tokens as soon as token b"
+      },
+      {
+        "doi": "10.48550/arXiv.2609.40016",
+        "title": "Component-Weighted Centroid Search for Exact Incremental BPE",
+        "url": "https://arxiv.org/abs/2609.40016",
+        "authors": "Harshit Verma, Rex Ying",
+        "year": "2026",
+        "abstract": "Exact incremental tokenizers keep the tokenization of a growing text up to date, so a long prompt or agent trace is not retokenized each time it grows. Jiang and Gong's algorithm does this for byte-pair encoding (BPE) in $O(\\log^2 t)$ worst-case time per byte, where $t$ is the length of the longest token. Its search passes through $O(\\log t)$ nested subproblems and runs a binary search over the possible branches at each one. We weight each branch by the size of the subproblem it leads to. Each step then costs about one probe for every halving of the remaining candidates, and a whole update costs $O(\\log t)$, as much as one binary search over all candidates. Output and asymptotic memory are unchanged. We also construct valid BPE vocabularies on which the original search provably needs $Θ(\\log^2 t)$ probes and ours $Θ(\\log t)$, and a Rust implementation reproduces both counts exactly. On s"
+      },
+      {
+        "doi": "10.48550/arXiv.2309.08715",
+        "title": "Formalizing BPE Tokenization",
+        "url": "https://arxiv.org/abs/2309.08715",
+        "authors": "Martin Berglund, Brink van der Merwe",
+        "year": "2023",
+        "abstract": "In this paper, we formalize practical byte pair encoding tokenization as it is used in large language models and other NLP systems, in particular we formally define and investigate the semantics of the SentencePiece and HuggingFace tokenizers, in particular how they relate to each other, depending on how the tokenization rules are constructed. Beyond this we consider how tokenization can be performed in an incremental fashion, as well as doing it left-to-right using an amount of memory constant in the length of the string, enabling e.g. using a finite state string-to-string transducer."
+      },
+      {
+        "doi": "10.48550/arXiv.2306.16837",
+        "title": "A Formal Perspective on Byte-Pair Encoding",
+        "url": "https://arxiv.org/abs/2306.16837",
+        "authors": "Vilém Zouhar, Clara Meister, Juan Luis Gastaldi, Li Du et al.",
+        "year": "2023",
+        "abstract": "Byte-Pair Encoding (BPE) is a popular algorithm used for tokenizing data in NLP, despite being devised initially as a compression method. BPE appears to be a greedy algorithm at face value, but the underlying optimization problem that BPE seeks to solve has not yet been laid down. We formalize BPE as a combinatorial optimization problem. Via submodular functions, we prove that the iterative greedy version is a $\\frac{1}{σ(\\boldsymbolμ^\\star)}(1-e^{-{σ(\\boldsymbolμ^\\star)}})$-approximation of an optimal merge sequence, where ${σ(\\boldsymbolμ^\\star)}$ is the total backward curvature with respect to the optimal merge sequence $\\boldsymbolμ^\\star$. Empirically the lower bound of the approximation is $\\approx 0.37$. We provide a faster implementation of BPE which improves the runtime complexity from $\\mathcal{O}\\left(N M\\right)$ to $\\mathcal{O}\\left(N \\log M\\right)$, where $N$ is the sequence"
+      },
+      {
+        "doi": "10.48550/arXiv.2207.13870",
+        "title": "Engineering faster double-array Aho-Corasick automata",
+        "url": "https://arxiv.org/abs/2207.13870",
+        "authors": "Shunsuke Kanda, Koichi Akabe, Yusuke Oda",
+        "year": "2022",
+        "abstract": "Multiple pattern matching in strings is a fundamental problem in text processing applications such as regular expressions or tokenization. This paper studies efficient implementations of double-array Aho-Corasick automata (DAACs), data structures for quickly performing the multiple pattern matching. The practical performance of DAACs is improved by carefully designing the data structure, and many implementation techniques have been proposed thus far. A problem in DAACs is that their ideas are not aggregated. Since comprehensive descriptions and experimental analyses are unavailable, engineers face difficulties in implementing an efficient DAAC. In this paper, we review implementation techniques for DAACs and provide a comprehensive description of them. We also propose several new techniques for further improvement. We conduct exhaustive experiments through real-world datasets and reveal "
+      },
+      {
+        "doi": "10.48550/arXiv.1508.07909",
+        "title": "Neural Machine Translation of Rare Words with Subword Units",
+        "url": "https://arxiv.org/abs/1508.07909",
+        "authors": "Rico Sennrich, Barry Haddow, Alexandra Birch",
+        "year": "2015",
+        "abstract": "Neural machine translation (NMT) models typically operate with a fixed vocabulary, but translation is an open-vocabulary problem. Previous work addresses the translation of out-of-vocabulary words by backing off to a dictionary. In this paper, we introduce a simpler and more effective approach, making the NMT model capable of open-vocabulary translation by encoding rare and unknown words as sequences of subword units. This is based on the intuition that various word classes are translatable via smaller units than words, for instance names (via character copying or transliteration), compounds (via compositional translation), and cognates and loanwords (via phonological and morphological transformations). We discuss the suitability of different word segmentation techniques, including simple character n-gram models and a segmentation based on the byte pair encoding compression algorithm, an"
+      },
+      {
+        "doi": "10.48550/arXiv.1808.06226",
+        "title": "SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing",
+        "url": "https://arxiv.org/abs/1808.06226",
+        "authors": "Taku Kudo, John Richardson",
+        "year": "2018",
+        "abstract": "This paper describes SentencePiece, a language-independent subword tokenizer and detokenizer designed for Neural-based text processing, including Neural Machine Translation. It provides open-source C++ and Python implementations for subword units. While existing subword segmentation tools assume that the input is pre-tokenized into word sequences, SentencePiece can train subword models directly from raw sentences, which allows us to make a purely end-to-end and language independent system. We perform a validation experiment of NMT on English-Japanese machine translation, and find that it is possible to achieve comparable accuracy to direct subword training from raw sentences. We also compare the performance of subword training and segmentation with various configurations. SentencePiece is available under the Apache 2 license at https://github.com/google/sentencepiece."
+      },
+      {
+        "doi": "10.48550/arXiv.2402.01035",
+        "title": "Getting the most out of your tokenizer for pre-training and domain adaptation",
+        "url": "https://arxiv.org/abs/2402.01035",
+        "authors": "Gautier Dagan, Gabriel Synnaeve, Baptiste Rozière",
+        "year": "2024",
+        "abstract": "Tokenization is an understudied and often neglected component of modern LLMs. Most published works use a single tokenizer for all experiments, often borrowed from another model, without performing ablations or analysis to optimize tokenization. Moreover, the tokenizer is generally kept unchanged when fine-tuning a base model. In this paper, we show that the size, pre-tokenization regular expression, and training data of a tokenizer can significantly impact the model's generation speed, effective context size, memory usage, and downstream performance. We train specialized Byte-Pair Encoding code tokenizers, and conduct extensive ablations on the impact of tokenizer design on the performance of LLMs for code generation tasks such as HumanEval and MBPP, and provide recommendations for tokenizer hyper-parameters selection and switching the tokenizer in a pre-trained LLM. We perform our exper"
+      },
+      {
+        "doi": "10.1145/360825.360855",
+        "title": "Efficient string matching",
+        "url": "https://api.crossref.org/works/10.1145%2F360825.360855",
+        "authors": "Alfred V. Aho, Margaret J. Corasick",
+        "year": "1975"
+      },
+      {
+        "doi": "10.48550/arXiv.2605.07654",
+        "title": "Reliable Chain-of-Thought via Prefix Consistency",
+        "url": "https://arxiv.org/abs/2605.07654",
+        "authors": "Naoto Iwase, Yuki Ichihara, Mohammad Atif Quamar, Junpei Komiyama",
+        "year": "2026",
+        "abstract": "Large language models often improve accuracy on reasoning tasks by sampling multiple chain-of-thought (CoT) traces and aggregating them with majority voting, a test-time technique called self-consistency. When we truncate a CoT partway through and regenerate the remainder, we observe that traces with correct answers reproduce their original answer more often than traces with wrong answers. We use this difference as a reliability signal, prefix consistency, that weights each candidate answer by how often it reappears under regeneration. It requires no access to token log-probabilities or self-rating prompts. Across five reasoning models and four math and science benchmarks, prefix consistency is the best correctness predictor in most settings, and reweighting votes by this signal reaches the plateau accuracy of majority voting with up to $21\\times$ fewer tokens (median $4.6\\times$). Our c"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "The selected implementation executes every mechanism claimed in the manuscript’s method: rank-ordered update-before-read compilation of four interval endpoints per merge; interval acceptance using the predecessor token’s DFS rank; decreasing-length/increasing-rank candidate ordering; a dense 256-way automaton transition table; conservative certificates computed from all vocabulary spellings ending with p(t); certificate-based predecessor-read bypass; atomic-only state dispatch; defensive byte fallback; last-token history; and reconstruction by token-length backtracking. The formulas and pseudocode match the corresponding operations in model.py, including the p(t)=s(t) update-before-read case and the n<=length(s(t)) guard. Config keys describing state partitioning, lookup, proof objects, checking, and runtime assertions are unused metadata, but manuscript.md does not claim those named mechanisms are executed. No manuscript method claim contradicts the active intervals/flat-transitions/atomic-fastpath/certified-regions configuration."
+  }
+}

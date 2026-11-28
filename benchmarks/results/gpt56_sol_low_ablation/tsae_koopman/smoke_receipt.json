@@ -1,0 +1,53 @@
+{
+  "success": true,
+  "best": {
+    "config": {
+      "name": "support_gated_bidirectional_koopman_mixture",
+      "latent_width": 8192,
+      "active_features": 64,
+      "num_koopman_regimes": 8,
+      "gate_source": "stop_gradient_binary_topk_support",
+      "forward_loss_weight": 0.2,
+      "backward_loss_weight": 0.2,
+      "cycle_loss_weight": 0.1,
+      "gate_entropy_weight": 0.002,
+      "regime_balance_weight": 0.01,
+      "minimum_regime_usage": 0.03,
+      "fista_momentum": false
+    },
+    "value": 0.24123226076238613,
+    "label": "pruned",
+    "snapshot": "pruned"
+  },
+  "baseline_full": 0.2555203956955264,
+  "final_test": 0.2542928930910779,
+  "local_score": 4.7142857142857135,
+  "local_decision": "Reject",
+  "claims": 22,
+  "roles": 30,
+  "protected_hashes": {
+    "eval.py": "8f2c757b33da56282dbdc0b8d6bf5935c09a28c3c401361e3fb0ccf5a43218f7",
+    "data.py": "3e6e31ed68e579fb9e502622c6953d09955d74abb4912843d96b1e817a4a4627",
+    "task_spec.json": "4a9adc541227be43896bf58915a2436c749a6adcd23fb4cacc1855ee6a0ac69d"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/tsae_koopman",
+    "--model",
+    "gpt-5.6-sol",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-gpt56-tsae_koopman"
+  ],
+  "seconds": 1751.6498034622055
+}

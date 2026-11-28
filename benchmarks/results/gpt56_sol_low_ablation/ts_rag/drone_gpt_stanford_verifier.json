@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56-ts_rag/manuscript.pdf",
+  "seconds": 65.87,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 4.71,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The algebraic results hold, but the positive additive interaction contradicts the numbers and reversed subtraction labels invalidate central mechanism-attribution claims.",
+    "Experimental_Soundness": "Principal ablations mismatch across tables; split integrity, baseline fidelity, orthogonal controls, and statistical independence cannot be established from the protocol.",
+    "Writing_Clarity": "The article has a coherent standalone structure, explicit theorems, pseudocode, and tables, but contradictory labels and erroneous interpretive statements materially impair clarity.",
+    "Prior_Work_Context": "The bibliography and supplied-literature positioning are adequate, but formal differentiation from the closest classical local-regression and reconstruction-transfer approaches remains unresolved.",
+    "Question_Importance": "Efficient retrieval forecasting under nonstationary trends is an important problem with broad practical relevance.",
+    "Originality": "The combination is a reasonable specialization of established projection, similarity retrieval, and ridge reconstruction; a genuinely new mathematical or algorithmic principle is not demonstrated.",
+    "Value_to_Community": "The explicit estimator and characterization could support a useful technical note, but the small, underspecified workload and contradictory empirical attribution limit current value."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.5,
+    "Experimental_Soundness": 3.0,
+    "Writing_Clarity": 6.0,
+    "Prior_Work_Context": 5.5,
+    "Question_Importance": 7.0,
+    "Originality": 4.5,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "QTR combines quadratic orthogonal detrending, hybrid temporal/spectral retrieval, and ridge reconstruction coefficients transported to historical future residuals. The projection and ridge proofs are sound under their stated assumptions, but establish standard algebraic properties rather than forecast accuracy guarantees. The reported forecasting gains are substantial, yet contradictory ablation labels, an incorrect interaction claim, and an underspecified benchmark prevent reliable empirical attribution.",
+    "strengths": "The estimator is compact and mathematically explicit, with usable pseudocode and fixed hyperparameters. The orthogonality, strict convexity, regularized-objective dominance, and conditional stability arguments are correct. Paired test confidence intervals, channel-level results, noise perturbations, and explicit limitations are positive features. The manuscript largely reads as a standalone research article rather than an audit report.",
+    "weaknesses": "The component-subtraction table reverses the two principal interventions relative to the factorial table. The claimed positive additive interaction contradicts the reported numbers. Dataset provenance, chronological splitting, memory-bank eligibility, leakage prevention, baseline implementations, and hyperparameter selection are insufficiently specified. Only one lookback and horizon are evaluated, and bank-size scaling is analytical rather than experimentally measured. Hardware, precision, timing methodology, and memory-accounting scope are absent. The theoretical contribution consists primarily of established projection and ridge identities.",
+    "detailed_comments": "1. Mathematical verification: Theorem 1 and Proposition 1 follow from orthogonal projection; full column rank requires at least three distinct sampling points, satisfied by L=64. Theorem 2 correctly proves dominance only for the regularized history-reconstruction objective on the same prototype dictionary. It does not imply lower future prediction error. Lemma 1 and Proposition 2 correctly bound the ridge map with fixed D, G, trend, and scale. They do not establish stability of the complete pipeline under raw-input noise, which can change normalization, trend estimates, and selected neighbors. The limitations acknowledge neighbor discontinuities, but Section 4.6 still gives the conditional bound more explanatory weight than the experiment supports.\n2. Contradictory subtraction results: Section 4.4 assigns 0.2017 to trend enabled/ridge disabled and 0.1669 to trend disabled/ridge enabled. Section 4.5 assigns 0.2017 to removing trend and 0.1669 to removing ridge. These should be reversed if the interventions are identical. The MAE and spectral values are reversed consistently as well. Consequently, the statements identifying which removed mechanism causes the largest degradation are unsupported until the discrepancy is resolved.\n3. Interaction arithmetic: The isolated improvements sum to 0.3570 using the displayed MSEs, exceeding the joint improvement of 0.2863. The additive improvement interaction is therefore -0.0707, not positive. The joint error ratio of approximately 0.211 is below the multiplicative reference of approximately 0.256, but that is a different interaction scale and cannot rescue the additive statement or establish a causal mechanism.\n4. Experimental validity: The protocol names validation and test splits without explaining their construction, dataset sources or generators, temporal overlap, bank size, or whether every retrieved continuation predates its query. Seven domain labels do not establish evaluation on seven standard real-world datasets. It is also unclear whether the 42 observations are independent series or correlated members of shared channels. These omissions prevent assessment of leakage and effective sample size.\n5. Baseline fidelity: The retrieved abstracts describe MQRetNN as pretrained neural cross-entity retrieval with attention and TimesNet as a learned architecture using period-dependent tensors and convolutional blocks. A softmax kNN forecaster and Fourier periodic forecaster are simplified surrogates, not reproductions of those methods. Vanilla TS-RAG and DLinear also lack sufficient implementation and fitting details. The reported reductions establish comparisons against the implemented estimators, not necessarily the cited systems.\n6. Statistical evidence: Paired Student-t intervals are appropriate only with defensible sampling and independence assumptions. Per-series differences, channel clustering, seeds, noise repetitions, and uncertainty on ablation differences are missing. Aggregate positive differences alone do not establish statistically resolved component benefits. The 2x2 design also lacks operational definitions showing that retrieval, normalization, trend continuation, and all other settings remain controlled across cells.\n7. Scale and resources: Noise levels provide a useful perturbation test, but there are no measured sweeps over bank size, horizon, lookback, or channel dimensionality. A single full-bank measurement cannot validate linear empirical scaling. The reported approximately 1.66 MB traced peak needs a stated accounting scope, including cached arrays and native allocations. Sub-millisecond latency requires hardware, numerical precision, software/thread configuration, warm-up, repetition counts, and preprocessing exclusions.\n8. Novelty and presentation: The supplied literature supports differentiation from neural retrieval augmentation and weighted-neighbor prediction, but does not establish priority for detrending followed by local ridge or analogous reconstruction-weight transfer. The table provides broad categorical comparisons rather than a formal novelty boundary. The paper is organized coherently without internal log filenames or duplicate appendix headings. However, the false interaction sentence, reversed intervention labels, incorrect identification of load as the highest validation-MSE channel when weather is higher, and ambiguous percentage-column heading need correction. Some mathematical corruption may come from PDF extraction and should not automatically be attributed to the manuscript.",
+    "questions": "What are the exact data sources or generation procedures, chronological split boundaries, bank sizes, and retrieval eligibility rules? Which subtraction table labels or results are correct, and can per-series paired ablation differences verify the attribution? How are all four factorial estimators defined operationally? Were the cited baselines faithfully implemented, and what fitting and tuning budgets were used? Are confidence intervals robust to within-channel dependence? Can the authors provide held-out ablation results, repeated noise trials, measured bank-size/horizon sweeps, and complete hardware and memory-accounting details? What closest established local-regression or reconstruction-weight-transfer formulation is mathematically distinct from QTR?",
+    "assessment": "Reject in the current form. The method is a potentially useful specialization with correct elementary theory, but the central mechanism evidence is internally inconsistent and the benchmark is insufficiently specified. Correcting the attribution errors and establishing reproducible, leakage-controlled comparisons are necessary before the claimed empirical contribution can be assessed confidently."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

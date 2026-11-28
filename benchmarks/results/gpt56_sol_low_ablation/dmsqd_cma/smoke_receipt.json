@@ -1,0 +1,71 @@
+{
+  "success": true,
+  "best": {
+    "config": {
+      "adaptive_emitter_allocation": true,
+      "allocation_signal": "ema_realized_normalized_qd_gain_per_evaluation",
+      "reward_ema_decay": 0.9,
+      "emitters": [
+        "frontier_secant",
+        "local_surrogate",
+        "archive_elite_mutation"
+      ],
+      "initial_shares": {
+        "frontier_secant": 0.25,
+        "local_surrogate": 0.2,
+        "archive_elite_mutation": 0.55
+      },
+      "minimum_share": 0.05,
+      "coverage_saturation_window": 3,
+      "coverage_gain_threshold": 0.005,
+      "post_saturation_shares": {
+        "frontier_secant": 0.05,
+        "local_surrogate": 0.15,
+        "archive_elite_mutation": 0.8
+      },
+      "surrogate_target": "cellwise_quality_improvement",
+      "surrogate_acceptance": "positive_uncertainty_penalized_improvement_over_target_cell_elite",
+      "duplicate_cell_filter": true,
+      "parent_sampling": "quality_cvar_mixture",
+      "cvar_parent_fraction": 0.25,
+      "frontier_boundary_guidance": false,
+      "local_surrogate_refinement": false,
+      "cma_covariance_adaptation": true,
+      "archive_threshold_annealing": true
+    },
+    "value": 0.35264886194733563,
+    "label": "pruned",
+    "snapshot": "pruned"
+  },
+  "baseline_full": 0.7121110138086076,
+  "final_test": 0.3563110132496008,
+  "local_score": 4.142857142857142,
+  "local_decision": "Reject",
+  "claims": 22,
+  "roles": 28,
+  "protected_hashes": {
+    "eval.py": "02ddf46a4861b8169ce4b9804f5b38ced0c7d64f91119afce5e92f3754953e72",
+    "data.py": "d14aeb519b860e140dc6677adb66fd97eff55748a3551c537aa75d10e411cd82",
+    "task_spec.json": "957080d474b3ea03adb0fc22e9ff18a216f8e974456bca6f14c9d2be674d790f"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/dmsqd_cma",
+    "--model",
+    "gpt-5.6-sol",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-gpt56-dmsqd_cma"
+  ],
+  "seconds": 1955.3318984601647
+}

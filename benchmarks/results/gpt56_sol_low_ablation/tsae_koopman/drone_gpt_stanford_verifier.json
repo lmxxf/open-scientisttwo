@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56-tsae_koopman/manuscript.pdf",
+  "seconds": 56.46,
+  "numerical_score": 4.0,
+  "fine_weighted_score": 5.38,
+  "positive_count": 2,
+  "neutral_count": 4,
+  "negative_count": 1,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": 0,
+    "Writing_Clarity": 1,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "The main linear-algebra results hold, but central claims of semantic necessity, controlled causal attribution, and a unified algorithmic advance exceed the evidence. The projection ablation is dominated by its explicit penalty, and full-refinement stability is not proved.",
+    "Experimental_Soundness": "A held-out synthetic comparison, paired intervals, factorial table, and subtraction experiments constitute a useful local prototype. Small scale, missing protocol details, uncertain baseline parity, and absent ablation uncertainty prevent a stronger rating.",
+    "Writing_Clarity": "The manuscript reads as an organized standalone academic article with explicit theorems, proofs, algorithms, tables, related work, and limitations; it avoids audit-report clutter.",
+    "Prior_Work_Context": "The bibliography covers relevant SAE, temporal representation, dictionary-learning, and Koopman work, but technical differentiation from sparse Koopman autoencoders is only moderately resolved and one relevant retrieved work is omitted.",
+    "Question_Importance": "Recovering stable sparse features from sequential representations while accommodating predictable evolution is an important representation-learning problem.",
+    "Originality": "The construction is a reasonable specialization combining established sparse projection, graph proximal smoothing, ridge dynamics, and dictionary adaptation; no nontrivial coupling theorem or clearly novel solver principle is established.",
+    "Value_to_Community": "The explicit formulation and preliminary findings could support a useful technical note, but broad value is constrained by the tiny synthetic workload, incomplete reproducibility, and limited novelty evidence."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 4.0,
+    "Experimental_Soundness": 5.0,
+    "Writing_Clarity": 8.0,
+    "Prior_Work_Context": 6.0,
+    "Question_Importance": 7.5,
+    "Originality": 4.5,
+    "Value_to_Community": 5.0
+  },
+  "sections": {
+    "summary": "The paper combines nonnegative Top-6 sparse coding, path-Laplacian smoothing, ridge-fitted latent dynamics, and dictionary adaptation. The main linear-algebra results are correct, but elementary and restricted to individual continuous subproblems. The experiments suggest benefits on a small synthetic workload, while incomplete protocol specification, weak statistical isolation, and overinterpretation of the sparsity ablation prevent the claimed unified algorithmic advance from being established.",
+    "strengths": "The manuscript provides explicit updates, numerical hyperparameters, pseudocode, complexity estimates, paired trajectory-level confidence intervals, and a complete two-factor temporal comparison. The Laplacian proximal-map proof and ridge-estimator derivation are correct. The limitations candidly acknowledge transductive adaptation, synthetic scale, dense cubic costs, and the absence of global convergence or demonstrated semantic interpretability.",
+    "weaknesses": "Evaluation comprises only eight length-48 synthetic trajectories at one dictionary width. The data-generating process, split construction, initialization, baseline tuning, rollout horizon, metric normalization, and elevated-stress parameters are insufficiently specified. Ablation effects and factorial interaction lack confidence intervals. Removing support projection is judged primarily through an objective explicitly penalizing its removal, rather than demonstrating a substantial loss of feature recovery. Theoretical guarantees largely restate standard ridge regression, graph smoothing, and positive-definite system properties. Closest-work differentiation remains descriptive.",
+    "detailed_comments": "Mathematics: Theorem 1 correctly characterizes the unconstrained Laplacian proximal map, and Theorem 2 correctly derives the identity-centered ridge estimator with row-wise orientation. Neither result transfers automatically through hard support projection or establishes convergence of the composite algorithm. Spectral rescaling changes the ridge minimizer; the exact-solution theorem applies before that rescaling. The displayed conceptual objective also yields a K-subproblem with effective ridge rho/mu_K, whereas the implemented fit uses rho directly. With the stated constants, these are approximately 28.57 and 2.0, respectively. Calling the procedure an approximation permits this choice, but the mismatch should be explicit. The bidirectional sweep is not an exact joint temporal minimization: neighboring values are held fixed, and the endpoint diagonal includes terms absent from the corresponding path objective. Proposition 2 bounds perturbations to B for fixed K; it does not establish stability of the complete refinement map, including K estimation and discontinuous Top-6 selection. Proposition 3 is technically false for nonzero updated columns with norm below 1e-12, because division by the numerical floor does not produce unit norm. The related-work table also gives a different complexity expression from Section 3.6.\n\nExperiments: The reported standard composite scores are consistent with the displayed reconstruction, F1, and rollout values. The benchmark gain intervals exclude zero as stated, but eight paired observations provide limited evidence without the trajectory-generation and independence assumptions. No randomized execution protocol, independent training-seed variation, or paired uncertainty for component effects is reported. The factorial interaction is approximately 0.0045, but its uncertainty is unknown and aggregate complementarity does not verify the proposed causal explanation. The subtraction table uses validation performance, while the main factorial uses held-out performance; these are not interchangeable confirmations of component effects. Without projection, support F1 is 0.3337 versus 0.3343 with projection. Most of the composite deterioration therefore reflects the explicit sparsity penalty, not demonstrated collapse of semantic feature recovery. The exact definition of that penalty is missing. Transductive adaptation is disclosed, but equal target-data access and adaptation budgets across baselines are not established. The stress experiment changes noise/sparsity without reporting values or separating their effects, and does not vary sequence length, observation dimension, or dictionary width. Hardware reporting identifies a clock rate and architecture but omits CPU model, numerical precision, software/thread configuration, timing repetitions, and whether traced memory includes native allocations.\n\nNovelty and presentation: The retrieved Sparse Koopman Autoencoders work already couples sparse latent supports with learned linear dynamics. The paper acknowledges it, but does not formally establish what the additional smoothing and dictionary updates contribute beyond a conventional composition of established operators. Deep Koopman Sensing, also retrieved, provides relevant context for reconstruction with learned latent dynamics but is not discussed. The article is organized as a standalone paper with clear sections and algorithms, without internal audit filenames or duplicate appendix clutter. Its reproducibility omissions and occasionally stronger-than-supported causal language remain substantive weaknesses.",
+    "questions": "What is the complete synthetic generator, including transition dynamics, noise levels, dictionary perturbation, seeds, and train/validation/test sizes? Which target observations are used to fit D and K for each baseline, and is rollout genuinely out-of-sample? What are the precise metric definitions, sparsity penalty, and rollout horizon? Can paired confidence intervals be supplied for every subtraction effect and the factorial interaction across independent dataset and initialization seeds? Does support projection improve recovery at matched sparsity or under a score excluding the explicit violation penalty? How does the method compare with sparse Koopman learning and standard temporal sparse coding under equal adaptation and computation budgets?",
+    "assessment": "I recommend rejection in its present form. This is a plausible small-scale technical prototype with mostly correct elementary subproblem analysis, but the evidence does not establish the claimed mechanism attribution or a sufficiently differentiated algorithmic contribution. A reproducible protocol, statistically supported orthogonal ablations, stronger matched baselines, and meaningful scale variation would materially change the assessment."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

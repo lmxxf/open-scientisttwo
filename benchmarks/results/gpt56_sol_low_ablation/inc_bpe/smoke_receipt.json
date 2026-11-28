@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "best": {
+    "label": "evolved0",
+    "snapshot": "evolved0_full",
+    "config": {
+      "name": "fused_state_acceptance_partition",
+      "acceptance_mode": "intervals",
+      "flat_transitions": true,
+      "atomic_fastpath": true,
+      "certified_regions": true,
+      "state_partition": "priority_winner_segments",
+      "segment_domain": "predecessor_dfs_rank",
+      "lookup": "two_level_rank_directory",
+      "compile": "endpoint_sweep",
+      "fallback": null,
+      "proof_objects": [
+        "interval_partition",
+        "rank_monotonicity",
+        "certificate_soundness",
+        "winner_partition_completeness"
+      ],
+      "checker": "independent_linear_scan",
+      "runtime_assertions": false
+    },
+    "value": 2.8513194491905676
+  },
+  "baseline_full": 10.565207857224678,
+  "final_test": 2.9358458656740067,
+  "local_score": 6.285714285714286,
+  "local_decision": "Accept",
+  "claims": 16,
+  "roles": 27,
+  "protected_hashes": {
+    "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+    "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+    "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283"
+  },
+  "command": [
+    "/home/lmxxf/work/ai-theorys-study/wechat/assets/383/open-scientisttwo/open_scientisttwo/pipeline.py",
+    "--source",
+    "benchmarks/inc_bpe",
+    "--model",
+    "gpt-5.6-sol",
+    "--K",
+    "3",
+    "--S",
+    "3",
+    "--ablation-plan-count",
+    "5",
+    "--eval-timeout",
+    "120",
+    "--role-timeout",
+    "600",
+    "--output",
+    "/tmp/st-gpt56-inc_bpe"
+  ],
+  "seconds": 2497.838794895215
+}

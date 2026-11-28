@@ -1,0 +1,195 @@
+{
+  "mse": 0.3563110132496008,
+  "normalized_qd_score": 0.6436889867503993,
+  "coverage_ratio": 0.9594907407407408,
+  "mean_elite_quality": 0.6708955057111633,
+  "max_elite_quality": 0.7827404106611291,
+  "cvar10_quality": 0.569822154448244,
+  "baselines": {
+    "vanilla_map_elites_2009_08438": {
+      "mse": 0.703885,
+      "normalized_qd_score": 0.296115,
+      "coverage_ratio": 0.8796,
+      "paired_mse_reduction_mean": 0.347574,
+      "paired_mse_reduction_t95_ci": 0.0227
+    },
+    "diagonal_cma_me_strict_1912_02400": {
+      "mse": 0.44039,
+      "normalized_qd_score": 0.55961,
+      "coverage_ratio": 0.9317,
+      "paired_mse_reduction_mean": 0.084079,
+      "paired_mse_reduction_t95_ci": 0.030134
+    },
+    "diagonal_cma_mae_annealed_2205_10752": {
+      "mse": 0.427095,
+      "normalized_qd_score": 0.572905,
+      "coverage_ratio": 0.9334,
+      "paired_mse_reduction_mean": 0.070784,
+      "paired_mse_reduction_t95_ci": 0.036291
+    }
+  },
+  "per_dimension_breakdown": [
+    {
+      "mse": 0.33338631859775925,
+      "normalized_qd_score": 0.6666136814022408,
+      "coverage_ratio": 0.9722222222222222,
+      "mean_elite_quality": 0.685659786585162,
+      "max_elite_quality": 0.8332117307337702,
+      "cvar10_quality": 0.5890409164901775,
+      "task_name": "QD_dim24_rep0",
+      "dim": 24
+    },
+    {
+      "mse": 0.30508587935495923,
+      "normalized_qd_score": 0.6949141206450408,
+      "coverage_ratio": 0.9652777777777778,
+      "mean_elite_quality": 0.7199110314596106,
+      "max_elite_quality": 0.8450259901942693,
+      "cvar10_quality": 0.603997327841845,
+      "task_name": "QD_dim24_rep1",
+      "dim": 24
+    },
+    {
+      "mse": 0.35531822070765395,
+      "normalized_qd_score": 0.644681779292346,
+      "coverage_ratio": 0.9791666666666666,
+      "mean_elite_quality": 0.6583984128943109,
+      "max_elite_quality": 0.7979755242672527,
+      "cvar10_quality": 0.5465962185593983,
+      "task_name": "QD_dim24_rep2",
+      "dim": 24
+    },
+    {
+      "mse": 0.3595114252996179,
+      "normalized_qd_score": 0.6404885747003821,
+      "coverage_ratio": 0.9652777777777778,
+      "mean_elite_quality": 0.6635277320637053,
+      "max_elite_quality": 0.7733814400984259,
+      "cvar10_quality": 0.5592411854970205,
+      "task_name": "QD_dim36_rep0",
+      "dim": 36
+    },
+    {
+      "mse": 0.3375023305339535,
+      "normalized_qd_score": 0.6624976694660465,
+      "coverage_ratio": 0.9583333333333334,
+      "mean_elite_quality": 0.6913019159645704,
+      "max_elite_quality": 0.7961760051488002,
+      "cvar10_quality": 0.5738885805470981,
+      "task_name": "QD_dim36_rep1",
+      "dim": 36
+    },
+    {
+      "mse": 0.36678995040814155,
+      "normalized_qd_score": 0.6332100495918584,
+      "coverage_ratio": 0.9791666666666666,
+      "mean_elite_quality": 0.6466826038384936,
+      "max_elite_quality": 0.7535753011822927,
+      "cvar10_quality": 0.5376827743744346,
+      "task_name": "QD_dim36_rep2",
+      "dim": 36
+    },
+    {
+      "mse": 0.322057124097725,
+      "normalized_qd_score": 0.677942875902275,
+      "coverage_ratio": 0.9583333333333334,
+      "mean_elite_quality": 0.7074186531154174,
+      "max_elite_quality": 0.8050251652649996,
+      "cvar10_quality": 0.6210683586485038,
+      "task_name": "QD_dim48_rep0",
+      "dim": 48
+    },
+    {
+      "mse": 0.3649289742800784,
+      "normalized_qd_score": 0.6350710257199216,
+      "coverage_ratio": 0.9791666666666666,
+      "mean_elite_quality": 0.648583175203324,
+      "max_elite_quality": 0.7689502735768504,
+      "cvar10_quality": 0.5468759371588574,
+      "task_name": "QD_dim48_rep1",
+      "dim": 48
+    },
+    {
+      "mse": 0.3755891625323611,
+      "normalized_qd_score": 0.6244108374676389,
+      "coverage_ratio": 0.9375,
+      "mean_elite_quality": 0.6660382266321481,
+      "max_elite_quality": 0.7872532516634653,
+      "cvar10_quality": 0.5690652885509595,
+      "task_name": "QD_dim48_rep2",
+      "dim": 48
+    },
+    {
+      "mse": 0.37292148636481215,
+      "normalized_qd_score": 0.6270785136351879,
+      "coverage_ratio": 0.9236111111111112,
+      "mean_elite_quality": 0.678942150101256,
+      "max_elite_quality": 0.7691788497846412,
+      "cvar10_quality": 0.5939828148648026,
+      "task_name": "QD_dim64_rep0",
+      "dim": 64
+    },
+    {
+      "mse": 0.3937265493258256,
+      "normalized_qd_score": 0.6062734506741744,
+      "coverage_ratio": 0.9513888888888888,
+      "mean_elite_quality": 0.6372509262560665,
+      "max_elite_quality": 0.7256939438196595,
+      "cvar10_quality": 0.5447540374709654,
+      "task_name": "QD_dim64_rep1",
+      "dim": 64
+    },
+    {
+      "mse": 0.38891473749232175,
+      "normalized_qd_score": 0.6110852625076783,
+      "coverage_ratio": 0.9444444444444444,
+      "mean_elite_quality": 0.6470314544198946,
+      "max_elite_quality": 0.7374374521991226,
+      "cvar10_quality": 0.551672413374866,
+      "task_name": "QD_dim64_rep2",
+      "dim": 64
+    }
+  ],
+  "runtime_ms": 8956.929,
+  "traced_memory_bytes": {
+    "current_bytes": 87811,
+    "peak_bytes": 722147
+  },
+  "environment_metadata": {
+    "python": "3.12.3",
+    "platform": "Linux-6.17.0-1014-nvidia-aarch64-with-glibc2.39",
+    "machine": "aarch64",
+    "cpu": "ARM Cortex-X925 (3.90 GHz, pinned single core)"
+  },
+  "num_tasks": 12,
+  "mode": "full",
+  "split": "test",
+  "extra": false,
+  "factorial_2x2_study": {
+    "full_selected": {
+      "mse": 0.356311,
+      "normalized_qd_score": 0.643689,
+      "coverage_ratio": 0.9595
+    },
+    "cma_on_anneal_on_frontier_off": {
+      "mse": 0.356311,
+      "normalized_qd_score": 0.643689,
+      "coverage_ratio": 0.9595
+    },
+    "cma_on_anneal_off_frontier_off": {
+      "mse": 0.360849,
+      "normalized_qd_score": 0.639151,
+      "coverage_ratio": 0.9618
+    },
+    "cma_off_anneal_on_frontier_off": {
+      "mse": 0.594487,
+      "normalized_qd_score": 0.405513,
+      "coverage_ratio": 0.8698
+    },
+    "cma_off_anneal_off_frontier_off": {
+      "mse": 0.594487,
+      "normalized_qd_score": 0.405513,
+      "coverage_ratio": 0.8698
+    }
+  }
+}

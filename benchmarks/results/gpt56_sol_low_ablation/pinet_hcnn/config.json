@@ -1,0 +1,9 @@
+{
+  "name": "curvature_metric_projection",
+  "projection_metric": "D + U*U^T, D positive diagonal",
+  "metric_parameterization": "softplus diagonal with bounded low-rank correction",
+  "newton_hessian": "metric plus active constraint curvature",
+  "nullspace_system": "Z^T H Z",
+  "adjoint": "reuse factorization of Z^T H Z",
+  "safeguard": "eigenvalue floor 1e-6 and condition cap 1e6"
+}

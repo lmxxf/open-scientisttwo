@@ -1,0 +1,290 @@
+[
+  {
+    "label": "baseline_source",
+    "snapshot": "snapshots/baseline_source",
+    "model_sha256": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542"
+    },
+    "metric": "mse",
+    "value": 10.480972479045803,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "baseline_subset",
+    "snapshot": "snapshots/baseline_subset",
+    "model_sha256": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542",
+    "mode": "subset",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542"
+    },
+    "metric": "mse",
+    "value": 11.351725940282146,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "baseline_full",
+    "snapshot": "snapshots/baseline_full",
+    "model_sha256": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "ac7596ad3a873a300cac2a7ec931d46452bf43a4978afbe7ae477bd4f7644542"
+    },
+    "metric": "mse",
+    "value": 10.565207857224678,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "initial_subset",
+    "snapshot": "snapshots/initial_subset",
+    "model_sha256": "4292eb9f51e04cf64cce068770d00a9b55fe4ddf8b1bd348ea94a6b7df4fb1b0",
+    "mode": "subset",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "808ffa61077e747053948132ddb05a1448bf9f463722473db8f19fa61473bfdc",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "4292eb9f51e04cf64cce068770d00a9b55fe4ddf8b1bd348ea94a6b7df4fb1b0"
+    },
+    "metric": "mse",
+    "value": 5.37302306232353,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "initial_full",
+    "snapshot": "snapshots/initial_full",
+    "model_sha256": "4292eb9f51e04cf64cce068770d00a9b55fe4ddf8b1bd348ea94a6b7df4fb1b0",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "808ffa61077e747053948132ddb05a1448bf9f463722473db8f19fa61473bfdc",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "4292eb9f51e04cf64cce068770d00a9b55fe4ddf8b1bd348ea94a6b7df4fb1b0"
+    },
+    "metric": "mse",
+    "value": 3.384535981846663,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "seed0_subset",
+    "snapshot": "snapshots/seed0_subset",
+    "model_sha256": "d461d3c8be5105d6924f529a3a5cc3cc2b800187ae61b939b41cc26dfd254776",
+    "mode": "subset",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "0ccf4a83cc06f0f2b66849fa3b7335377506f23ce2cf179a0c8589fd44b3d0b1",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "d461d3c8be5105d6924f529a3a5cc3cc2b800187ae61b939b41cc26dfd254776"
+    },
+    "metric": "mse",
+    "value": 5.248977686278522,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "seed0_full",
+    "snapshot": "snapshots/seed0_full",
+    "model_sha256": "d461d3c8be5105d6924f529a3a5cc3cc2b800187ae61b939b41cc26dfd254776",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "0ccf4a83cc06f0f2b66849fa3b7335377506f23ce2cf179a0c8589fd44b3d0b1",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "d461d3c8be5105d6924f529a3a5cc3cc2b800187ae61b939b41cc26dfd254776"
+    },
+    "metric": "mse",
+    "value": 3.1854031274431485,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "evolved0_subset",
+    "snapshot": "snapshots/evolved0_subset",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "subset",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "3663c6a547f0f3e1fb6fe1dc6ff7a90918808bca25bfe412497cd7227bc73774",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 4.9356652501349645,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "evolved0_full",
+    "snapshot": "snapshots/evolved0_full",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "3663c6a547f0f3e1fb6fe1dc6ff7a90918808bca25bfe412497cd7227bc73774",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 2.8513194491905676,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "ablation0",
+    "snapshot": "snapshots/ablation0",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "154902f2d2840790788ac326ac4ad812dedd61d2d934224f3700318ecfa651e9",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 2.949513549942316,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "ablation1",
+    "snapshot": "snapshots/ablation1",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "d9e5a7367e3a73ca5553260e60961c9cfb46b187f6b8efedb0517aec2341efd7",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 3.1854900347146513,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "ablation2",
+    "snapshot": "snapshots/ablation2",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "4158d4dc0612ee4373b34edf3a8ab8e2a2350baa7961ccce65056b637cac1dcd",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 3.5413237734852983,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "ablation3",
+    "snapshot": "snapshots/ablation3",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "e5df9bb05302931ebb351b49fc297fb767a35e9a0be3b389ea512d53225da1af",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 3.4906992772852794,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "ablation4",
+    "snapshot": "snapshots/ablation4",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "36ebd4db70ff97d9b5df1ba58c6dcd1e4e9552d9f1adb6441dd5d581544daae1",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 3.1865319114230157,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "rebuttal0",
+    "snapshot": "snapshots/rebuttal0",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "validation",
+    "extra": true,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "3663c6a547f0f3e1fb6fe1dc6ff7a90918808bca25bfe412497cd7227bc73774",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 2.937860901713268,
+    "eval_timeout": 120.0
+  },
+  {
+    "label": "final_test",
+    "snapshot": "snapshots/final_test",
+    "model_sha256": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91",
+    "mode": "full",
+    "split": "test",
+    "extra": false,
+    "files": {
+      "task_spec.json": "60e7ed2cf3f7cc8a4a90dab2141b003ac67300c32c0bb4c47e1aea6575eb0283",
+      "config.json": "3663c6a547f0f3e1fb6fe1dc6ff7a90918808bca25bfe412497cd7227bc73774",
+      "eval.py": "abfb78c0b6fba940d67cd679d65c609a1a8bf9780e73931fff91ecd4bfa2f687",
+      "data.py": "913bc9390db0b565aacabd6c1a7d3cd65891abfa5f64520797071f836402edbf",
+      "model.py": "0abbfc68fef52c6dafe0b151f9f04dcc9502c3a02b13420bb5a5aecf7365db91"
+    },
+    "metric": "mse",
+    "value": 2.9358458656740067,
+    "eval_timeout": 120.0
+  }
+]

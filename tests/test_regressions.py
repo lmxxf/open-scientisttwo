@@ -158,3 +158,33 @@ class IntegrityTests(unittest.TestCase):
             result=subprocess.run([compiler,'-interaction=nonstopmode','-halt-on-error','manuscript.tex'],cwd=d,capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stdout[-2000:])
             self.assertTrue((Path(d)/'manuscript.pdf').exists())
+
+    def test_trial_runtime_error_recovers_or_marks_bad(self):
+        p=Pipeline.__new__(Pipeline)
+        p.base_subset,p.base_full,p.successes,p.claims,p.engineering=10.,8.,[],[{'label':'full_ok'}],1
+        p.code=lambda *a:None
+        events=[]
+        p.event=lambda *a,**kw:events.append(kw)
+        calls=[0]
+        def snap(label,cfg,mode):
+            calls[0]+=1
+            if calls[0]==1:
+                raise RuntimeError('TypeError: int() got list')
+            return 7. if mode=='full' else 9.
+        p.snapshot=snap
+        p.agent=lambda *a:{'decision':'Good'}
+        p.refine=lambda label,value,mode:({'fixed':True},p.snapshot(label+'_fixed',{'fixed':True},mode))
+        p.trial('recover',{'config':{}})
+        self.assertEqual(len(p.successes),1)
+        self.assertEqual(p.successes[0]['value'],7.)
+        p.snapshot=lambda *a,**kw:(_ for _ in ()).throw(RuntimeError('always crash'))
+        p.refine=lambda label,value,mode:(_ for _ in ()).throw(RuntimeError('still crash'))
+        p.trial('crash_branch',{'config':{}})
+        self.assertEqual(len(p.successes),1)
+        self.assertEqual(events[-1]['decision'],'Bad')
+
+    def test_extract_unescaped_latex_backslash(self):
+        from open_scientisttwo.runner import extract
+        raw = '{"method": "Differential $dy = Z_A\\,dw$ and \\\\top"}'
+        parsed = extract(raw)
+        self.assertEqual(parsed['method'], r'Differential $dy = Z_A\,dw$ and \top')

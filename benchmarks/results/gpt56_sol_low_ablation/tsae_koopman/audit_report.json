@@ -1,0 +1,103 @@
+{
+  "I1": {
+    "pass_": true,
+    "claims": 22
+  },
+  "I2": {
+    "pass_": true,
+    "hashes": {
+      "eval.py": "8f2c757b33da56282dbdc0b8d6bf5935c09a28c3c401361e3fb0ccf5a43218f7",
+      "data.py": "3e6e31ed68e579fb9e502622c6953d09955d74abb4912843d96b1e817a4a4627",
+      "task_spec.json": "4a9adc541227be43896bf58915a2436c749a6adcd23fb4cacc1855ee6a0ac69d"
+    }
+  },
+  "I3": {
+    "pass_": true,
+    "references": [
+      {
+        "doi": "10.48550/arXiv.2511.05541",
+        "title": "Temporal Sparse Autoencoders: Leveraging the Sequential Nature of Language for Interpretability",
+        "url": "https://arxiv.org/abs/2511.05541",
+        "authors": "Usha Bhalla, Alex Oesterling, Claudio Mayrink Verdun, Himabindu Lakkaraju et al.",
+        "year": "2025",
+        "abstract": "Translating the internal representations and computations of models into concepts that humans can understand is a key goal of interpretability. While recent dictionary learning methods such as Sparse Autoencoders (SAEs) provide a promising route to discover human-interpretable features, they often only recover token-specific, noisy, or highly local concepts. We argue that this limitation stems from neglecting the temporal structure of language, where semantic content typically evolves smoothly over sequences. Building on this insight, we introduce Temporal Sparse Autoencoders (T-SAEs), which incorporate a novel contrastive loss encouraging consistent activations of high-level features over adjacent tokens. This simple yet powerful modification enables SAEs to disentangle semantic from syntactic features in a self-supervised manner. Across multiple datasets and models, T-SAEs recover smoo"
+      },
+      {
+        "doi": "10.48550/arXiv.2604.03919",
+        "title": "Interpreting Video Representations with Spatio-Temporal Sparse Autoencoders",
+        "url": "https://arxiv.org/abs/2604.03919",
+        "authors": "Atahan Dokme, Sriram Vishwanath",
+        "year": "2026",
+        "abstract": "We present the first systematic study of Sparse Autoencoders (SAEs) on video representations. Standard SAEs decompose video into interpretable, monosemantic features but destroy temporal coherence: hard TopK selection produces unstable feature assignments across frames, reducing autocorrelation by 36%. We propose spatio-temporal contrastive objectives and Matryoshka hierarchical grouping that recover and even exceed raw temporal coherence. The contrastive loss weight controls a tunable trade-off between reconstruction and temporal coherence. A systematic ablation on two backbones and two datasets shows that different configurations excel at different goals: reconstruction fidelity, temporal coherence, action discrimination, or interpretability. Contrastive SAE features improve action classification by +3.9 pp over raw features and text-video retrieval by up to 2.8 x R@1. A cross-backbone"
+      },
+      {
+        "doi": "10.48550/arXiv.2611.03420",
+        "title": "Temporal Island Sparse Autoencoders for Interpreting Clinical Time-Series Models",
+        "url": "https://arxiv.org/abs/2611.03420",
+        "authors": "Muhan Yeo, Bong Gyun Kang, HyunGi Kim, Sungroh Yoon",
+        "year": "2026",
+        "abstract": "Deep learning models for electronic health records achieve strong predictive performance but provide little insight into what clinical concepts they represent internally. Post-hoc attribution methods produce per-cell importance scores that lack temporal coherence, cross-variable structure, and reusability across patients. We introduce the Temporal Island Sparse Autoencoder (TI-SAE), which learns a backbone-specific, patient-shared clinical concept dictionary from a frozen predictive model's representations. Each dictionary entry (latent) is defined by learned temporal Gaussian islands (specifying when the concept is active) and a sparse variable-composition vector (specifying which variables are involved). A decoupled selector then identifies which dictionary entries drive each patient's prediction, separating representation learning from attribution. We evaluate TI-SAE across five backb"
+      },
+      {
+        "doi": "10.48550/arXiv.2608.29057",
+        "title": "Sparse Koopman Autoencoders Identify Local Dynamical Regimes in Multibasin Systems",
+        "url": "https://arxiv.org/abs/2608.29057",
+        "authors": "Aidan Li, Uday Kiran Reddy Tadipatri, Mahan Fathi, Sarath Chandar et al.",
+        "year": "2026",
+        "abstract": "Koopman autoencoders (KAEs) seek a higher-dimensional latent representation in which nonlinear dynamics evolve linearly. However, many interesting systems have multiple basins of attraction, and both theoretical and empirical work has shown these multibasin systems cannot generally admit a single finite-dimensional global Koopman embedding under standard assumptions. We posit that encoders with a sparsity-inducing objective encouraging few active latent coefficients will provide latent supports as an inspectable basin-modeling principle for Koopman autoencoders. We use these encoders producing sparse latents in training Sparse Koopman Autoencoders (SKAEs) without basin labels or other regime annotations, and treat the learned latent supports as model-produced regime variables after training. Across a range of procedurally generated multibasin systems and chaotic flows, we show that SKAEs"
+      },
+      {
+        "doi": "10.48550/arXiv.2309.08600",
+        "title": "Sparse Autoencoders Find Highly Interpretable Features in Language Models",
+        "url": "https://arxiv.org/abs/2309.08600",
+        "authors": "Hoagy Cunningham, Aidan Ewart, Logan Riggs, Robert Huben et al.",
+        "year": "2023",
+        "abstract": "One of the roadblocks to a better understanding of neural networks' internals is \\textit{polysemanticity}, where neurons appear to activate in multiple, semantically distinct contexts. Polysemanticity prevents us from identifying concise, human-understandable explanations for what neural networks are doing internally. One hypothesised cause of polysemanticity is \\textit{superposition}, where neural networks represent more features than they have neurons by assigning features to an overcomplete set of directions in activation space, rather than to individual neurons. Here, we attempt to identify those directions, using sparse autoencoders to reconstruct the internal activations of a language model. These autoencoders learn sets of sparsely activating features that are more interpretable and monosemantic than directions identified by alternative approaches, where interpretability is measur"
+      },
+      {
+        "doi": "10.48550/arXiv.2406.04093",
+        "title": "Scaling and evaluating sparse autoencoders",
+        "url": "https://arxiv.org/abs/2406.04093",
+        "authors": "Leo Gao, Tom Dupré la Tour, Henk Tillman, Gabriel Goh et al.",
+        "year": "2024",
+        "abstract": "Sparse autoencoders provide a promising unsupervised approach for extracting interpretable features from a language model by reconstructing activations from a sparse bottleneck layer. Since language models learn many concepts, autoencoders need to be very large to recover all relevant features. However, studying the properties of autoencoder scaling is difficult due to the need to balance reconstruction and sparsity objectives and the presence of dead latents. We propose using k-sparse autoencoders [Makhzani and Frey, 2013] to directly control sparsity, simplifying tuning and improving the reconstruction-sparsity frontier. Additionally, we find modifications that result in few dead latents, even at the largest scales we tried. Using these techniques, we find clean scaling laws with respect to autoencoder size and sparsity. We also introduce several new metrics for evaluating feature qual"
+      },
+      {
+        "doi": "10.48550/arXiv.2408.05147",
+        "title": "Gemma Scope: Open Sparse Autoencoders Everywhere All At Once on Gemma 2",
+        "url": "https://arxiv.org/abs/2408.05147",
+        "authors": "Tom Lieberum, Senthooran Rajamanoharan, Arthur Conmy, Lewis Smith et al.",
+        "year": "2024",
+        "abstract": "Sparse autoencoders (SAEs) are an unsupervised method for learning a sparse decomposition of a neural network's latent representations into seemingly interpretable features. Despite recent excitement about their potential, research applications outside of industry are limited by the high cost of training a comprehensive suite of SAEs. In this work, we introduce Gemma Scope, an open suite of JumpReLU SAEs trained on all layers and sub-layers of Gemma 2 2B and 9B and select layers of Gemma 2 27B base models. We primarily train SAEs on the Gemma 2 pre-trained models, but additionally release SAEs trained on instruction-tuned Gemma 2 9B for comparison. We evaluate the quality of each SAE on standard metrics and release these results. We hope that by releasing these SAE weights, we can help make more ambitious safety and interpretability research easier for the community. Weights and a tutori"
+      },
+      {
+        "doi": "10.48550/arXiv.1712.09707",
+        "title": "Deep learning for universal linear embeddings of nonlinear dynamics",
+        "url": "https://arxiv.org/abs/1712.09707",
+        "authors": "Bethany Lusch, J. Nathan Kutz, Steven L. Brunton",
+        "year": "2017",
+        "abstract": "Identifying coordinate transformations that make strongly nonlinear dynamics approximately linear is a central challenge in modern dynamical systems. These transformations have the potential to enable prediction, estimation, and control of nonlinear systems using standard linear theory. The Koopman operator has emerged as a leading data-driven embedding, as eigenfunctions of this operator provide intrinsic coordinates that globally linearize the dynamics. However, identifying and representing these eigenfunctions has proven to be mathematically and computationally challenging. This work leverages the power of deep learning to discover representations of Koopman eigenfunctions from trajectory data of dynamical systems. Our network is parsimonious and interpretable by construction, embedding the dynamics on a low-dimensional manifold that is of the intrinsic rank of the dynamics and parame"
+      },
+      {
+        "doi": "10.48550/arXiv.1407.5155",
+        "title": "Sparse and spurious: dictionary learning with noise and outliers",
+        "url": "https://arxiv.org/abs/1407.5155",
+        "authors": "Rémi Gribonval, Rodolphe Jenatton, Francis Bach",
+        "year": "2014",
+        "abstract": "A popular approach within the signal processing and machine learning communities consists in modelling signals as sparse linear combinations of atoms selected from a learned dictionary. While this paradigm has led to numerous empirical successes in various fields ranging from image to audio processing, there have only been a few theoretical arguments supporting these evidences. In particular, sparse coding, or sparse dictionary learning, relies on a non-convex procedure whose local minima have not been fully analyzed yet. In this paper, we consider a probabilistic model of sparse signals, and show that, with high probability, sparse coding admits a local minimum around the reference dictionary generating the signals. Our study takes into account the case of over-complete dictionaries, noisy signals, and possible outliers, thus extending previous work limited to noiseless settings and/or "
+      },
+      {
+        "doi": "10.48550/arXiv.1109.2389",
+        "title": "A Probabilistic Framework for Discriminative Dictionary Learning",
+        "url": "https://arxiv.org/abs/1109.2389",
+        "authors": "Bernard Ghanem, Narendra Ahuja",
+        "year": "2011",
+        "abstract": "In this paper, we address the problem of discriminative dictionary learning (DDL), where sparse linear representation and classification are combined in a probabilistic framework. As such, a single discriminative dictionary and linear binary classifiers are learned jointly. By encoding sparse representation and discriminative classification models in a MAP setting, we propose a general optimization framework that allows for a data-driven tradeoff between faithful representation and accurate classification. As opposed to previous work, our learning methodology is capable of incorporating a diverse family of classification cost functions (including those used in popular boosting methods), while avoiding the need for involved optimization techniques. We show that DDL can be solved by a sequence of updates that make use of well-known and well-studied sparse coding and dictionary learning alg"
+      }
+    ]
+  },
+  "I4": {
+    "aligned": true,
+    "evidence": "manuscript.md matches the executed path in snapshots/pruned/model.py under config.json: fista_momentum=false selects direct nonnegative projected-gradient iterations; support projection defaults on with q=k_active+1 (reported as Top-6); path-Laplacian smoothing uses strengths 0.10 and 0.05; Koopman fitting uses ridge 2.0, row-wise orientation K=(C^{-1}R)^T, and spectral cap 1.05; two bidirectional sweeps use A=I+0.07(I+K^T K) with the stated forward/backward terms; dictionary refinement defaults to four rounds, 12 inference iterations, ridge 0.08, step 0.32, and column normalization; final inference uses 24 iterations and reconstructs as ZD^T. The mixture/gating/loss fields in config.json are unused metadata, and manuscript.md correctly makes no claims that those mechanisms execute."
+  }
+}

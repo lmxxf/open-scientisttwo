@@ -1,0 +1,57 @@
+{
+  "pdf": "/tmp/st-gpt56-dmsqd_cma/manuscript.pdf",
+  "seconds": 63.17,
+  "numerical_score": 2.9,
+  "fine_weighted_score": 4.73,
+  "positive_count": 1,
+  "neutral_count": 4,
+  "negative_count": 2,
+  "triple_scores": {
+    "Claims_Support": -1,
+    "Experimental_Soundness": -1,
+    "Writing_Clarity": 0,
+    "Prior_Work_Context": 0,
+    "Question_Importance": 1,
+    "Originality": 0,
+    "Value_to_Community": 0
+  },
+  "triple_reasons": {
+    "Claims_Support": "Elementary invariants hold, but central attribution claims lack verification: dimension-dependent smoothing is constant across all tested dimensions, path and smoothing effects are not isolated, and ablation reference results disagree.",
+    "Experimental_Soundness": "Paired aggregate intervals are useful, but benchmark definitions and budgets are missing, held-out and randomization protocols are unspecified, and inconsistent subtraction results prevent clean causal interpretation.",
+    "Writing_Clarity": "The paper has a clean academic structure and explicit algorithms, but missing protocol details, ambiguous batch semantics, and inconsistent complexity and result accounting prevent full technical clarity.",
+    "Prior_Work_Context": "The bibliography covers major QD families, but nearest-method differentiation remains descriptive, efficient covariance alternatives are unresolved, and retrieved Differential MAP-Elites is omitted.",
+    "Question_Importance": "Improving evaluation-efficient repertoire optimization with inexpensive anisotropic search is an important problem for black-box optimization and quality diversity.",
+    "Originality": "The method is a plausible specialization combining established annealing, evolution-path, diagonal adaptation, and mixture-sampling ideas; a genuinely new algorithmic principle is not established.",
+    "Value_to_Community": "An inexpensive QD optimizer and transparent invariant analysis could be useful, but the unspecified workload and unresolved empirical attribution currently limit the contribution to a prospective technical note."
+  },
+  "fine_scores_10": {
+    "Claims_Support": 3.5,
+    "Experimental_Soundness": 2.5,
+    "Writing_Clarity": 6.5,
+    "Prior_Work_Context": 5.0,
+    "Question_Importance": 8.0,
+    "Originality": 4.5,
+    "Value_to_Community": 4.5
+  },
+  "sections": {
+    "summary": "The manuscript proposes TAP-CMA-MAE, combining archive threshold annealing, diagonal covariance adaptation, a rank-one evolution path, variance smoothing, and quality-biased parent sampling. The elementary invariant proofs are largely correct under their stated assumptions. However, the empirical study is insufficiently specified to reproduce, the ablation tables use inconsistent reference results, and the claimed mechanism attribution exceeds the evidence. I recommend rejection in its current form.",
+    "strengths": "The method has explicit update equations and useful pseudocode. Diagonal-plus-rank-one sampling plausibly provides linear-cost anisotropic mutations. The manuscript reports paired confidence intervals, coverage, and lower-tail elite quality rather than only aggregate QD-Score. It acknowledges limitations concerning rotation invariance, fixed step size, descriptor dimensionality, and lack of global convergence guarantees. The presentation generally resembles a standalone research article rather than an internal audit report.",
+    "weaknesses": "The experiments omit objective functions, descriptor definitions, archive resolution, numerical evaluation budgets, baseline configurations, tuning and held-out protocols, hardware, runtime, measured memory, and numerical precision. Factorial and subtraction results disagree without an explanation of their experimental populations. There are no uncertainty estimates for the small annealing gains, no separate path or smoothing ablations, and no demonstrated computational scaling advantage. The theoretical results mostly establish elementary properties of existing constructions rather than optimization effectiveness.",
+    "detailed_comments": "1. Mathematical scope: Lemma 1 and Theorem 1 correctly solve an exponential moving-average recurrence for constant-quality sequential threshold updates. Archive monotonicity and the parent-mixture probability also follow directly from their definitions. These results do not establish exploration effectiveness, beneficial covariance learning, improved archive-tail quality, or convergence. The statement that the guarantees explain preserved exploration incentives and learned search geometry is stronger than what is proved.\n2. Batch semantics: Algorithm 2 ranks candidates against old thresholds while updating thresholds sequentially. If several candidates visit the same cell in one batch, their ranking rewards need not follow the sequential geometric decay assumed by Theorem 1. The manuscript must distinguish the theorem's sequential surrogate reward from the actual batch ranking scores and specify within-batch update order.\n3. Covariance guarantee: Theorem 2 proves bounded diagonal entries and positive definiteness with a lower eigenvalue bound. Its proof does not bound the upper eigenvalue of D + beta pp^T because it does not bound p. A path bound could be derived from bounded candidates and the contractive path recurrence, but it is not supplied. Moreover, the actual untruncated mutation covariance includes sigma squared, and coordinate clipping changes the offspring covariance. The theorem should explicitly concern the pre-clipping covariance shape matrix.\n4. Inactive dimension dependence: rho = min(0.2, 2/sqrt(d)) equals 0.2 at every tested dimension, 24 through 64. Consequently, these experiments cannot attribute dimensional robustness to dimension-dependent smoothing. Clipping already bounds diagonal anisotropy; no smoothing subtraction isolates an additional benefit.\n5. Factorial attribution: When covariance adaptation is disabled, the two annealing conditions have exactly identical reported results. This is structurally plausible because thresholds influence distribution adaptation, while elite acceptance and parent selection do not depend on thresholds. Thus, the nominal 2-by-2 study is not evidence of two independently effective mechanisms. With covariance enabled, annealing contributes only 0.0045 QD-Score, without a paired confidence interval.\n6. Inconsistent ablations: The factorial study reports complete-method QD-Score 0.6437, without covariance 0.4055, and without annealing 0.6392. The subtraction study instead reports 0.6474, 0.4208, and 0.6410. These differences exceed some claimed component effects. Different seeds or workloads could explain them, but none are specified. The unchanged bookkeeping subtraction identifies a redundant implementation feature, not a beneficial algorithmic component. Path adaptation, diagonal adaptation, and smoothing remain confounded.\n7. Statistical interpretation: The supplied aggregate paired Student-t intervals exclude zero, but the twelve observations pool four dimensions with only three repetitions each. Their validity depends on the sampling unit and independence assumptions, which are unspecified. An aggregate interval does not establish improvement separately at each dimension. Per-instance paired differences, dimension-specific intervals, seed-generation details, and uncertainty for every mechanism contrast are needed. CVaR over occupied cells also changes its evaluation population with coverage and should be supplemented by a fixed-cell or coverage-conditioned comparison.\n8. Reproducibility and scaling: Equal evaluation budgets are asserted but B and G are never numerically reported. Neither the benchmark landscapes nor behavior mappings are defined. The four dimensions constitute a limited dimensional sweep rather than broad stress testing. No hardware or empirical runtime/memory measurements support the practical efficiency claims. Complexity accounting is internally inconsistent: the introduction gives an O(d) auxiliary contribution, whereas Section 3.5 introduces an unexplained O(d squared) observation buffer absent from the algorithm.\n9. Prior work and novelty: The retrieved CMA-ME literature already combines covariance adaptation with an archive; the manuscript explicitly inherits threshold annealing from CMA-MAE. Its technical novelty therefore rests on the particular inexpensive covariance representation and parent mixture. The comparison table does not establish a formal distinction from efficient covariance-adaptation variants, and the supplied retrieved literature includes Differential MAP-Elites, which is omitted despite its relevance as a simple continuous-domain optimizer/archive combination. Retrieved Multi-Emitter MAP-Elites also reports 100-dimensional optimization and robotics tasks, weakening the framing of 24\u201364 dimensions as compelling high-dimensional validation. Peripheral citations such as Venus exploration do little to resolve the nearest-method novelty boundary.\n10. Presentation: The article has coherent sections, explicit algorithms, and no obvious internal log filenames or duplicate appendix headings. I would not treat PDF text-extraction artifacts as evidence of poor manuscript organization. The substantive clarity problem is the missing experimental specification and unresolved table provenance.",
+    "questions": "What are the exact objectives, descriptors, archive sizes, evaluation budgets, baseline implementations, and tuning versus held-out splits? Why do Sections 4.4 and 4.5 use different complete-method and subtraction results? What are the paired confidence intervals for annealing, tail sampling, path adaptation, and smoothing separately? How are multiple same-cell observations ranked and threshold-updated within a batch? Can the authors provide a path-norm bound and distinguish pre-clipping covariance from actual offspring covariance? What improvement remains against matched diagonal-only, path-only, and efficient covariance baselines under identical parent selection and initialization? What are the runtime, peak-memory, precision, and hardware measurements?",
+    "assessment": "Reject. The proposal could become a useful technical contribution, but the current manuscript does not provide reproducible experimental evidence or sufficiently isolated attribution for its central empirical claims. The basic algebraic guarantees are valid within a narrower scope than the surrounding interpretation. A fully specified benchmark, reconciled ablation populations, component-level uncertainty, and comparisons targeting the actual novelty are necessary."
+  },
+  "calibration": {
+    "intercept": 4.2,
+    "weights": {
+      "Claims_Support": 1.5,
+      "Experimental_Soundness": 0.8,
+      "Writing_Clarity": 0.3,
+      "Prior_Work_Context": 0.6,
+      "Question_Importance": 1.0,
+      "Originality": 0.7,
+      "Value_to_Community": 0.7
+    },
+    "note": "Exact 7D linear regression fitted with 0.0000 residual to 5 official paperreview.ai ICLR reports"
+  }
+}

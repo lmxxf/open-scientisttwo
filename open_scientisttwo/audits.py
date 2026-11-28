@@ -65,14 +65,16 @@ def lookup(query):
         return disk[query]
     url = 'https://export.arxiv.org/api/query?' + urllib.parse.urlencode({'search_query': query, 'max_results': 2})
     last_err = None
-    for attempt in range(1):
+    for attempt in range(2):
         try:
-            res = execute(['curl', '--fail', '--silent', '--show-error', '--max-time', '8', url], '/tmp', 12)
+            res = execute(['curl', '--fail', '--silent', '--show-error', '--max-time', '12', url], '/tmp', 16)
             _LOOKUP_CACHE[query] = res
             _save_disk_cache('lookup', query, res)
             return res
         except Exception as exc:
             last_err = exc
+            if attempt == 0 and not _is_mocked():
+                import time as _t; _t.sleep(1.5)
     raise last_err
 
 

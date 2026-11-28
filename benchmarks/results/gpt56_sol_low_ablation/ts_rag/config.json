@@ -1,0 +1,20 @@
+{
+  "name": "affine_transport_trend_decoupling",
+  "decomposition": "robust_local_linear_trend_plus_residual",
+  "trend_estimator": "Theil-Sen_or_Huber",
+  "retrieval_key": "standardized_detrended_residual",
+  "normalization": "median_and_MAD",
+  "prototype_target": "neighbor_future_residual",
+  "transport": "query_level_plus_query_slope_times_horizon_plus_query_scale_times_predicted_residual",
+  "ridge_intercept": false,
+  "slope_mismatch_penalty": true,
+  "scale_ratio_clip": [
+    0.25,
+    4.0
+  ],
+  "robust_despiking": false,
+  "trend_decoupling": true,
+  "spectral_extrapolation": false,
+  "ridge_prototype_regression": true,
+  "adaptive_confidence_gating": true
+}

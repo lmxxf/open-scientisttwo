@@ -1,5 +1,5 @@
 """Bounded CLI roles. Persist only prompts, commands and final answers, never session logs."""
-import json, os, signal, subprocess, time
+import json, os, re, signal, subprocess, time
 from pathlib import Path
 
 
@@ -13,7 +13,8 @@ def execute(command, cwd, timeout=120, input=None):
         proc.communicate()
         raise TimeoutError(f'command timed out: {command[0]}')
     if proc.returncode:
-        raise RuntimeError(f'{command[0]} failed (exit {proc.returncode})')
+        detail = (err or out or '').strip()[-500:]
+        raise RuntimeError(f'{command[0]} failed (exit {proc.returncode})' + (f': {detail}' if detail else ''))
     return out
 
 
@@ -21,7 +22,15 @@ def extract(text):
     text = text.strip()
     if text.startswith('```'):
         text = '\n'.join(text.splitlines()[1:-1])
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        def _fix_escape(m):
+            slashes, nxt = m.group(1), m.group(2)
+            if len(slashes) % 2 == 1 and nxt not in '"\\/bfnrtu':
+                return slashes + '\\' + nxt
+            return m.group(0)
+        return json.loads(re.sub(r'(\\+)(.)', _fix_escape, text))
 
 
 class CodexRunner:
