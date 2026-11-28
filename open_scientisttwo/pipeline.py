@@ -161,7 +161,23 @@ class Pipeline:
         self.event(1, limitations=limitations)
         xml = lookup(self.spec['arxiv_query'])
         (self.root/'related_work.xml').write_text(xml)
-        self.refs = [reference(doi) for doi in self.spec['seed_dois']]
+        dois = list(self.spec['seed_dois'])
+        if not self.fast:
+            try:
+                q_plan = self.agent('Review retrieval planner', 'Read baseline_paper.md. Return {"query":"simple arXiv keyword query without nested parentheses for prior art retrieval"}.')
+                extra_xml = lookup(q_plan.get('query', ''))
+                import xml.etree.ElementTree as ET, re
+                ns = {'a': 'http://www.w3.org/2005/Atom'}
+                for entry in ET.fromstring(extra_xml).findall('a:entry', ns):
+                    aid = entry.findtext('a:id', '', ns)
+                    m_id = re.search(r'arxiv\.org/abs/([0-9]{4}\.[0-9]{4,5})', aid, flags=re.I)
+                    if m_id:
+                        cand_doi = '10.48550/arXiv.' + m_id.group(1)
+                        if cand_doi.casefold() not in {d.casefold() for d in dois}:
+                            dois.append(cand_doi)
+            except Exception:
+                pass
+        self.refs = [reference(doi) for doi in dois]
         save(self.root/'references.json', self.refs)
         ideas = self.agent('Seed Generator and Novelty Checker', 'Read related_work.xml and references.json. '
             f'For {self.spec["title"]}, propose {self.K+2} distinct evidence-grounded algorithmic improvements. '
@@ -212,6 +228,20 @@ class Pipeline:
             score = self.snapshot('pruned', base_cfg)
             if better(score, self.best['value'], self.spec, equal=True):
                 self.best = dict(config=base_cfg, value=score, label='pruned', snapshot='pruned')
+                # Re-plan and re-run subtraction ablations around the newly promoted pruned configuration so ablations match final method!
+                self.restore(self.best['snapshot'])
+                re_plans = self.agent('Ablation Planner', f'Read model.py and snapshots/pruned/config.json. Final selected pruned method is {self.best}. Return {{"ablations":[{{"config":{{}},"reason":"remove one active component from pruned"}},...]}}. Plan exactly {self.ablation_count} single-component subtraction configurations around snapshots/pruned/config.json using ONLY supported boolean/numeric keys.')['ablations']
+                if len(re_plans) == self.ablation_count:
+                    ablations = []
+                    for i, plan in enumerate(re_plans):
+                        self.restore(self.best['snapshot'])
+                        p_lbl = f'pruned_ablation{i}'
+                        p_cfg = dict(base_cfg)
+                        for k_p, v_p in plan.get('config', {}).items():
+                            if k_p in p_cfg and isinstance(p_cfg[k_p], (int, float)) and not isinstance(p_cfg[k_p], bool) and isinstance(v_p, str):
+                                continue
+                            p_cfg[k_p] = v_p
+                        ablations.append(dict(config=p_cfg, value=self.snapshot(p_lbl, p_cfg)))
         self.event(4, best=self.best, ablations=ablations)
         self.draft()
         for i in range(self.peer_rounds):

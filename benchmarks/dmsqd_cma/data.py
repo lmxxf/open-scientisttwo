@@ -37,21 +37,22 @@ def archive_cell_indices(descriptors, grid_size):
 def tasks(mode="full", split="validation", extra=False):
     seed_base = (710 if split == "validation" else 1120) + (7000 if extra else 0)
     rng = np.random.default_rng(seed_base)
-    configs = [(24, 10, 0.12), (36, 10, 0.20)] if mode == "subset" else [
-        (24, 12, 0.10), (36, 12, 0.18), (48, 12, 0.25), (64, 12, 0.30)
+    configs = [(24, 10, 0.12, 0), (36, 10, 0.12, 1), (48, 10, 0.12, 2)] if mode == "subset" else [
+        (d, 12, 0.15, rep) for d in (24, 36, 48, 64) for rep in range(3)
     ]
     out = []
-    for t_idx, (d, grid_sz, rip) in enumerate(configs):
+    for t_idx, (d, grid_sz, rip, rep) in enumerate(configs):
         U, _ = np.linalg.qr(rng.normal(size=(d, d)))
         V_b, _ = np.linalg.qr(rng.normal(size=(d, 2)))
         eigs = np.geomspace(0.4, 4.5 * (1.2 if extra else 1.0), d)
         center = rng.uniform(-0.8, 0.8, size=d)
         out.append({
             "task_id": t_idx,
-            "name": f"QD_dim{d}_grid{grid_sz}",
+            "name": f"QD_dim{d}_rep{rep}",
             "dim": d,
+            "replicate": rep,
             "grid_size": grid_sz,
-            "budget_generations": 24 if mode == "subset" else 36,
+            "budget_generations": 20 if mode == "subset" else 28,
             "batch_size": 24,
             "ripple_amp": rip,
             "rot_Q": U,

@@ -24,6 +24,8 @@ def _render_inline(text, math=True):
         else:
             esc = escape(p)
             esc = re.sub(r'\*\*([^*]+)\*\*', r'\\textbf{\1}', esc)
+            esc = re.sub(r'(?<!\*)\*([^*\n]+)\*(?!\*)', r'\\textit{\1}', esc)
+            esc = re.sub(r'`([^`\n]+)`', r'\\texttt{\1}', esc)
             out.append(esc)
     return ''.join(out)
 
@@ -43,6 +45,10 @@ def render(text, math=True):
                 out.append(lines[i])
                 i += 1
             out.append(r'\end{verbatim}')
+            i += 1
+            continue
+        if stripped.startswith('#### '):
+            out.append(r'\subsubsection*{' + _render_inline(stripped[5:].strip(), math) + '}')
             i += 1
             continue
         if stripped.startswith('### '):
@@ -105,7 +111,7 @@ def write_manuscript(root, response, claims, refs, spec):
 \setlength{\parskip}{6pt}
 \begin{document}
 '''
-        latex+='\\title{'+escape(response['title'])+'}\n\\author{Open-ScientistTwo Research Report}\n\\date{}\\maketitle\n'
+        latex+='\\title{'+escape(response['title'])+'}\n\\author{Anonymous Authors}\n\\date{}\\maketitle\n'
         latex+='\\begin{abstract}\n'+render(response['abstract'],native)+'\n\\end{abstract}\n'
         for key,title in SECTIONS:
             latex+='\\section{'+title+'}\n'+render(response[key],native)+'\n'

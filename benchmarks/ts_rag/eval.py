@@ -62,6 +62,32 @@ def baseline_timesnet_fft(case, top_modes=4):
     return (intercept + slope * future_t) + recon[L:]
 
 
+def baseline_matched_constant_ridge(case, top_k=8, lam=0.11):
+    """Matched-strength isotropic constant ridge regression over detrended top-k neighbors (control isolating continuation-disagreement weighting from pure ridge shrinkage)."""
+    x = np.asarray(case["query"], dtype=float)
+    keys = np.asarray(case["bank_keys"], dtype=float)
+    vals = np.asarray(case["bank_vals"], dtype=float)
+    L, H = len(x), case["horizon"]
+    t_idx = np.arange(L, dtype=float)
+    slope_x, int_x = np.polyfit(t_idx, x, 1)
+    rx = x - (int_x + slope_x * t_idx)
+    # Detrend bank keys linearly
+    t_mean = np.mean(t_idx); t_c = t_idx - t_mean; t_var = np.sum(t_c ** 2)
+    slopes_k = (keys @ t_c) / t_var
+    ints_k = np.mean(keys, axis=1) - slopes_k * t_mean
+    rk = keys - (ints_k[:, None] + slopes_k[:, None] * t_idx[None, :])
+    fut_t = np.arange(L, L + H, dtype=float)
+    rv = vals - (ints_k[:, None] + slopes_k[:, None] * fut_t[None, :])
+    sims = (rk @ rx) / (np.linalg.norm(rk, axis=1) * (np.linalg.norm(rx) + 1e-8) + 1e-8)
+    idx = np.argsort(sims)[-top_k:]
+    R_top = rk[idx].T  # L x K
+    V_top = rv[idx].T  # H x K
+    gram = R_top.T @ R_top
+    scale = max(float(np.mean(np.diag(gram))), 1e-6)
+    w = np.linalg.solve(gram + lam * scale * np.eye(top_k), R_top.T @ rx)
+    return (int_x + slope_x * fut_t) + (V_top @ w)
+
+
 def baseline_mqretnn_knn(case, top_k=8, tau=0.25):
     """MQRetNN-style softmax distance-weighted kNN retrieval over z-normalized windows (arXiv:2207.10517)."""
     x = np.asarray(case["query"], dtype=float)
@@ -150,7 +176,7 @@ def run(mode, split, extra, config):
 
     t0 = time.perf_counter()
     rows = []
-    rag_mses, dlin_mses, fft_mses, knn_mses = [], [], [], []
+    rag_mses, dlin_mses, fft_mses, knn_mses, cridge_mses = [], [], [], [], []
     by_channel = {name: [] for name, *_ in CHANNELS}
     for c in cases:
         pred = forecast(c, config)
@@ -162,6 +188,7 @@ def run(mode, split, extra, config):
         dlin_mses.append(score_prediction(baseline_dlinear_decomposition(c), c)["mse"])
         fft_mses.append(score_prediction(baseline_timesnet_fft(c), c)["mse"])
         knn_mses.append(score_prediction(baseline_mqretnn_knn(c), c)["mse"])
+        cridge_mses.append(score_prediction(baseline_matched_constant_ridge(c), c)["mse"])
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
 
     sel_mses = [r["mse"] for r in rows]
@@ -176,6 +203,7 @@ def run(mode, split, extra, config):
     paired_vs_dlin = [b - s for b, s in zip(dlin_mses, sel_mses)]
     paired_vs_fft = [b - s for b, s in zip(fft_mses, sel_mses)]
     paired_vs_knn = [b - s for b, s in zip(knn_mses, sel_mses)]
+    paired_vs_cridge = [b - s for b, s in zip(cridge_mses, sel_mses)]
 
     def _ci(arr):
         return float(t_crit * statistics.stdev(arr) / math.sqrt(len(arr))) if len(arr) > 1 else 0.0
@@ -197,17 +225,22 @@ def run(mode, split, extra, config):
                 paired_mse_reduction_t95_ci=_ci(paired_vs_rag),
                 relative_mse_reduction_pct=round((1.0 - mse_mean / max(float(np.mean(rag_mses)), 1e-12)) * 100.0, 2),
             ),
-            dlinear_2205_13504=dict(
+            matched_strength_constant_ridge_control=dict(
+                mse=float(np.mean(cridge_mses)),
+                paired_mse_reduction_mean=float(np.mean(paired_vs_cridge)),
+                paired_mse_reduction_t95_ci=_ci(paired_vs_cridge),
+            ),
+            moving_average_trend_seasonal_surrogate=dict(
                 mse=float(np.mean(dlin_mses)),
                 paired_mse_reduction_mean=float(np.mean(paired_vs_dlin)),
                 paired_mse_reduction_t95_ci=_ci(paired_vs_dlin),
             ),
-            timesnet_fft_2210_02186=dict(
+            fourier_harmonic_extrapolation_surrogate=dict(
                 mse=float(np.mean(fft_mses)),
                 paired_mse_reduction_mean=float(np.mean(paired_vs_fft)),
                 paired_mse_reduction_t95_ci=_ci(paired_vs_fft),
             ),
-            mqretnn_knn_2207_10517=dict(
+            softmax_knn_retrieval_surrogate=dict(
                 mse=float(np.mean(knn_mses)),
                 paired_mse_reduction_mean=float(np.mean(paired_vs_knn)),
                 paired_mse_reduction_t95_ci=_ci(paired_vs_knn),

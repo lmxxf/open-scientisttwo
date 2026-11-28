@@ -5,31 +5,48 @@ from data import dataset
 from model import run_tsae
 
 
-def baseline_framewise_ista(bundle):
-    """Standard token-independent ReLU-ISTA SAE (Cunningham et al., arXiv:2309.08600)."""
-    D = np.asarray(bundle["D_init"], dtype=float).copy()
+def _refine_dict_matched(D_init, train_seqs, lam=0.18, steps=4):
+    D = np.asarray(D_init, dtype=float).copy()
+    D /= np.linalg.norm(D, axis=0, keepdims=True) + 1e-12
+    for _ in range(steps):
+        G = np.zeros_like(D)
+        H_diag = np.full(D.shape[1], 1e-3, dtype=float)
+        for X in train_seqs:
+            Z = np.maximum(0.0, X @ D)
+            for _ in range(8):
+                Z = np.maximum(0.0, Z - 0.16 * ((Z @ D.T - X) @ D) - 0.16 * lam)
+            G += (X - Z @ D.T).T @ Z
+            H_diag += np.sum(Z ** 2, axis=0)
+        D += 0.35 * (G / H_diag[None, :])
+        D /= np.linalg.norm(D, axis=0, keepdims=True) + 1e-12
+    return D
+
+
+def baseline_framewise_ista(bundle, refine_dict=False):
+    """Token-independent ReLU-ISTA SAE with matched 20-step budget (Cunningham et al., arXiv:2309.08600)."""
+    D = _refine_dict_matched(bundle["D_init"], bundle["train_sequences"]) if refine_dict else np.asarray(bundle["D_init"], dtype=float).copy()
     D /= np.linalg.norm(D, axis=0, keepdims=True) + 1e-12
     recons, lats = [], []
     for c in bundle["eval_cases"]:
         X = np.asarray(c["X_obs"], dtype=float)
         Z = np.maximum(0.0, X @ D)
-        for _ in range(15):
-            Z = np.maximum(0.0, Z - 0.18 * ((Z @ D.T - X) @ D) - 0.18 * 0.22)
+        for _ in range(20):
+            Z = np.maximum(0.0, Z - 0.18 * ((Z @ D.T - X) @ D) - 0.18 * 0.20)
         recons.append(Z @ D.T); lats.append(Z)
     return dict(D_est=D, K_est=np.eye(bundle["m_dict"]), reconstructions=recons, latents=lats)
 
 
-def baseline_topk_sae(bundle):
-    """Framewise TopK Sparse Autoencoder (Gao et al., arXiv:2406.04093)."""
-    D = np.asarray(bundle["D_init"], dtype=float).copy()
+def baseline_topk_sae(bundle, refine_dict=True):
+    """Framewise TopK Sparse Autoencoder with matched dictionary refinement & 20-step budget (Gao et al., arXiv:2406.04093)."""
+    D = _refine_dict_matched(bundle["D_init"], bundle["train_sequences"]) if refine_dict else np.asarray(bundle["D_init"], dtype=float).copy()
     D /= np.linalg.norm(D, axis=0, keepdims=True) + 1e-12
     k = bundle["k_active"] + 1
     recons, lats = [], []
     for c in bundle["eval_cases"]:
         X = np.asarray(c["X_obs"], dtype=float)
         Z = np.maximum(0.0, X @ D)
-        for _ in range(12):
-            Z = np.maximum(0.0, Z - 0.20 * ((Z @ D.T - X) @ D))
+        for _ in range(20):
+            Z = np.maximum(0.0, Z - 0.18 * ((Z @ D.T - X) @ D))
             out = np.zeros_like(Z)
             idx = np.argpartition(Z, -k, axis=1)[:, -k:]
             rows = np.arange(len(Z))[:, None]
@@ -39,15 +56,15 @@ def baseline_topk_sae(bundle):
     return dict(D_est=D, K_est=np.eye(bundle["m_dict"]), reconstructions=recons, latents=lats)
 
 
-def baseline_laplacian_tsae(bundle):
-    """First-order Temporal Laplacian SAE without Koopman operator or dictionary refinement (Bhalla et al., arXiv:2511.05541)."""
-    D = np.asarray(bundle["D_init"], dtype=float).copy()
+def baseline_laplacian_tsae(bundle, refine_dict=True):
+    """Matched-budget First-Order Temporal Laplacian / Contrastive T-SAE with dictionary refinement (Bhalla et al., arXiv:2511.05541)."""
+    D = _refine_dict_matched(bundle["D_init"], bundle["train_sequences"]) if refine_dict else np.asarray(bundle["D_init"], dtype=float).copy()
     D /= np.linalg.norm(D, axis=0, keepdims=True) + 1e-12
     recons, lats = [], []
     for c in bundle["eval_cases"]:
         X = np.asarray(c["X_obs"], dtype=float)
         Z = np.maximum(0.0, X @ D)
-        for _ in range(18):
+        for _ in range(20):
             grad = (Z @ D.T - X) @ D
             lap = np.zeros_like(Z)
             lap[1:-1] = 2.0 * Z[1:-1] - Z[:-2] - Z[2:]

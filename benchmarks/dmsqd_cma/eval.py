@@ -29,34 +29,45 @@ def baseline_vanilla_map_elites(task, sigma=0.35):
     return dict(archive_q=aq, archive_x=ax)
 
 
-def baseline_cma_me_strict(task):
-    """CMA-ME with hard strict-improvement threshold alpha_a=1.0 (Fontaine et al., arXiv:1912.02400)."""
+def baseline_cma_me_strict(task, alpha_a=1.0):
+    """Diagonal CMA-ME / CMA-MAE with rank-mu diagonal covariance adaptation and archive threshold annealing alpha_a (arXiv:1912.02400 / 2205.10752)."""
     rng = np.random.default_rng(task["seed"])
     d, g, gens, batch = task["dim"], task["grid_size"], task["budget_generations"], task["batch_size"]
     aq = np.full((g, g), -np.inf, dtype=float)
+    t_grid = np.zeros((g, g), dtype=float)
     ax = np.zeros((g, g, d), dtype=float)
     m = np.zeros(d, dtype=float)
-    sigma = 0.45
+    diag_C = np.ones(d, dtype=float)
+    sigma = 0.42
     mu = batch // 2
     weights = np.log(mu + 0.5) - np.log(np.arange(1, mu + 1))
     weights /= np.sum(weights)
+    c_cov = 2.0 / (d + 6.0)
     for _ in range(gens):
-        X = m[None, :] + rng.normal(0.0, sigma, size=(batch, d))
+        std_vec = sigma * np.sqrt(diag_C)
+        Z = rng.normal(0.0, 1.0, size=(batch, d))
+        X = m[None, :] + Z * std_vec[None, :]
         quals, desc = evaluate_candidates(X, task)
         rows, cols = archive_cell_indices(desc, g)
         deltas = []
         for idx in range(batch):
             r, c = int(rows[idx]), int(cols[idx])
-            prev = aq[r, c] if np.isfinite(aq[r, c]) else 0.0
-            delta = float(quals[idx]) - prev
-            if quals[idx] > aq[r, c]:
-                aq[r, c] = float(quals[idx]); ax[r, c] = X[idx]
+            thresh = t_grid[r, c]
+            q_val = float(quals[idx])
+            delta = q_val - thresh
+            if q_val > aq[r, c]:
+                aq[r, c] = q_val; ax[r, c] = X[idx]
+            if q_val > thresh:
+                t_grid[r, c] = (1.0 - alpha_a) * thresh + alpha_a * q_val
             deltas.append(delta)
         order = np.argsort(deltas)[::-1][:mu]
         if deltas[order[0]] > 0:
+            z_sel = Z[order]
+            diag_C = np.clip((1.0 - c_cov) * diag_C + c_cov * (weights @ (z_sel ** 2)), 0.15, 4.0)
             m = weights @ X[order]
         else:
             m = rng.uniform(-0.8, 0.8, size=d)
+            diag_C = np.ones(d, dtype=float)
     return dict(archive_q=aq, archive_x=ax)
 
 
@@ -130,20 +141,21 @@ def run(mode, split, extra, config):
     tracemalloc.start()
     t0 = time.perf_counter()
     rows = []
-    map_rows, cmame_rows = [], []
+    map_rows, cmame_rows, cmamae_rows = [], [], []
     for t in task_list:
         s_sel = verify_and_score_archive(optimize_qd(t, config), t)
         s_sel["task_name"] = t["name"]; s_sel["dim"] = t["dim"]
         rows.append(s_sel)
         map_rows.append(verify_and_score_archive(baseline_vanilla_map_elites(t), t))
-        cmame_rows.append(verify_and_score_archive(baseline_cma_me_strict(t), t))
+        cmame_rows.append(verify_and_score_archive(baseline_cma_me_strict(t, alpha_a=1.0), t))
+        cmamae_rows.append(verify_and_score_archive(baseline_cma_me_strict(t, alpha_a=0.15), t))
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
     curr_mem, peak_mem = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     sel_mses = [r["mse"] for r in rows]
     n = len(sel_mses)
-    t_crit = 3.1824 if n == 4 else 4.3027
+    t_crit = 2.2010 if n >= 12 else 4.3027
 
     def _paired(base_list):
         b_mses = [r["mse"] for r in base_list]
@@ -166,7 +178,8 @@ def run(mode, split, extra, config):
         cvar10_quality=float(np.mean([r["cvar10_quality"] for r in rows])),
         baselines=dict(
             vanilla_map_elites_2009_08438=_paired(map_rows),
-            cma_me_strict_1912_02400=_paired(cmame_rows),
+            diagonal_cma_me_strict_1912_02400=_paired(cmame_rows),
+            diagonal_cma_mae_annealed_2205_10752=_paired(cmamae_rows),
         ),
         per_dimension_breakdown=rows,
         runtime_ms=round(elapsed_ms, 4),
