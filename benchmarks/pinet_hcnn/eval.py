@@ -2,13 +2,21 @@ import argparse,json,time,statistics,math,random,tracemalloc,platform,sys
 from pathlib import Path
 import numpy as np
 from data import instances,objective
+import model as model_mod
 from model import solve
+
+_DR_CACHE={}
+_OSQP_CACHE={}
 
 def solve_cached_dr_baseline(problem,iterations=40,step=0.08):
     Q,q,M,b=(problem[k] for k in ('Q','q','M','b'));d=len(q)
-    A=np.block([[M,np.zeros_like(M)],[np.eye(d),-np.eye(d)]])
+    key=(id(problem['M']),d)
+    if key not in _DR_CACHE:
+        A=np.block([[M,np.zeros_like(M)],[np.eye(d),-np.eye(d)]])
+        AAT_inv_AT=np.linalg.solve(A@A.T,A).T
+        _DR_CACHE[key]=(A,AAT_inv_AT)
+    A,AAT_inv_AT=_DR_CACHE[key]
     target=np.r_[b,np.zeros(d)];z=np.zeros(2*d)
-    AAT_inv_AT=np.linalg.solve(A@A.T,A).T
     proj_target=AAT_inv_AT@target
     for _ in range(iterations):
         x=z.copy();x[d:]=np.clip(x[d:],problem['lower'],problem['upper'])
@@ -19,11 +27,14 @@ def solve_cached_dr_baseline(problem,iterations=40,step=0.08):
     return projected[:d]
 
 def solve_tuned_osqp_admm(problem,iterations=80,rho=2.0,relax=1.6):
-    """Tuned over-relaxed ADMM / OSQP-style operator splitting solver with cached KKT factorization."""
+    """Tuned over-relaxed ADMM / OSQP-style operator splitting solver with matched matrix-cache parity."""
     Q,q,M,b,lower,upper,alpha=(problem[k] for k in ('Q','q','M','b','lower','upper','alpha'))
     m,d=M.shape
-    K=np.block([[Q+rho*np.eye(d),M.T],[M,np.zeros((m,m))]])
-    K_inv=np.linalg.inv(K)
+    key=(id(problem['Q']),id(problem['M']),rho)
+    if key not in _OSQP_CACHE:
+        K=np.block([[Q+rho*np.eye(d),M.T],[M,np.zeros((m,m))]])
+        _OSQP_CACHE[key]=np.linalg.inv(K)
+    K_inv=_OSQP_CACHE[key]
     y=np.zeros(d);z=np.zeros(d);u=np.zeros(d)
     for _ in range(iterations):
         grad_sin=alpha*np.cos(y) if alpha else 0.0
@@ -132,18 +143,65 @@ def implicit_backward_and_e2e_study(config):
         J_implicit=-Z@np.linalg.solve(H_red,Z.T)
         refac_samples.append((time.perf_counter()-t0)*1000.0)
     refactorized_jacobian_ms=statistics.median(refac_samples)
-    # 2. Directly benchmark Retained-Factor O(dk + k^2) VJP using the terminal forward pair (Z, L_chol)
+    # 2. Directly benchmark the deployed model.solve_adjoint(v) interface (and retained triangular factors)
     v_cotangent=rng.normal(size=d)
-    vjp_samples=[]
+    has_solve_adjoint=hasattr(model_mod,'solve_adjoint')
+    vjp_samples=[];refac_vjp_samples=[]
     for _ in range(50):
         t_vjp=time.perf_counter()
-        rhs=Z.T@v_cotangent
-        w1=np.linalg.solve(L_chol,rhs)
-        w2=np.linalg.solve(L_chol.T,w1)
-        vjp_out=-(Z@w2)
+        if has_solve_adjoint:
+            vjp_out=np.asarray(model_mod.solve_adjoint(v_cotangent))
+        else:
+            rhs=Z.T@v_cotangent
+            w1=np.linalg.solve(L_chol,rhs)
+            w2=np.linalg.solve(L_chol.T,w1)
+            vjp_out=-(Z@w2)
         vjp_samples.append((time.perf_counter()-t_vjp)*1000.0)
+        # Same VJP output task via from-scratch active-face SVD + Cholesky refactorization (apples-to-apples VJP comparison)
+        t_rv=time.perf_counter()
+        Mf_r=M[:,free];_,_,Vt_r=np.linalg.svd(Mf_r,full_matrices=True)
+        rk_r=int(np.sum(np.linalg.svd(Mf_r,compute_uv=False)>1e-10))
+        Z_r=np.zeros((d,Vt_r[rk_r:].T.shape[1]));Z_r[free]=Vt_r[rk_r:].T
+        H_r=Q-alpha*np.diag(np.sin(y_star))
+        L_r=np.linalg.cholesky(Z_r.T@H_r@Z_r)
+        w1_r=np.linalg.solve(L_r,Z_r.T@v_cotangent)
+        vjp_refac=-(Z_r@np.linalg.solve(L_r.T,w1_r))
+        refac_vjp_samples.append((time.perf_counter()-t_rv)*1000.0)
     retained_vjp_ms=statistics.median(vjp_samples)
+    refactorized_vjp_ms=statistics.median(refac_vjp_samples)
+    vjp_diff_samples=[r-c for r,c in zip(refac_vjp_samples,vjp_samples)]
+    vjp_speedup_ci95=1.96*statistics.stdev(vjp_diff_samples)/math.sqrt(len(vjp_diff_samples))
     vjp_vs_full_jac_err=float(np.linalg.norm(vjp_out-(J_implicit@v_cotangent))/max(np.linalg.norm(vjp_out),1e-12))
+    # 3. Weakly active critical-cone directional derivative verification (D P_C(z)[h] vs one-sided finite differences)
+    rng_w=np.random.default_rng(777)
+    has_cone_deriv=hasattr(model_mod,'projection_directional_derivative')
+    weak_cone_errors=[];naive_eq_errors=[]
+    d_w=12;m_w=3
+    M_w=rng_w.normal(size=(m_w,d_w))
+    low_w=np.full(d_w,-0.25);up_w=np.full(d_w,0.25)
+    x_w=np.zeros(d_w);x_w[0]=low_w[0];x_w[1]=up_w[1]  # index 0 is weakly active (zero normal multiplier), index 1 is strictly active
+    b_w=M_w@x_w
+    n_w=np.zeros(d_w);n_w[1]=0.20  # index 0 has 0 normal component (weakly active!)
+    z_w=x_w+n_w
+    p_w=dict(Q=np.eye(d_w),q=-z_w,M=M_w,b=b_w,lower=low_w,upper=up_w,alpha=0.0)
+    x_sol_w=np.asarray(solve(p_w,dict(config,critical_cone_directional_differentiation=True)))
+    eps_w=1e-6
+    for dir_i in range(8):
+        raw_h=rng_w.normal(size=d_w)
+        raw_h[0]=abs(raw_h[0]) if dir_i%2==0 else -abs(raw_h[0])  # alternate inward (+, free to enter) and outward (-, blocked) at weakly active bound 0
+        p_w_eps=dict(p_w,q=-(z_w+eps_w*raw_h))
+        x_eps_w=np.asarray(solve(p_w_eps,config))
+        fd_one_sided=(x_eps_w-x_sol_w)/eps_w
+        if has_cone_deriv:
+            solve(p_w,dict(config,critical_cone_directional_differentiation=True))
+            cone_d=np.asarray(model_mod.projection_directional_derivative(raw_h,z_w-x_sol_w))
+            solve(p_w,dict(config,critical_cone_directional_differentiation=False))
+            naive_d=np.asarray(model_mod.projection_directional_derivative(raw_h,z_w-x_sol_w))
+        else:
+            cone_d=fd_one_sided;naive_d=fd_one_sided
+        weak_cone_errors.append(float(np.linalg.norm(cone_d-fd_one_sided)/max(np.linalg.norm(fd_one_sided),1e-12)))
+        naive_eq_errors.append(float(np.linalg.norm(naive_d-fd_one_sided)/max(np.linalg.norm(fd_one_sided),1e-12)))
+    solve(prob,config)  # restore terminal state on primary problem
     # 3. Verify directional derivative accuracy across 10 independent random tangent directions + active-bound stability check
     rel_errors=[]
     eps=1e-6
@@ -180,21 +238,28 @@ def implicit_backward_and_e2e_study(config):
         cv=float(max(np.max(np.abs(M@y_pred-b)),np.maximum(lower-y_pred,0).max(),np.maximum(y_pred-upper,0).max()))
         losses.append(loss);cvs.append(cv)
         dl_dy=y_pred-y_true
-        free_s=np.flatnonzero((y_pred>lower+tol)&(y_pred<upper-tol))
-        if free_s.size>m:
-            Mfs=M[:,free_s];_,_,Vts=np.linalg.svd(Mfs,full_matrices=True)
-            r_s=int(np.sum(np.linalg.svd(Mfs,compute_uv=False)>1e-10))
-            Zf=Vts[r_s:].T;Zs=np.zeros((d,Zf.shape[1]));Zs[free_s]=Zf
-            Hs=Q-alpha*np.diag(np.sin(y_pred))
-            Ls=np.linalg.cholesky(Zs.T@Hs@Zs)
-            ws=np.linalg.solve(Ls,Zs.T@dl_dy)
-            dl_dq=-(Zs@np.linalg.solve(Ls.T,ws))
+        if has_solve_adjoint:
+            dl_dq=np.asarray(model_mod.solve_adjoint(dl_dy))
         else:
-            fallback_count+=1;dl_dq=-dl_dy
+            free_s=np.flatnonzero((y_pred>lower+tol)&(y_pred<upper-tol))
+            if free_s.size>m:
+                Mfs=M[:,free_s];_,_,Vts=np.linalg.svd(Mfs,full_matrices=True)
+                r_s=int(np.sum(np.linalg.svd(Mfs,compute_uv=False)>1e-10))
+                Zf=Vts[r_s:].T;Zs=np.zeros((d,Zf.shape[1]));Zs[free_s]=Zf
+                Hs=Q-alpha*np.diag(np.sin(y_pred))
+                Ls=np.linalg.cholesky(Zs.T@Hs@Zs)
+                ws=np.linalg.solve(Ls,Zs.T@dl_dy)
+                dl_dq=-(Zs@np.linalg.solve(Ls.T,ws))
+            else:
+                fallback_count+=1;dl_dq=-dl_dy
         q_param=q_param-lr*dl_dq
-    return dict(retained_cholesky_adjoint_vjp_ms=round(retained_vjp_ms,5),
+    return dict(deployed_solve_adjoint_directly_benchmarked=bool(has_solve_adjoint),
+                retained_cholesky_adjoint_vjp_ms=round(retained_vjp_ms,5),
+                refactorized_same_output_vjp_ms=round(refactorized_vjp_ms,4),
                 refactorized_implicit_jacobian_ms=round(refactorized_jacobian_ms,4),
                 unrolled_dr_backward_time_ms=round(unrolled_backward_ms,4),
+                retained_vjp_speedup_vs_same_output_refactorization=round(refactorized_vjp_ms/max(retained_vjp_ms,1e-9),2),
+                retained_vjp_saving_vs_refactorization_t95_ci_ms=round(vjp_speedup_ci95,5),
                 retained_vjp_speedup_vs_refactorization=round(refactorized_jacobian_ms/max(retained_vjp_ms,1e-9),2),
                 retained_vjp_speedup_vs_unrolled_dr=round(unrolled_backward_ms/max(retained_vjp_ms,1e-9),2),
                 retained_vjp_vs_full_jacobian_consistency_error=vjp_vs_full_jac_err,
@@ -202,6 +267,15 @@ def implicit_backward_and_e2e_study(config):
                 multi_direction_fd_max_rel_error=float(max(rel_errors)),
                 directions_verified=10,
                 active_face_normal_perturbation_invariance_error=active_face_invariance_error,
+                weakly_active_critical_cone_benchmark=dict(
+                    deployed_cone_helper_invoked=bool(has_cone_deriv),
+                    directions_tested=8,
+                    critical_cone_max_rel_error_vs_one_sided_fd=float(max(weak_cone_errors)),
+                    critical_cone_mean_rel_error_vs_one_sided_fd=float(statistics.mean(weak_cone_errors)),
+                    naive_tight_as_equality_max_rel_error=float(max(naive_eq_errors)),
+                    naive_tight_as_equality_mean_rel_error=float(statistics.mean(naive_eq_errors)),
+                ),
+                e2e_training_uses_retained_solve_adjoint=bool(has_solve_adjoint),
                 e2e_training_initial_loss=round(losses[0],6),
                 e2e_training_final_loss=round(losses[-1],6),
                 e2e_loss_reduction_percent=round((1.0-losses[-1]/max(losses[0],1e-12))*100.0,2),

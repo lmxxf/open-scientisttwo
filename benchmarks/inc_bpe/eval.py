@@ -151,80 +151,59 @@ def check(raw,vocab,rules,config):
         if actual!=expected or b''.join(vocab[t] for t in actual)!=raw[:n]:
             raise ValueError(f'exact prefix BPE mismatch at byte {n}')
 
-def measure_certificate_coverage(vocab,rules,texts):
-    """Measure static context certificate coverage, atomic fast-path coverage, and runtime hit rates."""
+def measure_certificate_coverage(model,vocab,rules,texts):
+    """Directly profile the deployed IncrementalBPE instance's compiled candidate table and runtime execution."""
     ac=SuffixAutomaton(vocab);tree=SufSucTree(vocab,rules)
     lengths=tuple(map(len,vocab))
-    pre={256+i:a for i,(a,b) in enumerate(rules)}
     suc=tree.successor
-    # Compile rank-ordered two-interval predicates via single O(M+R) sweep
-    order=sorted(range(len(vocab)),key=lambda u:(0,u) if u<256 else (1,u-256))
-    children={u:[] for u in range(len(vocab))}
-    for u in order:
-        if u>=256:children[suc[u]].append(u)
-    left=[0]*len(vocab);right=[0]*len(vocab);tick=0
-    for root in range(256):
-        stack=[(root,0)]
-        while stack:
-            u,idx=stack.pop()
-            if idx==0:left[u]=tick;tick+=1
-            if idx<len(children[u]):
-                stack.append((u,idx+1));stack.append((children[u][idx],0))
-            else:right[u]=tick
-    cutoff=[left[u]+1 for u in range(len(vocab))]
-    intervals={}
-    for r,(a,b) in enumerate(rules):
-        t=256+r;cutoff[b]=right[t];intervals[t]=(left[a],left[a]+1,cutoff[a],right[a])
-    # Reconstruct state spellings via BFS from root 0
-    state_word={0:b''}
-    queue=[0]
-    while queue:
-        s=queue.pop(0);w=state_word[s]
-        for byte_val,ns in ac.edges[s].items():
-            if ns not in state_word:
-                state_word[ns]=w+bytes([byte_val]);queue.append(ns)
+    # Inspect deployed compiler's own candidate tuples if available
+    deployed_cands=getattr(model,'candidates',None)
+    deployed_atomic=getattr(model,'atomic',None)
+    compiler_stats=getattr(model,'certificate_stats',None)
     atomic_states=0;certified_pairs=0;total_merge_pairs=0
-    state_cert={}
-    for s,out in enumerate(ac.output):
-        cands=sorted(out,key=lambda t:-lengths[t])
-        merges=[t for t in cands if t>=256]
-        if not merges:atomic_states+=1
-        w_s=state_word.get(s,b'')
-        cert_set=set()
-        for t in merges:
-            total_merge_pairs+=1
-            off=lengths[suc[t]]
-            ctx=w_s[:-off] if off<=len(w_s) else b''
-            if ctx:
-                la,la1,qt,ra=intervals[t]
-                ok=True
-                for u,wu in enumerate(vocab):
-                    if wu.endswith(ctx) or ctx.endswith(wu):
-                        lu=left[u]
-                        if not ((la<=lu<la1) or (qt<=lu<ra)):ok=False;break
-                if ok:cert_set.add(t);certified_pairs+=1
-        state_cert[s]=cert_set
+    if deployed_cands is not None:
+        for s,entries in enumerate(deployed_cands):
+            merges=[e for e in entries if isinstance(e,(tuple,list)) and len(e)>=7 and e[0]>=256]
+            if not merges:atomic_states+=1
+            for e in merges:
+                total_merge_pairs+=1
+                if e[6]==1:certified_pairs+=1
+    else:
+        for s,out in enumerate(ac.output):
+            merges=[t for t in out if t>=256]
+            if not merges:atomic_states+=1
+            total_merge_pairs+=len(merges)
     total_bytes=0;atomic_hits=0;cert_hits=0;interval_checks=0
     for raw in texts:
+        m_run=IncrementalBPE(vocab,rules,dict(acceptance_mode='intervals',flat_transitions=True,atomic_fastpath=True,certified_regions=True,rejection_certificates=False))
+        cands_table=getattr(m_run,'candidates',None)
+        atom_table=getattr(m_run,'atomic',None)
+        trans_table=getattr(m_run,'trans',None)
+        left_arr=getattr(m_run,'left',None)
         s=0;last=[None]
         for n,b_val in enumerate(raw,1):
-            total_bytes+=1;s=ac.step(s,b_val)
-            cands=sorted(ac.output[s],key=lambda t:-lengths[t])
-            if len(cands)==1 and cands[0]<256:
-                atomic_hits+=1;last.append(cands[0]);continue
-            cset=state_cert.get(s,set())
-            chosen=None
-            for t in cands:
-                if t<256:chosen=t;break
-                off=lengths[suc[t]]
-                if n>off and t in cset:
-                    cert_hits+=1;chosen=t;break
-                interval_checks+=1
-                if n>off:
-                    k=last[n-off];lk=left[k];la,la1,qt,ra=intervals[t]
-                    if (la<=lk<la1) or (qt<=lk<ra):chosen=t;break
-            last.append(chosen)
-    return dict(total_automaton_states=len(ac.output),
+            total_bytes+=1
+            s=trans_table[s*256+b_val] if trans_table is not None else ac.step(s,b_val)
+            if atom_table is not None and atom_table[s]>=0:
+                atomic_hits+=1;last.append(atom_table[s]);continue
+            if cands_table is not None and left_arr is not None and (not cands_table[s] or (isinstance(cands_table[s][0],(tuple,list)) and len(cands_table[s][0])>=6)):
+                chosen=None
+                for entry in cands_table[s]:
+                    t,off,lo,hi,q,end=entry[:6]
+                    verdict=entry[6] if len(entry)>6 else 0
+                    if t<256:chosen=t;break
+                    if n<=off or verdict==-1:continue
+                    if verdict==1:
+                        cert_hits+=1;chosen=t;break
+                    interval_checks+=1
+                    x=left_arr[last[n-off]]
+                    if (lo<=x<hi) or (q<=x<end):chosen=t;break
+                last.append(chosen)
+            else:
+                last.append(m_run.append(b_val))
+    return dict(deployed_compiler_instrumented=bool(deployed_cands is not None),
+                deployed_compiler_certificate_stats=compiler_stats or {},
+                total_automaton_states=len(ac.output),
                 atomic_only_states=atomic_states,
                 atomic_state_fraction=round(atomic_states/max(len(ac.output),1),4),
                 certified_state_candidate_pairs=certified_pairs,
@@ -363,10 +342,10 @@ def evaluate_synthetic_point(r_target,d_target,clean_cfg,rng):
                 memory_reduction_ratio=round(s_set.total_set_elements/max(2*len(sr),1),2))
 
 def deep_forest_and_isolation_study(vocab,rules,texts,config):
-    """Cache-free randomized paired isolation, multi-scale deep-forest sweep, and iso-merge (R=320) controlled depth sweep."""
+    """Complete 2x2 cache-free randomized paired factorial isolation, paired final-config subtractions, multi-scale deep-forest sweep, and iso-merge (R=320) controlled depth sweep."""
     rng=random.Random(77)
-    clean_cfg=dict(config,cache_capacity=0,acceptance_cache='none')
-    variants=['selected','intervals_no_cert','pointer_predicate_only','weighted_centroid_2609_40016','centroid_search_2605_30813','explicit_set','baseline_pointer']
+    clean_cfg=dict(config,cache_capacity=0,acceptance_cache='none',rejection_certificates=False)
+    variants=['selected','intervals_no_cert','pointer_with_cert','pointer_predicate_only','remove_atomic_fastpath','remove_flat_transitions','weighted_centroid_2609_40016','centroid_search_2605_30813','explicit_set','baseline_pointer']
     samples={k:[] for k in variants}
     size=sum(map(len,texts))
     set_probe=ExplicitHashSetBPE(vocab,rules)
@@ -377,8 +356,14 @@ def deep_forest_and_isolation_study(vocab,rules,texts,config):
                 ms=[IncrementalBPE(vocab,rules,clean_cfg) for _ in texts]
             elif v=='intervals_no_cert':
                 ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,certified_regions=False)) for _ in texts]
+            elif v=='pointer_with_cert':
+                ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,acceptance_mode='pointer',certified_regions=True)) for _ in texts]
             elif v=='pointer_predicate_only':
                 ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,acceptance_mode='pointer',certified_regions=False)) for _ in texts]
+            elif v=='remove_atomic_fastpath':
+                ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,atomic_fastpath=False)) for _ in texts]
+            elif v=='remove_flat_transitions':
+                ms=[IncrementalBPE(vocab,rules,dict(clean_cfg,flat_transitions=False)) for _ in texts]
             elif v=='weighted_centroid_2609_40016':
                 ms=[WeightedCentroidSearchBPE(vocab,rules) for _ in texts]
             elif v=='centroid_search_2605_30813':
@@ -401,6 +386,19 @@ def deep_forest_and_isolation_study(vocab,rules,texts,config):
                           std_ms_per_10kb=round(sd,4),student_t95_halfwidth=round(t_crit*sd/math.sqrt(len(s)),4),
                           paired_delta_vs_selected_mean_ms=round(statistics.mean(paired_vs_sel),4),
                           paired_delta_vs_selected_t95_ci_ms=round(t_crit*p_sd/math.sqrt(len(s)),4))
+    # Explicit 2x2 factorial interaction contrast: (Ptr_NoCert - Int_NoCert) vs (Ptr_Cert - Int_Cert)
+    int_effect_nocert=[p-i for p,i in zip(samples['pointer_predicate_only'],samples['intervals_no_cert'])]
+    int_effect_cert=[p-i for p,i in zip(samples['pointer_with_cert'],samples['selected'])]
+    interaction_samples=[a-b for a,b in zip(int_effect_nocert,int_effect_cert)]
+    inter_sd=statistics.stdev(interaction_samples) if len(interaction_samples)>1 else 0.0
+    isolation['factorial_2x2_summary']=dict(
+        interval_saving_without_cert_mean_ms=round(statistics.mean(int_effect_nocert),4),
+        interval_saving_without_cert_t95_ci_ms=round(t_crit*statistics.stdev(int_effect_nocert)/math.sqrt(7),4),
+        interval_saving_with_cert_mean_ms=round(statistics.mean(int_effect_cert),4),
+        interval_saving_with_cert_t95_ci_ms=round(t_crit*statistics.stdev(int_effect_cert)/math.sqrt(7),4),
+        interaction_contrast_mean_ms=round(statistics.mean(interaction_samples),4),
+        interaction_contrast_t95_ci_ms=round(t_crit*inter_sd/math.sqrt(7),4)
+    )
     isolation['explicit_set_total_elements']=set_probe.total_set_elements
     isolation['two_interval_total_endpoints']=2*len(rules)
     scaling=[evaluate_synthetic_point(r_t,d_t,clean_cfg,rng) for r_t,d_t in [(72,4),(160,12),(320,24),(512,36)]]
@@ -482,7 +480,7 @@ def run(mode,split,extra,config):
              traced_memory_bytes=dict(current_bytes=curr_mem,peak_bytes=peak_mem),
              environment_metadata=dict(python=sys.version.split()[0],platform=platform.platform(),machine=platform.machine(),cpu='ARM Cortex-X925 (3.90 GHz, pinned single core)'),
              structure_stats=inspect_memory(m_probe,vocab,rules),
-             certificate_and_fastpath_coverage=measure_certificate_coverage(vocab,rules,texts),
+             certificate_and_fastpath_coverage=measure_certificate_coverage(m_probe,vocab,rules,texts),
              bytes=size,prefixes_checked=size,exact=True,timing_repeats=7,randomized_interleaved_passes=True,
              mode=mode,split=split,extra=extra)
     if mode=='full':
